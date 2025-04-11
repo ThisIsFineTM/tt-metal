@@ -2,11 +2,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "ttnn/distributed/distributed_pybind.hpp"
-#include <pybind11/cast.h>
 #include <cstddef>
 #include <memory>
-#include <pybind11/pytypes.h>
+
 #include "tt-metalium/mesh_coord.hpp"
 #include "distributed_tensor.hpp"
 #include "ttnn/distributed/api.hpp"
@@ -15,49 +13,65 @@
 
 // This is required for automatic conversions, as in the creation of mesh devices
 // https://github.com/tenstorrent/tt-metal/issues/18082
-#include "pybind11/stl.h"
 #include "ttnn/tensor/types.hpp"
+
+#include "ttnn/distributed/distributed_nanobind.hpp"
+
+#include <nanobind/nanobind.h>
+#include <nanobind/make_iterator.h>
+#include <nanobind/stl/unique_ptr.h>
+
+// We strongly recommend that you replace all use of std::unique_ptr<T> by
+// std::unique_ptr<T, nb::deleter<T>> in your code. Without the latter type
+// declaration, which references a custom nanobind-provided deleter nb::deleter<T>,
+// nanobind cannot transfer ownership of objects constructed using nb::init<...>
+// to C++ and will refuse to do so with an error message. Further detail on this
+// special case can be found in the advanced section on object ownership.
+
+//#include <nanobind/pytypes.h>
+//#include <nanobind/cast.h>
+//#include <nanobind/stl.h>
 
 using namespace tt::tt_metal;
 
 namespace ttnn::distributed {
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
-void py_module_types(py::module& module) {
-    py::class_<MeshToTensor, std::unique_ptr<MeshToTensor>>(module, "CppMeshToTensor");
-    py::class_<TensorToMesh, std::unique_ptr<TensorToMesh>>(module, "CppTensorToMesh");
+void py_module_types(nb::module& module) {
+    nb::class_<MeshToTensor>(module, "CppMeshToTensor");
+    nb::class_<TensorToMesh>(module, "CppTensorToMesh");
 
-    py::class_<Shard2dConfig>(module, "Shard2dConfig");
-    py::class_<Concat2dConfig>(module, "Concat2dConfig");
+    nb::class_<Shard2dConfig>(module, "Shard2dConfig");
+    nb::class_<Concat2dConfig>(module, "Concat2dConfig");
 
-    py::class_<MeshDevice, std::shared_ptr<MeshDevice>>(module, "MeshDevice");
-    py::class_<MeshSubDeviceManagerId>(module, "MeshSubDeviceManagerId");
-    py::class_<MeshShape>(module, "MeshShape", "Shape of a mesh device.");
-    py::class_<MeshCoordinate>(module, "MeshCoordinate", "Coordinate within a mesh device.");
-    py::class_<MeshCoordinateRange>(module, "MeshCoordinateRange", "Range of coordinates within a mesh device.");
-    py::class_<MeshCoordinateRangeSet>(
+    nb::class_<MeshDevice, std::shared_ptr<MeshDevice>>(module, "MeshDevice");
+    nb::class_<MeshSubDeviceManagerId>(module, "MeshSubDeviceManagerId");
+    nb::class_<MeshShape>(module, "MeshShape", "Shape of a mesh device.");
+    nb::class_<MeshCoordinate>(module, "MeshCoordinate", "Coordinate within a mesh device.");
+    nb::class_<MeshCoordinateRange>(module, "MeshCoordinateRange", "Range of coordinates within a mesh device.");
+    nb::class_<MeshCoordinateRangeSet>(
         module, "MeshCoordinateRangeSet", "Set of coordinate ranges within a mesh device.");
 }
 
-void py_module(py::module& module) {
+void py_module(nb::module& module) {
     // TODO: #17477 - Remove overloads that accept 'row' and 'col'. Instead, use generic ND terms.
-    static_cast<py::class_<MeshShape>>(module.attr("MeshShape"))
+    static_cast<nb::class_<MeshShape>>(module.attr("MeshShape"))
         .def(
-            py::init([](size_t num_rows, size_t num_cols) { return MeshShape(num_rows, num_cols); }),
+            nb::init([](size_t num_rows, size_t num_cols) { return MeshShape(num_rows, num_cols); }),
             "Constructor with the specified number of rows and columns.",
-            py::arg("num_rows"),
-            py::arg("num_cols"))
+            nb::arg("num_rows"),
+            nb::arg("num_cols"))
         .def(
-            py::init([](size_t x, size_t y, size_t z) { return MeshShape(x, y, z); }),
+            nb::init([](size_t x, size_t y, size_t z) { return MeshShape(x, y, z); }),
             "Constructor with the specified 3D shape.",
-            py::arg("x"),
-            py::arg("y"),
-            py::arg("z"))
+            nb::arg("x"),
+            nb::arg("y"),
+            nb::arg("z"))
         .def(
-            py::init([](const std::vector<uint32_t>& shape) { return MeshShape(shape); }),
+            nb::init([](const std::vector<uint32_t>& shape) { return MeshShape(shape); }),
             "Constructor with the specified ND shape.",
-            py::arg("shape"))
+            nb::arg("shape"))
         .def(
             "__repr__",
             [](const MeshShape& ms) {
@@ -67,24 +81,24 @@ void py_module(py::module& module) {
             })
         .def(
             "__iter__",
-            [](const MeshShape& ms) { return py::make_iterator(ms.view().begin(), ms.view().end()); },
-            py::keep_alive<0, 1>());
-    static_cast<py::class_<MeshCoordinate>>(module.attr("MeshCoordinate"))
+            [](const MeshShape& ms) { return nb::make_iterator(ms.view().begin(), ms.view().end()); },
+            nb::keep_alive<0, 1>());
+    static_cast<nb::class_<MeshCoordinate>>(module.attr("MeshCoordinate"))
         .def(
-            py::init([](size_t row, size_t col) { return MeshCoordinate(row, col); }),
+            nb::init([](size_t row, size_t col) { return MeshCoordinate(row, col); }),
             "Constructor with specified row and column offsets.",
-            py::arg("row"),
-            py::arg("col"))
+            nb::arg("row"),
+            nb::arg("col"))
         .def(
-            py::init([](size_t x, size_t y, size_t z) { return MeshCoordinate(x, y, z); }),
+            nb::init([](size_t x, size_t y, size_t z) { return MeshCoordinate(x, y, z); }),
             "Constructor with the specified 3D coordinate.",
-            py::arg("x"),
-            py::arg("y"),
-            py::arg("z"))
+            nb::arg("x"),
+            nb::arg("y"),
+            nb::arg("z"))
         .def(
-            py::init([](const std::vector<uint32_t>& coords) { return MeshCoordinate(coords); }),
+            nb::init([](const std::vector<uint32_t>& coords) { return MeshCoordinate(coords); }),
             "Constructor with the specified ND coordinate.",
-            py::arg("coords"))
+            nb::arg("coords"))
         .def(
             "__repr__",
             [](const MeshCoordinate& mc) {
@@ -94,20 +108,20 @@ void py_module(py::module& module) {
             })
         .def(
             "__iter__",
-            [](const MeshCoordinate& mc) { return py::make_iterator(mc.coords().begin(), mc.coords().end()); },
-            py::keep_alive<0, 1>());
+            [](const MeshCoordinate& mc) { return nb::make_iterator(mc.coords().begin(), mc.coords().end()); },
+            nb::keep_alive<0, 1>());
 
-    static_cast<py::class_<MeshCoordinateRange>>(module.attr("MeshCoordinateRange"))
+    static_cast<nb::class_<MeshCoordinateRange>>(module.attr("MeshCoordinateRange"))
         .def(
-            py::init(
+            nb::init(
                 [](const MeshCoordinate& start, const MeshCoordinate& end) { return MeshCoordinateRange(start, end); }),
             "Constructor with specified start and end coordinates.",
-            py::arg("start"),
-            py::arg("end"))
+            nb::arg("start"),
+            nb::arg("end"))
         .def(
-            py::init([](const MeshShape& shape) { return MeshCoordinateRange(shape); }),
+            nb::init([](const MeshShape& shape) { return MeshCoordinateRange(shape); }),
             "Constructor that spans the entire mesh.",
-            py::arg("shape"))
+            nb::arg("shape"))
         .def(
             "__repr__",
             [](const MeshCoordinateRange& mcr) {
@@ -117,28 +131,28 @@ void py_module(py::module& module) {
             })
         .def(
             "__iter__",
-            [](const MeshCoordinateRange& mcr) { return py::make_iterator(mcr.begin(), mcr.end()); },
-            py::keep_alive<0, 1>());
+            [](const MeshCoordinateRange& mcr) { return nb::make_iterator(mcr.begin(), mcr.end()); },
+            nb::keep_alive<0, 1>());
 
-    static_cast<py::class_<MeshCoordinateRangeSet>>(module.attr("MeshCoordinateRangeSet"))
+    static_cast<nb::class_<MeshCoordinateRangeSet>>(module.attr("MeshCoordinateRangeSet"))
         .def(
-            py::init([]() { return MeshCoordinateRangeSet(); }),
+            nb::init([]() { return MeshCoordinateRangeSet(); }),
             "Default constructor for an empty MeshCoordinateRangeSet.")
         .def(
-            py::init([](const MeshCoordinateRange& range) { return MeshCoordinateRangeSet(range); }),
+            nb::init([](const MeshCoordinateRange& range) { return MeshCoordinateRangeSet(range); }),
             "Constructor with specified range.",
-            py::arg("range"))
-        .def("merge", &MeshCoordinateRangeSet::merge, py::arg("range"))
+            nb::arg("range"))
+        .def("merge", &MeshCoordinateRangeSet::merge, nb::arg("range"))
         .def("__repr__", [](const MeshCoordinateRangeSet& mcrs) {
             std::ostringstream str;
             str << mcrs;
             return str.str();
         });
 
-    auto py_mesh_device = static_cast<py::class_<MeshDevice, std::shared_ptr<MeshDevice>>>(module.attr("MeshDevice"));
+    auto py_mesh_device = static_cast<nb::class_<MeshDevice, std::shared_ptr<MeshDevice>>>(module.attr("MeshDevice"));
     py_mesh_device
         .def(
-            py::init([](const MeshShape& mesh_shape,
+            nb::init([](const MeshShape& mesh_shape,
                         size_t l1_small_size,
                         size_t trace_region_size,
                         size_t num_command_queues,
@@ -155,30 +169,30 @@ void py_module(py::module& module) {
                     {},
                     worker_l1_size);
             }),
-            py::kw_only(),
-            py::arg("mesh_shape"),
-            py::arg("l1_small_size"),
-            py::arg("trace_region_size"),
-            py::arg("num_command_queues"),
-            py::arg("dispatch_core_config"),
-            py::arg("offset"),
-            py::arg("physical_device_ids"),
-            py::arg("worker_l1_size") = DEFAULT_WORKER_L1_SIZE)
+            nb::kw_only(),
+            nb::arg("mesh_shape"),
+            nb::arg("l1_small_size"),
+            nb::arg("trace_region_size"),
+            nb::arg("num_command_queues"),
+            nb::arg("dispatch_core_config"),
+            nb::arg("offset"),
+            nb::arg("physical_device_ids"),
+            nb::arg("worker_l1_size") = DEFAULT_WORKER_L1_SIZE)
         .def("get_num_devices", &MeshDevice::num_devices)
         .def("id", &MeshDevice::id)
         .def("get_device_ids", &MeshDevice::get_device_ids)
         .def(
             "get_device",
-            py::overload_cast<chip_id_t>(&MeshDevice::get_device, py::const_),
-            py::return_value_policy::reference)
+            nb::overload_cast<chip_id_t>(&MeshDevice::get_device, nb::const_),
+            nb::return_value_policy::reference)
         .def(
             "get_device",
-            py::overload_cast<size_t, size_t>(&MeshDevice::get_device, py::const_),
-            py::return_value_policy::reference)
+            nb::overload_cast<size_t, size_t>(&MeshDevice::get_device, nb::const_),
+            nb::return_value_policy::reference)
         .def(
             "get_devices",
             &MeshDevice::get_devices,
-            py::return_value_policy::reference,
+            nb::return_value_policy::reference,
             R"doc(
            Get the devices in the device mesh.
 
@@ -189,14 +203,14 @@ void py_module(py::module& module) {
         .def(
             "create_submesh",
             &MeshDevice::create_submesh,
-            py::arg("submesh_shape"),
-            py::arg("offset") = std::nullopt,
-            py::keep_alive<1, 0>())  // Keep MeshDevice alive as long as SubmeshDevice is alive
+            nb::arg("submesh_shape"),
+            nb::arg("offset") = std::nullopt,
+            nb::keep_alive<1, 0>())  // Keep MeshDevice alive as long as SubmeshDevice is alive
         .def(
             "create_submeshes",
             &MeshDevice::create_submeshes,
-            py::arg("submesh_shape"),
-            py::keep_alive<1, 0>())  // Keep MeshDevice alive as long as SubmeshDevices are alive
+            nb::arg("submesh_shape"),
+            nb::keep_alive<1, 0>())  // Keep MeshDevice alive as long as SubmeshDevices are alive
         .def(
             "compute_with_storage_grid_size",
             &MeshDevice::compute_with_storage_grid_size,
@@ -230,7 +244,7 @@ void py_module(py::module& module) {
         .def(
             "enable_async",
             &MeshDevice::enable_async,
-            py::arg("enable"),
+            nb::arg("enable"),
             R"doc(
                Enable or disable async mode across all devices in the mesh.
 
@@ -263,7 +277,7 @@ void py_module(py::module& module) {
         .def(
             "reshape",
             &MeshDevice::reshape,
-            py::arg("new_shape"),
+            nb::arg("new_shape"),
             R"doc(
                Reshapes the logical mesh and re-maps the physical devices to the new logical coordinates.
 
@@ -295,8 +309,8 @@ void py_module(py::module& module) {
             [](MeshDevice& self, const std::vector<SubDevice>& sub_devices, DeviceAddr local_l1_size) {
                 return self.mesh_create_sub_device_manager(sub_devices, local_l1_size);
             },
-            py::arg("sub_devices"),
-            py::arg("local_l1_size"),
+            nb::arg("sub_devices"),
+            nb::arg("local_l1_size"),
             R"doc(
                Creates a sub-device manager for the given mesh device.
 
@@ -315,8 +329,8 @@ void py_module(py::module& module) {
             [](MeshDevice& self, const std::vector<SubDevice>& sub_devices, DeviceAddr local_l1_size) {
                 return self.mesh_create_sub_device_manager_with_fabric(sub_devices, local_l1_size);
             },
-            py::arg("sub_devices"),
-            py::arg("local_l1_size"),
+            nb::arg("sub_devices"),
+            nb::arg("local_l1_size"),
             R"doc(
                Creates a sub-device manager for the given mesh device. This will automatically create a sub-device of ethernet cores for use with fabric.
                Note that this is a temporary API until migration to actual fabric is complete.
@@ -335,7 +349,7 @@ void py_module(py::module& module) {
         .def(
             "load_sub_device_manager",
             &MeshDevice::mesh_load_sub_device_manager,
-            py::arg("mesh_sub_device_manager_id"),
+            nb::arg("mesh_sub_device_manager_id"),
             R"doc(
                Loads the sub-device manager with the given ID.
 
@@ -352,7 +366,7 @@ void py_module(py::module& module) {
         .def(
             "remove_sub_device_manager",
             &MeshDevice::mesh_remove_sub_device_manager,
-            py::arg("mesh_sub_device_manager_id"),
+            nb::arg("mesh_sub_device_manager_id"),
             R"doc(
                Removes the sub-device manager with the given ID.
 
@@ -365,7 +379,7 @@ void py_module(py::module& module) {
             [](MeshDevice& self, const std::vector<SubDeviceId>& sub_device_ids) {
                 self.mesh_set_sub_device_stall_group(sub_device_ids);
             },
-            py::arg("sub_device_ids"),
+            nb::arg("sub_device_ids"),
             R"doc(
                Set the SubDevice IDs that will be stalled on by default for Fast Dispatch commands such as reading, writing, synchronizing.
                Stalling here refers to the Fast Dispatch cores waiting for programs to complete execution on the specified SubDevices before proceeding with the specified instruction.
@@ -384,30 +398,30 @@ void py_module(py::module& module) {
            )doc");
 
     auto py_tensor_to_mesh =
-        static_cast<py::class_<TensorToMesh, std::unique_ptr<TensorToMesh>>>(module.attr("CppTensorToMesh"));
+        static_cast<nb::class_<TensorToMesh, std::unique_ptr<TensorToMesh>>>(module.attr("CppTensorToMesh"));
 
     auto py_mesh_to_tensor =
-        static_cast<py::class_<MeshToTensor, std::unique_ptr<MeshToTensor>>>(module.attr("CppMeshToTensor"));
+        static_cast<nb::class_<MeshToTensor, std::unique_ptr<MeshToTensor>>>(module.attr("CppMeshToTensor"));
 
     module.def(
         "open_mesh_device",
         &open_mesh_device,
-        py::kw_only(),
-        py::arg("mesh_shape"),
-        py::arg("l1_small_size"),
-        py::arg("trace_region_size"),
-        py::arg("num_command_queues"),
-        py::arg("offset"),
-        py::arg("physical_device_ids"),
-        py::arg("dispatch_core_config"),
-        py::arg("worker_l1_size") = DEFAULT_WORKER_L1_SIZE);
-    module.def("close_mesh_device", &close_mesh_device, py::arg("mesh_device"), py::kw_only());
+        nb::kw_only(),
+        nb::arg("mesh_shape"),
+        nb::arg("l1_small_size"),
+        nb::arg("trace_region_size"),
+        nb::arg("num_command_queues"),
+        nb::arg("offset"),
+        nb::arg("physical_device_ids"),
+        nb::arg("dispatch_core_config"),
+        nb::arg("worker_l1_size") = DEFAULT_WORKER_L1_SIZE);
+    module.def("close_mesh_device", &close_mesh_device, nb::arg("mesh_device"), nb::kw_only());
     module.def(
         "get_device_tensor",
-        py::overload_cast<const Tensor&, int>(&ttnn::distributed::get_device_tensor),
-        py::arg("tensor"),
-        py::arg("device_id"),
-        py::kw_only(),
+        nb::overload_cast<const Tensor&, int>(&ttnn::distributed::get_device_tensor),
+        nb::arg("tensor"),
+        nb::arg("device_id"),
+        nb::kw_only(),
         R"doc(
        Get the tensor shard corresponding to the device_id.
 
@@ -419,21 +433,21 @@ void py_module(py::module& module) {
             Tensor: The shard of the tensor corresponding to the device_id.
     )doc");
 
-    auto py_shard2d_config = static_cast<py::class_<Shard2dConfig>>(module.attr("Shard2dConfig"));
-    py_shard2d_config.def(py::init<int, int>(), py::arg("row_dim"), py::arg("col_dim"))
+    auto py_shard2d_config = static_cast<nb::class_<Shard2dConfig>>(module.attr("Shard2dConfig"));
+    py_shard2d_config.def(nb::init<int, int>(), nb::arg("row_dim"), nb::arg("col_dim"))
         .def_readwrite("row_dim", &Shard2dConfig::row_dim)
         .def_readwrite("col_dim", &Shard2dConfig::col_dim);
-    auto py_concat2d_config = static_cast<py::class_<Concat2dConfig>>(module.attr("Concat2dConfig"));
-    py_concat2d_config.def(py::init<int, int>(), py::arg("row_dim"), py::arg("col_dim"))
+    auto py_concat2d_config = static_cast<nb::class_<Concat2dConfig>>(module.attr("Concat2dConfig"));
+    py_concat2d_config.def(nb::init<int, int>(), nb::arg("row_dim"), nb::arg("col_dim"))
         .def_readwrite("row_dim", &Concat2dConfig::row_dim)
         .def_readwrite("col_dim", &Concat2dConfig::col_dim);
 
     module.def(
         "get_device_tensor",
-        py::overload_cast<const Tensor&, const IDevice*>(&ttnn::distributed::get_device_tensor),
-        py::arg("tensor"),
-        py::arg("device"),
-        py::kw_only(),
+        nb::overload_cast<const Tensor&, const IDevice*>(&ttnn::distributed::get_device_tensor),
+        nb::arg("tensor"),
+        nb::arg("device"),
+        nb::kw_only(),
         R"doc(
        Get the tensor shard corresponding to the device.
 
@@ -448,8 +462,8 @@ void py_module(py::module& module) {
     module.def(
         "get_device_tensors",
         &get_device_tensors,
-        py::arg("tensor"),
-        py::kw_only(),
+        nb::arg("tensor"),
+        nb::kw_only(),
         R"doc(
        Get a list of tensor shards from a multidevice tensor.
 
@@ -464,7 +478,7 @@ void py_module(py::module& module) {
         [](MeshDevice& mesh_device) -> std::unique_ptr<TensorToMesh> {
             return replicate_tensor_to_mesh_mapper(mesh_device);
         },
-        py::arg("mesh_device"),
+        nb::arg("mesh_device"),
         R"doc(
        Returns a mapper replicating a tensor over the given mesh.
 
@@ -480,8 +494,8 @@ void py_module(py::module& module) {
         [](MeshDevice& mesh_device, int dim) -> std::unique_ptr<TensorToMesh> {
             return shard_tensor_to_mesh_mapper(mesh_device, dim);
         },
-        py::arg("mesh_device"),
-        py::arg("dim"),
+        nb::arg("mesh_device"),
+        nb::arg("dim"),
         R"doc(
        Returns a mapper sharding a tensor over the given dimension for the given mesh.
 
@@ -499,9 +513,9 @@ void py_module(py::module& module) {
            const Shard2dConfig& config) -> std::unique_ptr<TensorToMesh> {
             return shard_tensor_to_2d_mesh_mapper(mesh_device, mesh_shape, config);
         },
-        py::arg("mesh_device"),
-        py::arg("mesh_shape"),
-        py::arg("config"),
+        nb::arg("mesh_device"),
+        nb::arg("mesh_shape"),
+        nb::arg("config"),
         R"doc(
        Returns a mapper sharding a tensor over the given dimension for the given mesh.
 
@@ -516,14 +530,14 @@ void py_module(py::module& module) {
     module.def(
         "concat_mesh_to_tensor_composer",
         [](int dim) -> std::unique_ptr<MeshToTensor> { return concat_mesh_to_tensor_composer(dim); },
-        py::arg("dim"));
+        nb::arg("dim"));
     module.def(
         "concat_2d_mesh_to_tensor_composer",
         [](MeshDevice& mesh_device, const Concat2dConfig& config) -> std::unique_ptr<MeshToTensor> {
             return concat_2d_mesh_to_tensor_composer(mesh_device, config);
         },
-        py::arg("mesh_device"),
-        py::arg("config"),
+        nb::arg("mesh_device"),
+        nb::arg("config"),
         R"doc(
             Returns a Concat2dMeshToTensor composer with the given mesh device and dimensions.
 
@@ -541,9 +555,9 @@ void py_module(py::module& module) {
            std::optional<std::reference_wrapper<MeshDevice>> mesh_device = std::nullopt) -> Tensor {
             return distribute_tensor(tensor, mapper, mesh_device);
         },
-        py::arg("tensor"),
-        py::arg("mapper"),
-        py::arg("mesh_device") = py::none(),
+        nb::arg("tensor"),
+        nb::arg("mapper"),
+        nb::arg("mesh_device") = nb::none(),
         R"doc(
             Distributes a tensor across a mesh device according to provided mapper.
 
@@ -558,8 +572,8 @@ void py_module(py::module& module) {
     module.def(
         "aggregate_tensor",
         [](const Tensor& tensor, const MeshToTensor& composer) -> Tensor { return aggregate_tensor(tensor, composer); },
-        py::arg("tensor"),
-        py::arg("composer"),
+        nb::arg("tensor"),
+        nb::arg("composer"),
         R"doc(
             Aggregates a set of shard tensors into a single host tensor using the provided composer.
 
@@ -577,8 +591,8 @@ void py_module(py::module& module) {
 
             return aggregate_tensor(aggregated_tensor, composer);
         },
-        py::arg("tensor"),
-        py::arg("composer"),
+        nb::arg("tensor"),
+        nb::arg("composer"),
         R"doc(
             Aggregates a set of shard tensors into a single host tensor using the provided composer.
 
@@ -592,8 +606,8 @@ void py_module(py::module& module) {
     module.def(
         "aggregate_as_tensor",
         [](const std::vector<Tensor>& tensors) -> Tensor { return aggregate_as_tensor(tensors, AllGatherTensor{}); },
-        py::arg("tensors"),
-        py::kw_only(),
+        nb::arg("tensors"),
+        nb::kw_only(),
         R"doc(
             Aggregates a set of shards into one tensor. Device shards will remain on device and be packed into a multidevice storage object.
 
