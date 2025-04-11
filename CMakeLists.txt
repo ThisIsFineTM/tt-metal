@@ -30,6 +30,14 @@ project(
 message(STATUS "Metalium version: ${PROJECT_VERSION}")
 message(STATUS "Building Unified Library for all architectures, thanks to blozano-tt")
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
+
+find_program(MOLD ld.mold)
+if(MOLD)
+    set(CMAKE_LINKER_TYPE MOLD)
+endif()
+
+
 # Defining build types is the pervue of the top-level project
 if(PROJECT_IS_TOP_LEVEL)
     include(sanitizers)
@@ -49,7 +57,10 @@ else()
 endif()
 
 include(project_options)
+
+set(TT_UNITY_BUILDS FALSE)
 include(unity)
+
 include(clang-tidy)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -84,10 +95,10 @@ include(compilers)
 CHECK_COMPILERS()
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_FLAGS_RELEASE "-Os")
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g -DDEBUG")
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g -DDEBUG")
-set(CMAKE_CXX_FLAGS_CI "-O3 -DDEBUG")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-Os -g -DDEBUG")
+set(CMAKE_CXX_FLAGS_CI "-Os -DDEBUG")
 
 # We're not currently using C++20 modules, so don't bother scanning for them
 set(CMAKE_CXX_SCAN_FOR_MODULES FALSE)
@@ -99,6 +110,11 @@ set(CMAKE_FIND_PACKAGE_TARGETS_GLOBAL TRUE)
 # Project Options
 #   The following options and their defaults impact what artifacts get built
 ############################################################################################################################
+set(WITH_PYTHON_BINDINGS TRUE)
+
+set(USE_PYBIND FALSE)
+set(USE_NANOBIND TRUE)
+
 message(STATUS "ENABLE_LIBCXX: ${ENABLE_LIBCXX}")
 message(STATUS "Build shared libs: ${BUILD_SHARED_LIBS}")
 message(STATUS "Build with ASAN: ${ENABLE_ASAN}")
@@ -106,6 +122,8 @@ message(STATUS "Build with MSAN: ${ENABLE_MSAN}")
 message(STATUS "Build with TSAN: ${ENABLE_TSAN}")
 message(STATUS "Build with UBSAN: ${ENABLE_UBSAN}")
 message(STATUS "Build Python bindings: ${WITH_PYTHON_BINDINGS}")
+message(STATUS "Build Python bindings with pybind11: ${USE_PYBIND}")
+message(STATUS "Build Python bindings with nanobind: ${USE_NANOBIND}")
 message(STATUS "Build Programming Examples: ${BUILD_PROGRAMMING_EXAMPLES}")
 message(STATUS "Build TT METAL Tests: ${TT_METAL_BUILD_TESTS}")
 message(STATUS "Build TTNN Tests: ${TTNN_BUILD_TESTS}")
@@ -196,9 +214,21 @@ add_compile_options(
     -Wreturn-type
     -Wswitch
     -Wuninitialized
+    #-Wshadow-local
+    -Wextra
+    #-Wpedantic
+    -Wformat=2
     -fPIC
     -fvisibility-inlines-hidden
-    -fno-lto # FIXME: This seems to be here for ttnn; it should go to TTNN, then.
+    -Wno-missing-field-initializers
+    -Wno-sign-compare
+    -Wno-ignored-qualifiers
+    -Wno-type-limits
+
+    #-fno-lto # FIXME: This seems to be here for ttnn; it should go to TTNN, then.
+    -flto=auto #-flto-partition=1to1
+    -pipe
+    -Wodr
     "$<$<STREQUAL:${CMAKE_SYSTEM_PROCESSOR},x86_64>:-mavx2>"
     "$<$<CXX_COMPILER_ID:Clang>:-Wno-c++11-narrowing>"
     "$<$<CXX_COMPILER_ID:Clang>:-Wno-error=local-type-template-args>"
@@ -285,15 +315,28 @@ if(WITH_PYTHON_BINDINGS)
             DESTINATION ${CMAKE_INSTALL_LIBDIR}
             COMPONENT tar
     )
-
-    install(
-        TARGETS
-            ttnn
-            DESTINATION
-            ${PROJECT_SOURCE_DIR}/ttnn/ttnn
-            COMPONENT
-            tt_pybinds
-    )
+    
+    if(USE_PYBIND)
+        install(
+            TARGETS
+                ttnn
+                DESTINATION
+                ${PROJECT_SOURCE_DIR}/ttnn/ttnn
+                COMPONENT
+                tt_pybinds
+        )
+    endif(USE_PYBIND)
+    
+    if(USE_NANOBIND)
+        install(
+            TARGETS
+                ttnn
+                DESTINATION
+                ${PROJECT_SOURCE_DIR}/ttnn/ttnn
+                COMPONENT
+                tt_nanobinds
+        )
+    endif(USE_NANOBIND)
 else()
     #when we don't build python bindings, we generate a dynamic library ttnncpp
     install(

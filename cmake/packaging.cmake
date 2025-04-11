@@ -35,18 +35,34 @@ set(CPACK_DEBIAN_ENABLE_COMPONENT_DEPENDS TRUE)
 set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS FALSE)
 
 get_cmake_property(CPACK_COMPONENTS_ALL COMPONENTS)
-list(
-    REMOVE_ITEM
-    CPACK_COMPONENTS_ALL
-    umd-dev # FIXME: -dev packages will come later
-    tt_pybinds # Wow this one is big!
-    tar # TODO: Remove that tarball entirely
-    # Deps that define install targets that we can't (or haven't) disabled
-    msgpack-cxx
-    Headers
-    Library
-    Unspecified # TODO: audit if there's anything we need to ship here
-)
+if(USE_PYBIND)
+    list(
+        REMOVE_ITEM
+        CPACK_COMPONENTS_ALL
+        umd-dev # FIXME: -dev packages will come later
+        tt_pybinds # Wow this one is big!
+        tar # TODO: Remove that tarball entirely
+        # Deps that define install targets that we can't (or haven't) disabled
+        msgpack-cxx
+        Headers
+        Library
+        Unspecified # TODO: audit if there's anything we need to ship here
+    )
+endif(USE_PYBIND)
+if(USE_NANOBIND)
+    list(
+        REMOVE_ITEM
+        CPACK_COMPONENTS_ALL
+        umd-dev # FIXME: -dev packages will come later
+        tt_pybinds # Wow this one is big!
+        tar # TODO: Remove that tarball entirely
+        # Deps that define install targets that we can't (or haven't) disabled
+        msgpack-cxx
+        Headers
+        Library
+        Unspecified # TODO: audit if there's anything we need to ship here
+    )
+endif(USE_NANOBIND)
 
 # Logically we should ship jit-build with metalium-runtime, but jit-build fails to split dbgsyms for now (lacking a Build ID on the binaries)
 cpack_add_component(jit-build GROUP metalium-jit)
