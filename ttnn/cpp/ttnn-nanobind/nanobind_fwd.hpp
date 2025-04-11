@@ -2,7 +2,10 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-namespace pybind11 {
+#pragma once
+
+
+namespace nanobind {
 class module_;
 using module = module_;
-}  // namespace pybind11
+}  // namespace nanobind

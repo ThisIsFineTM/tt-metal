@@ -794,6 +794,7 @@ list(
 GENERATE_FBS_HEADER(${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn/tensor/flatbuffer/tensor_types.fbs)
 list(APPEND TTNN_SRC ${FBS_GENERATED_HEADER_FILE})
 
+# TODO: are all these up to date?
 set(TTNN_SUBLIBRARIES
     ttnn/operations/ccl/
     ttnn/operations/conv
@@ -1179,44 +1180,6 @@ if(USE_PYBIND)
     )
 endif(USE_PYBIND)
 
-<<<<<<< HEAD
-#TODO : should be using pybind11_add_module, but right now it introduces many build problems
-#pybinds will always be built as a shared library
-list(
-    APPEND
-    TTNN_SRC_PYBIND
-    ${CMAKE_CURRENT_SOURCE_DIR}/cpp/pybind11/__init__.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cpp/pybind11/types.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cpp/pybind11/events.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cpp/pybind11/global_circular_buffer.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cpp/pybind11/global_semaphore.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cpp/pybind11/cluster.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cpp/pybind11/device.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cpp/pybind11/fabric.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cpp/pybind11/profiler.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cpp/pybind11/tensor.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cpp/pybind11/pytensor.cpp
-)
-||||||| parent of c04034f7f2 (Nanobind skeleton.)
-#TODO : should be using pybind11_add_module, but right now it introduces many build problems
-#pybinds will always be built as a shared library
-list(
-    APPEND
-    TTNN_SRC_PYBIND
-    ${CMAKE_CURRENT_SOURCE_DIR}/cpp/pybind11/__init__.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cpp/pybind11/types.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cpp/pybind11/events.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cpp/pybind11/global_circular_buffer.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cpp/pybind11/global_semaphore.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cpp/pybind11/cluster.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cpp/pybind11/device.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cpp/pybind11/fabric.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cpp/pybind11/profiler.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cpp/pybind11/tensor.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/cpp/pybind11/pytensor.cpp
-    ${TT_LIB_SRCS}
-) # TT_LIB_SRCS from tt_eager/tt_lib/CMakeLists.txt for python bindings
-=======
 if(USE_NANOBIND)
     set(CCL_EXPERIMENTAL_TTNN_SRCS_NANOBIND
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn/operations/experimental/ccl/all_gather_async/all_gather_async_nanobind.cpp
@@ -1231,7 +1194,6 @@ if(USE_NANOBIND)
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn/operations/experimental/ccl/llama_reduce_scatter/llama_reduce_scatter_nanobind.cpp
     )
 endif(USE_NANOBIND)
->>>>>>> c04034f7f2 (Nanobind skeleton.)
 
 if(USE_PYBIND)
     set(CCL_EXPERIMENTAL_TTNN_SRCS_PYBIND
@@ -1305,22 +1267,23 @@ endif(USE_PYBIND)
 
 if(USE_NANOBIND)
     # TODO: use nanobind_add_module
+    #https://github.com/wjakob/nanobind/blob/61e044dc7339c659b5c8d36ce176456c9b64862a/cmake/nanobind-config.cmake#L331
 
     list(
         APPEND
         TTNN_SRC_NANOBIND
-        ${CMAKE_CURRENT_SOURCE_DIR}/cpp/nanobind/__init__.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/cpp/nanobind/types.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/cpp/nanobind/events.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/cpp/nanobind/global_circular_buffer.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/cpp/nanobind/global_semaphore.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/cpp/nanobind/cluster.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/cpp/nanobind/device.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/cpp/nanobind/fabric.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/cpp/nanobind/profiler.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/cpp/nanobind/tensor.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/cpp/nanobind/pytensor.cpp
-        #${TT_LIB_SRCS} #removed in rebase
+        ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn-nanobind/__init__.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn-nanobind/types.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn-nanobind/events.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn-nanobind/global_circular_buffer.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn-nanobind/global_semaphore.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn-nanobind/cluster.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn-nanobind/device.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn-nanobind/fabric.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn-nanobind/profiler.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn-nanobind/tensor.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn-nanobind/pytensor.cpp
+        ${TT_LIB_SRCS}
     ) # TT_LIB_SRCS from tt_eager/tt_lib/CMakeLists.txt for python bindings
 endif(USE_NANOBIND)
 
@@ -1331,6 +1294,12 @@ endif(USE_PYBIND)
 if(USE_NANOBIND)
     set(TTNN_PUBLIC_INCLUDE_DIRS_NANOBIND ${Python3_INCLUDE_DIRS})
 endif(USE_NANOBIND)
+
+# removed in rebase
+##################################################
+# Add all subdirectories
+##################################################
+#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn/deprecated)
 
 ##################################################
 # Handle sublibraries
@@ -1394,10 +1363,46 @@ endif(USE_PYBIND)
 
 
 if(USE_NANOBIND)
+
+    # https://nanobind.readthedocs.io/en/latest/api_cmake.html#low-level-interface
+    # -static Perform a static library build (without this suffix, a shared build is used)
+    # -abi3   Perform a stable ABI build targeting Python v3.12+.
+    # -ft     Perform a build that opts into the Python 3.13+ free-threaded behavior.
+
+    set(NANOBIND_LIBNAME "nanobind-static-abi3")
+    nanobind_build_library(${NANOBIND_LIBNAME})
+
+    target_include_directories(${NANOBIND_LIBNAME}
+        PUBLIC
+            ${PYTHON_INCLUDE_DIRS}
+    )
+
+    add_library(nanobind ALIAS ${NANOBIND_LIBNAME})
+
+    #include(CMakePrintHelpers)
+    #cmake_print_properties(
+    #  TARGETS nanobind
+    #  PROPERTIES
+    #    INTERFACE_INCLUDE_DIRECTORIES
+    #    INCLUDE_DIRECTORIES
+    #    INTERFACE_COMPILE_DEFINITIONS
+    #    INTERFACE_COMPILE_FEATURES
+    #    INTERFACE_COMPILE_OPTIONS
+    #    INTERFACE_HEADER_SETS
+    #    INTERFACE_LINK_LIBRARIES
+    #    #SOURCES
+    #    SOURCE_DIR
+    #    INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
+    #    NAME
+    #    OUTPUT_NAME
+    #    ALIAS_GLOBAL
+    #    ALIASED_TAEGET
+    #)
+
     set(TARGET_LINK_LIBRARIES_NANOBIND
         ttnncpp
         ${Python3_LIBRARIES}
-        nanobind::module
+        nanobind
     )
 endif(USE_NANOBIND)
 
@@ -1411,7 +1416,7 @@ if(USE_PYBIND)
 endif(USE_PYBIND)
 
 if(USE_NANOBIND)
-list(APPEND TTNN_PUBLIC_INCLUDE_DIRS_NANOBIND ${TTNN_PUBLIC_INCLUDE_DIRS})
+    list(APPEND TTNN_PUBLIC_INCLUDE_DIRS_NANOBIND ${TTNN_PUBLIC_INCLUDE_DIRS})
 endif(USE_NANOBIND)
 
 ##################################################
@@ -1452,7 +1457,7 @@ if(WITH_PYTHON_BINDINGS)
     if(USE_PYBIND)
         build_library(
             "ttnn"                           #LIBRARY_NAME
-            "TTNN"	                         #ALIAS
+            "TTNN"                             #ALIAS
             SHARED
             SOURCES
                 "${SOURCES_PYBIND}"
@@ -1468,7 +1473,7 @@ if(WITH_PYTHON_BINDINGS)
     if(USE_NANOBIND)
         build_library(
             "ttnn"                           #LIBRARY_NAME
-            "TTNN"	                         #ALIAS
+            "TTNN"                             #ALIAS
             SHARED
             SOURCES
                 "${SOURCES_NANOBIND}"
@@ -1479,5 +1484,44 @@ if(WITH_PYTHON_BINDINGS)
             TARGET_LINK_LIBRARIES
                 "${TARGET_LINK_LIBRARIES_NANOBIND}"
         )
+        # .. enable size optimizations
+        nanobind_opt_size(ttnn)
+
+        # .. enable link time optimization
+        nanobind_lto(ttnn)
+
+        # .. set the default symbol visibility to 'hidden'
+        nanobind_set_visibility(ttnn)
+
+        # .. strip unneeded symbols and debug info from the binary (only active in release builds)
+        nanobind_strip(ttnn)
+
+        # .. disable the stack protector
+        #nanobind_disable_stack_protector(ttnn)
+
+        # .. set the Python extension suffix
+        nanobind_extension(ttnn)
+
+        # .. set important compilation flags
+        nanobind_compile_options(ttnn)
+
+        # .. set important linker flags
+        nanobind_link_options(ttnn)
+
+        # Statically link against libstdc++/libgcc when targeting musllinux
+        #nanobind_musl_static_libcpp(ttnn)
+
+        #cmake_print_properties(
+        #    TARGETS ttnn
+        #    PROPERTIES
+        #        INCLUDE_DIRECTORIES
+        #        ALIAS_GLOBAL
+        #        HEADER_DIRS
+        #        IMPORTED_GLOBAL
+        #        IMPORTED_LINK_DEPENDENT_LIBRARIES
+        #        INTERFACE_INCLUDE_DIRECTORIES
+        #        LINK_DIRECTORIES
+        #        LINK_LIBRARIES
+        #    )
     endif(USE_NANOBIND)
 endif()

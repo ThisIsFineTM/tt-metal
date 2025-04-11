@@ -141,7 +141,12 @@ CPMAddPackage(
 # pybind11 : https://github.com/pybind/pybind11
 ############################################################################################################################
 
-CPMAddPackage(NAME pybind11 GITHUB_REPOSITORY pybind/pybind11 GIT_TAG v2.13.6 OPTIONS "CMAKE_MESSAGE_LOG_LEVEL NOTICE")
+CPMAddPackage(
+    NAME pybind11
+    GITHUB_REPOSITORY pybind/pybind11
+    GIT_TAG v2.13.6 
+    OPTIONS
+        "CMAKE_MESSAGE_LOG_LEVEL NOTICE")
 
 ############################################################################################################################
 # nanobind : https://github.com/wjakob/nanobind
@@ -152,8 +157,17 @@ CPMAddPackage(
     GITHUB_REPOSITORY wjakob/nanobind
     GIT_TAG v2.6.1
     OPTIONS 
-    "CMAKE_MESSAGE_LOG_LEVEL NOTICE"
+        "CMAKE_MESSAGE_LOG_LEVEL NOTICE"
+        "NB_USE_SUBMODULE_DEPS ON"
 )
+
+if(nanobind_ADDED)
+    message("nanobind_SOURCE_DIR: " ${nanobind_SOURCE_DIR})
+    message("nanobind_BINARY_DIR: " ${nanobind_BINARY_DIR})
+    # pull in cmake config from nanobind
+    #add_subdirectory(${nanobind_SOURCE_DIR} ${nanobind_BINARY_DIR})
+    #include(${nanobind_SOURCE_DIR})
+endif()
 
 ############################################################################################################################
 # nlohmann/json : https://github.com/nlohmann/json
