@@ -166,7 +166,7 @@ void JitBuildEnv::init(
         case ARCH::BLACKHOLE: common_flags = "-mcpu=tt-bh -fno-rvtt-sfpu-replay "; break;
         default: TT_ASSERT(false, "Invalid arch"); break;
     }
-    common_flags += "-std=c++17 -flto -ffast-math ";
+    common_flags += "-std=c++17 -flto=auto -flto-partition=1to1 -pipe -ffast-math ";
 
     if (tt::llrt::RunTimeOptions::get_instance().get_riscv_debug_info_enabled()) {
         common_flags += "-g ";
