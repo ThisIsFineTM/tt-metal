@@ -10,7 +10,7 @@ namespace nb = nanobind;
 
 namespace ttnn::distributed {
 
-void py_module_types(nb::module& module);
-void py_module(nb::module& module);
+void py_module_types(nb::module_& mod);
+void py_module(nb::module_& mod);
 
 }  // namespace ttnn::distributed
