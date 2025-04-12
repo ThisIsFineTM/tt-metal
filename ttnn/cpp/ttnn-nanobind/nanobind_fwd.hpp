@@ -7,5 +7,8 @@
 
 namespace nanobind {
 class module_;
-using module = module_;
+
+// we aren't using 'module' because it can interfere with C++20 modules
+//using module = module_;
+
 }  // namespace nanobind
