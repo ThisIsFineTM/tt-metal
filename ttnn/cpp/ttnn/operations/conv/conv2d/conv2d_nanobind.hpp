@@ -4,8 +4,12 @@
 
 #pragma once
 
-#include "pybind11/pybind_fwd.hpp"
+#include "ttnn-nanobind/nanobind_fwd.hpp"
 
 namespace ttnn::operations::conv::conv2d {
-void py_bind_conv2d(pybind11::module& module);
+
+namespace nb = nanobind;
+
+void bind_conv2d(nb::module_& mod);
+
 }
