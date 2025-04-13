@@ -2,13 +2,15 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "clone_pybind.hpp"
+#include "clone_nanobind.hpp"
+
+#include <optional>
 
 #include "clone.hpp"
-#include "pybind11/decorators.hpp"
+#include "ttnn-nanobind/decorators.hpp"
 
 namespace ttnn::operations::data_movement::clone {
-void bind_clone_operation(py::module& module) {
+void bind_clone_operation(nb::module_& mod) {
     auto doc = R"doc(clone(input: Tensor, dtype: DataType, memory_config: MemoryConfig) -> Tensor
 
     Clones the input, creating a copy with the specified `memory_config` and converting its data type to `dtype`.
@@ -25,15 +27,15 @@ void bind_clone_operation(py::module& module) {
     )doc";
 
     bind_registered_operation(
-        module,
+        mod,
         ttnn::clone,
         doc,
-        ttnn::pybind_arguments_t{
-            py::arg("input"),
-            py::kw_only(),
-            py::arg("dtype") = std::nullopt,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("compute_kernel_config") = std::nullopt,
+        ttnn::nanobind_arguments_t{
+            nb::arg("input"),
+            nb::kw_only(),
+            nb::arg("dtype") = std::nullopt,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("compute_kernel_config") = std::nullopt,
         });
 }
 }  // namespace ttnn::operations::data_movement::clone
