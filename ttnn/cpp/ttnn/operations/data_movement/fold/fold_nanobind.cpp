@@ -2,20 +2,22 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+#include "ttnn/operations/data_movement/fold/fold_nanobind.hpp"
+
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
 #include "ttnn/operations/data_movement/fold/fold.hpp"
-#include "ttnn/operations/data_movement/fold/fold_pybind.hpp"
-
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-
-#include "cpp/pybind11/decorators.hpp"
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "ttnn/types.hpp"
 
 namespace ttnn::operations::data_movement {
 
-void bind_fold_operation(py::module& module) {
+void bind_fold_operation(nb::module_& mod) {
     bind_registered_operation(
-        module,
+        mod,
         ttnn::fold,
         R"doc(
             Fold TT Tensor.
@@ -27,7 +29,7 @@ void bind_fold_operation(py::module& module) {
                 "stride_h", "Stride along the H-dimension", "int", "", "Yes"
                 "stride_w", "Stride along the W-dimension", "int", "", "Yes"
         )doc",
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const decltype(ttnn::fold)& op,
                const ttnn::Tensor& input,
                uint32_t stride_h,
@@ -53,18 +55,18 @@ void bind_fold_operation(py::module& module) {
                     grid_size,
                     override_memory_config);
             },
-            py::arg("input"),
-            py::arg("stride_h"),
-            py::arg("stride_w"),
-            py::arg("use_transpose_as_fold") = false,
-            py::arg("output_shape") = std::nullopt,
-            py::arg("pad_c") = 0,
-            py::arg("pad_h") = 0,
-            py::arg("pad_w") = 0,
-            py::arg("grid_size") = std::nullopt,
-            py::arg("override_memory_config") = std::nullopt,
-            py::kw_only(),
-            py::arg("queue_id") = DefaultQueueId});
+            nb::arg("input"),
+            nb::arg("stride_h"),
+            nb::arg("stride_w"),
+            nb::arg("use_transpose_as_fold") = false,
+            nb::arg("output_shape") = std::nullopt,
+            nb::arg("pad_c") = 0,
+            nb::arg("pad_h") = 0,
+            nb::arg("pad_w") = 0,
+            nb::arg("grid_size") = std::nullopt,
+            nb::arg("override_memory_config") = std::nullopt,
+            nb::kw_only(),
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
 }  // namespace ttnn::operations::data_movement
