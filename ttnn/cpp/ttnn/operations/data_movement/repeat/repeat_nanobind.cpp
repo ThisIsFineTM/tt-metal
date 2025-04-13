@@ -2,40 +2,43 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include "repeat_nanobind.hpp"
 
-#include "cpp/pybind11/decorators.hpp"
+#include <optional>
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 
 #include "repeat.hpp"
 
 namespace ttnn::operations::data_movement {
-namespace py = pybind11;
+namespace nb = nanobind;
 
 namespace detail {
 template <typename data_movement_operation_t>
-void bind_repeat(py::module& module, const data_movement_operation_t& operation, const char* doc) {
+void bind_repeat(nb::module_& mod, const data_movement_operation_t& operation, const char* doc) {
     ttnn::bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const data_movement_operation_t& self,
                const ttnn::Tensor& input_tensor,
                const ttnn::SmallVector<uint32_t>& repetition_vector,
                const std::optional<ttnn::MemoryConfig>& memory_config,
                QueueId queue_id) { return self(input_tensor, repetition_vector, memory_config, queue_id); },
-            py::arg("input_tensor"),
-            py::arg("repeat_dims"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId,
+            nb::arg("input_tensor"),
+            nb::arg("repeat_dims"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId,
         });
 }
 
 }  // namespace detail
 
-void py_bind_repeat(py::module& module) {
+void bind_repeat(nb::module_& mod) {
     auto doc = R"doc(
 
     Returns a new tensor filled with repetition of input :attr:`input_tensor` according to number of times specified in :attr:`shape`.
@@ -60,7 +63,7 @@ void py_bind_repeat(py::module& module) {
         [3, 4]])
             )doc";
 
-    detail::bind_repeat(module, ttnn::repeat, doc);
+    detail::bind_repeat(mod, ttnn::repeat, doc);
 }
 
 }  // namespace ttnn::operations::data_movement
