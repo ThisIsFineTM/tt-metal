@@ -2,17 +2,22 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include "indexed_fill_nanobind.hpp"
 
-#include "indexed_fill_pybind.hpp"
+#include <optional>
+
+#include <fmt/format.h>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
 #include "indexed_fill.hpp"
-#include "cpp/pybind11/decorators.hpp"
+#include "cpp/ttnn-nanobind/decorators.hpp"
 
 namespace ttnn::operations::data_movement {
 namespace detail {
 
-void bind_indexed_fill(pybind11::module& module) {
+void bind_indexed_fill(nb::module_& mod) {
     auto doc = fmt::format(
         R"doc(
 
@@ -41,10 +46,10 @@ void bind_indexed_fill(pybind11::module& module) {
 
     using OperationType = decltype(ttnn::indexed_fill);
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::indexed_fill,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const OperationType& self,
                const ttnn::Tensor& batch_id,
                const ttnn::Tensor& input_tensor_a,
@@ -54,13 +59,13 @@ void bind_indexed_fill(pybind11::module& module) {
                QueueId queue_id) {
                 return self(queue_id, batch_id, input_tensor_a, input_tensor_b, memory_config, dim);
             },
-            pybind11::arg("batch_id").noconvert(),
-            pybind11::arg("input_tensor_a").noconvert(),
-            pybind11::arg("input_tensor_b").noconvert(),
-            pybind11::kw_only(),
-            pybind11::arg("memory_config") = std::nullopt,
-            pybind11::arg("dim") = 0,
-            pybind11::arg("queue_id") = DefaultQueueId});
+            nb::arg("batch_id").noconvert(),
+            nb::arg("input_tensor_a").noconvert(),
+            nb::arg("input_tensor_b").noconvert(),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("dim") = 0,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
 }  // namespace detail
