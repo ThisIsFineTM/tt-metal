@@ -2,18 +2,22 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include "fill_rm_nanobind.hpp"
 
-#include "fill_rm_pybind.hpp"
+#include <optional>
+#include <fmt/format.h>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
 #include "fill_rm.hpp"
-#include "cpp/pybind11/decorators.hpp"
+#include "cpp/ttnn-nanobind/decorators.hpp"
 
 namespace ttnn::operations::data_movement {
 namespace detail {
-namespace py = pybind11;
+namespace nb = nanobind;
 
-void bind_fill_rm_op(py::module& module) {
+void bind_fill_rm_op(nb::module_& mod) {
     auto doc = fmt::format(
         R"doc(
             Generates an NCHW row-major tensor and fill it with high values up to
@@ -80,10 +84,10 @@ void bind_fill_rm_op(py::module& module) {
 
     using OperationType = decltype(ttnn::fill_rm);
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::fill_rm,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const OperationType& self,
                uint32_t N,
                uint32_t C,
@@ -98,21 +102,21 @@ void bind_fill_rm_op(py::module& module) {
                QueueId queue_id) {
                 return self(queue_id, N, C, H, W, hOnes, wOnes, any, val_hi, val_lo, memory_config);
             },
-            py::arg("N"),
-            py::arg("C"),
-            py::arg("H"),
-            py::arg("W"),
-            py::arg("hOnes"),
-            py::arg("wOnes"),
-            py::arg("any"),
-            py::arg("val_hi"),
-            py::arg("val_lo"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId});
+            nb::arg("N"),
+            nb::arg("C"),
+            nb::arg("H"),
+            nb::arg("W"),
+            nb::arg("hOnes"),
+            nb::arg("wOnes"),
+            nb::arg("any"),
+            nb::arg("val_hi"),
+            nb::arg("val_lo"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
-void bind_fill_ones_rm_op(py::module& module) {
+void bind_fill_ones_rm_op(nb::module_& mod) {
     auto doc = fmt::format(
         R"doc(
             Same as ``fill_rm``, but ``val_hi`` is set to ``1`` and ``val_lo`` is
@@ -156,10 +160,10 @@ void bind_fill_ones_rm_op(py::module& module) {
 
     using OperationType = decltype(ttnn::fill_ones_rm);
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::fill_ones_rm,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const OperationType& self,
                uint32_t N,
                uint32_t C,
@@ -170,23 +174,23 @@ void bind_fill_ones_rm_op(py::module& module) {
                const Tensor& any,
                const std::optional<MemoryConfig>& memory_config,
                QueueId queue_id) { return self(queue_id, N, C, H, W, hOnes, wOnes, any, memory_config); },
-            py::arg("N"),
-            py::arg("C"),
-            py::arg("H"),
-            py::arg("W"),
-            py::arg("hOnes"),
-            py::arg("wOnes"),
-            py::arg("any"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId});
+            nb::arg("N"),
+            nb::arg("C"),
+            nb::arg("H"),
+            nb::arg("W"),
+            nb::arg("hOnes"),
+            nb::arg("wOnes"),
+            nb::arg("any"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
 }  // namespace detail
 
-void bind_fill_rm(py::module& module) {
-    detail::bind_fill_rm_op(module);
-    detail::bind_fill_ones_rm_op(module);
+void bind_fill_rm(nb::module_& mod) {
+    detail::bind_fill_rm_op(mod);
+    detail::bind_fill_ones_rm_op(mod);
 }
 
 }  // namespace ttnn::operations::data_movement
