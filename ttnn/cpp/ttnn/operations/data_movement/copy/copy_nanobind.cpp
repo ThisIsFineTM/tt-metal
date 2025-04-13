@@ -2,11 +2,16 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include "copy_nanobind.hpp"
+
+#include <optional>
+#include <string>
+#include <string_view>
+
+#include <fmt/format.h>
 
 #include "copy.hpp"
-#include "cpp/pybind11/decorators.hpp"
+#include "cpp/ttnn-nanobind/decorators.hpp"
 
 namespace {
 std::string get_binary_doc_string(
@@ -53,9 +58,9 @@ std::string get_unary_doc_string(
 
 namespace ttnn::operations::data_movement::detail {
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
-void py_bind_copy(py::module& module) {
+void bind_copy(nb::module_& mod) {
     auto doc = get_binary_doc_string(
         "copy",
         "input_a",
@@ -63,21 +68,21 @@ void py_bind_copy(py::module& module) {
         R"doc(Copies the elements from ``{0}`` into ``{1}``. ``{1}`` is modified in place.)doc");
 
     bind_registered_operation(
-        module,
+        mod,
         ttnn::copy,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const decltype(ttnn::copy)& self,
                const ttnn::Tensor& input_a,
                const ttnn::Tensor& input_b,
                QueueId queue_id) { return self(queue_id, input_a, input_b); },
-            py::arg("input_a").noconvert(),
-            py::arg("input_b").noconvert(),
-            py::kw_only(),
-            py::arg("queue_id") = DefaultQueueId});
+            nb::arg("input_a").noconvert(),
+            nb::arg("input_b").noconvert(),
+            nb::kw_only(),
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
-void py_bind_assign(py::module& module) {
+void bind_assign(nb::module_& mod) {
     auto doc = get_unary_doc_string(
         "assign", "input", R"doc(  Returns a new tensor which is a new copy of input tensor ``{0}``.
 
@@ -99,30 +104,30 @@ void py_bind_assign(py::module& module) {
     )doc");
 
     bind_registered_operation(
-        module,
+        mod,
         ttnn::assign,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const decltype(ttnn::assign)& self,
                const ttnn::Tensor& input,
                const ttnn::MemoryConfig& memory_config,
                const std::optional<const ttnn::DataType> dtype,
                std::optional<ttnn::Tensor>& optional_output_tensor,
                QueueId queue_id) { return self(queue_id, input, memory_config, dtype, optional_output_tensor); },
-            py::arg("input_tensor").noconvert(),
-            py::kw_only(),
-            py::arg("memory_config"),
-            py::arg("dtype") = std::nullopt,
-            py::arg("output_tensor") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId},
-        ttnn::pybind_overload_t{
+            nb::arg("input_tensor").noconvert(),
+            nb::kw_only(),
+            nb::arg("memory_config"),
+            nb::arg("dtype") = std::nullopt,
+            nb::arg("output_tensor") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId},
+        ttnn::nanobind_overload_t{
             [](const decltype(ttnn::assign)& self,
                const ttnn::Tensor& input_a,
                const ttnn::Tensor& input_b,
                QueueId queue_id) { return self(queue_id, input_a, input_b); },
-            py::arg("input_a").noconvert(),
-            py::arg("input_b").noconvert(),
-            py::arg("queue_id") = DefaultQueueId});
+            nb::arg("input_a").noconvert(),
+            nb::arg("input_b").noconvert(),
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
 }  // namespace ttnn::operations::data_movement::detail

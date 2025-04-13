@@ -4,11 +4,13 @@
 
 #pragma once
 
-#include "pybind11/pybind_fwd.hpp"
+#include "ttnn-nanobind/nanobind_fwd.hpp"
 
 namespace ttnn::operations::data_movement::detail {
 
-void py_bind_copy(pybind11::module& m);
-void py_bind_assign(pybind11::module& m);
+namespace nb = nanobind;
+
+void bind_copy(nb::module_& mod);
+void bind_assign(nb::module_& mod);
 
 }  // namespace ttnn::operations::data_movement::detail
