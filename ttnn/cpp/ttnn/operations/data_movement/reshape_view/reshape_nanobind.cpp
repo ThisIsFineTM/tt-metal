@@ -2,12 +2,14 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "reshape_pybind.hpp"
+#include "reshape_nanobind.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <optional>
 
-#include "cpp/pybind11/decorators.hpp"
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "ttnn/operations/data_movement/reshape_view/reshape.hpp"
 #include "ttnn/types.hpp"
 #include "ttnn/operations/data_movement/reshape_view/reshape_common.hpp"
@@ -18,25 +20,25 @@ namespace ttnn::operations::data_movement {
 namespace detail {
 
 template <typename data_movement_operation_t>
-void bind_reshape_view(pybind11::module& module, const data_movement_operation_t& operation, const char* doc) {
+void bind_reshape_view(nb::module_& mod, const data_movement_operation_t& operation, const char* doc) {
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const data_movement_operation_t& self,
                const ttnn::Tensor& input_tensor,
                const ttnn::Shape& shape,
                const std::optional<MemoryConfig>& memory_config,
                const QueueId queue_id,
                const std::optional<PadValue>& pad_value) -> ttnn::Tensor { return self(input_tensor, shape); },
-            py::arg("input_tensor"),
-            py::arg("shape"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId,
-            py::arg("pad_value") = std::nullopt},
-        ttnn::pybind_overload_t{
+            nb::arg("input_tensor"),
+            nb::arg("shape"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId,
+            nb::arg("pad_value") = std::nullopt},
+        ttnn::nanobind_overload_t{
             [](const data_movement_operation_t& self,
                const ttnn::Tensor& input_tensor,
                const ttnn::Shape& logical_shape,
@@ -46,34 +48,34 @@ void bind_reshape_view(pybind11::module& module, const data_movement_operation_t
                const std::optional<PadValue>& pad_value) -> ttnn::Tensor {
                 return self(input_tensor, logical_shape, padded_shape);
             },
-            py::arg("input_tensor"),
-            py::arg("logical_shape"),
-            py::arg("padded_shape"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId,
-            py::arg("pad_value") = std::nullopt},
-        ttnn::pybind_overload_t{
+            nb::arg("input_tensor"),
+            nb::arg("logical_shape"),
+            nb::arg("padded_shape"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId,
+            nb::arg("pad_value") = std::nullopt},
+        ttnn::nanobind_overload_t{
             [](const data_movement_operation_t& self,
                const ttnn::Tensor& input_tensor,
                const ttnn::SmallVector<int32_t> shape,
                const std::optional<MemoryConfig>& memory_config,
                const QueueId queue_id,
                const std::optional<PadValue>& pad_value) -> ttnn::Tensor { return self(input_tensor, shape); },
-            py::arg("input_tensor"),
-            py::arg("shape"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId,
-            py::arg("pad_value") = std::nullopt});
+            nb::arg("input_tensor"),
+            nb::arg("shape"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId,
+            nb::arg("pad_value") = std::nullopt});
 }
 
 }  // namespace detail
 
 
-void py_bind_reshape_view(pybind11::module& module) {
+void bind_reshape_view(nb::module_& mod) {
     detail::bind_reshape_view(
-        module,
+        mod,
         ttnn::reshape,
 
         R"doc(
