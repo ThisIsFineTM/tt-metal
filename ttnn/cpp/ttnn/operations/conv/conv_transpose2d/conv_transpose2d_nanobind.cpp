@@ -2,20 +2,25 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "cpp/pybind11/decorators.hpp"
+#include "conv_transpose2d_nanobind.hpp"
 
-#include "conv_transpose2d_pybind.hpp"
+#include <array>
+#include <optional>
+
+#include <nanobind/nanobind.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "conv_transpose2d.hpp"
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
 namespace ttnn {
 namespace operations::conv {
 namespace conv_transpose2d {
 
-void py_bind_conv_transpose2d(py::module& module) {
+void bind_conv_transpose2d(nb::module_& mod) {
     bind_registered_operation(
-        module,
+        mod,
         ttnn::conv_transpose2d,
         R"doc(
         Applies a 2D transposed convolution operator over an input image composed of several input planes.
@@ -88,7 +93,7 @@ void py_bind_conv_transpose2d(py::module& module) {
                     groups=groups,
                 )
         )doc",
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const decltype(ttnn::conv_transpose2d)& self,
                const ttnn::Tensor& input_tensor,
                const ttnn::Tensor& weight_tensor,
@@ -132,29 +137,29 @@ void py_bind_conv_transpose2d(py::module& module) {
                     memory_config,
                     mirror_kernel);
             },
-            py::kw_only(),
-            py::arg("input_tensor"),
-            py::arg("weight_tensor"),
-            py::arg("device"),
-            py::arg("in_channels"),
-            py::arg("out_channels"),
-            py::arg("batch_size"),
-            py::arg("input_height"),
-            py::arg("input_width"),
-            py::arg("kernel_size"),
-            py::arg("stride"),
-            py::arg("padding"),
-            py::arg("output_padding"),
-            py::arg("dilation"),
-            py::arg("groups"),
-            py::arg("bias_tensor") = std::nullopt,
-            py::arg("conv_config") = std::nullopt,
-            py::arg("compute_config") = std::nullopt,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("mirror_kernel") = true,
-            py::arg("queue_id") = DefaultQueueId},
+            nb::kw_only(),
+            nb::arg("input_tensor"),
+            nb::arg("weight_tensor"),
+            nb::arg("device"),
+            nb::arg("in_channels"),
+            nb::arg("out_channels"),
+            nb::arg("batch_size"),
+            nb::arg("input_height"),
+            nb::arg("input_width"),
+            nb::arg("kernel_size"),
+            nb::arg("stride"),
+            nb::arg("padding"),
+            nb::arg("output_padding"),
+            nb::arg("dilation"),
+            nb::arg("groups"),
+            nb::arg("bias_tensor") = std::nullopt,
+            nb::arg("conv_config") = std::nullopt,
+            nb::arg("compute_config") = std::nullopt,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("mirror_kernel") = true,
+            nb::arg("queue_id") = DefaultQueueId},
 
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const decltype(ttnn::conv_transpose2d)& self,
                const ttnn::Tensor& input_tensor,
                const ttnn::Tensor& weight_tensor,
@@ -198,27 +203,27 @@ void py_bind_conv_transpose2d(py::module& module) {
                     memory_config,
                     mirror_kernel);
             },
-            py::kw_only(),
-            py::arg("input_tensor"),
-            py::arg("weight_tensor"),
-            py::arg("device"),
-            py::arg("in_channels"),
-            py::arg("out_channels"),
-            py::arg("batch_size"),
-            py::arg("input_height"),
-            py::arg("input_width"),
-            py::arg("kernel_size"),
-            py::arg("stride"),
-            py::arg("padding"),
-            py::arg("output_padding"),
-            py::arg("dilation"),
-            py::arg("groups"),
-            py::arg("bias_tensor") = std::nullopt,
-            py::arg("conv_config") = std::nullopt,
-            py::arg("compute_config") = std::nullopt,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("mirror_kernel") = true,
-            py::arg("queue_id") = DefaultQueueId});
+            nb::kw_only(),
+            nb::arg("input_tensor"),
+            nb::arg("weight_tensor"),
+            nb::arg("device"),
+            nb::arg("in_channels"),
+            nb::arg("out_channels"),
+            nb::arg("batch_size"),
+            nb::arg("input_height"),
+            nb::arg("input_width"),
+            nb::arg("kernel_size"),
+            nb::arg("stride"),
+            nb::arg("padding"),
+            nb::arg("output_padding"),
+            nb::arg("dilation"),
+            nb::arg("groups"),
+            nb::arg("bias_tensor") = std::nullopt,
+            nb::arg("conv_config") = std::nullopt,
+            nb::arg("compute_config") = std::nullopt,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("mirror_kernel") = true,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
 }  // namespace conv_transpose2d
