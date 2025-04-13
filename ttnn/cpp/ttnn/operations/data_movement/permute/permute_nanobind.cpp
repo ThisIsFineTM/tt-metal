@@ -2,12 +2,21 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "permute_pybind.hpp"
+#include "permute_nanobind.hpp"
+
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include <cpp/ttnn-nanobind/decorators.hpp>
+
+#include "permute.hpp"
 
 namespace ttnn::operations::data_movement::detail {
-namespace py = pybind11;
+namespace nb = nanobind;
 
-void bind_permute(py::module& module) {
+void bind_permute(nb::module_& mod) {
     auto doc =
         R"doc(permute(input_tensor: ttnn.Tensor, dims: List[int], memory_config: Optional[MemoryConfig] = std::nullopt, queue_id: int = 0) -> ttnn.Tensor
 
@@ -34,10 +43,10 @@ void bind_permute(py::module& module) {
 
     using OperationType = decltype(ttnn::permute);
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::permute,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const OperationType& self,
                const ttnn::Tensor& input_tensor,
                const ttnn::SmallVector<int64_t>& dims,
@@ -46,12 +55,12 @@ void bind_permute(py::module& module) {
                const std::optional<float>& pad_value) {
                 return self(queue_id, input_tensor, dims, memory_config, pad_value);
             },
-            py::arg("input_tensor").noconvert(),
-            py::arg("dims"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId,
-            py::arg("pad_value") = 0.0f,
+            nb::arg("input_tensor").noconvert(),
+            nb::arg("dims"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId,
+            nb::arg("pad_value") = 0.0f,
         });
 }
 
