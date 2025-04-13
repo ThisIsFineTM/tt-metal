@@ -2,41 +2,44 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include "expand_nanobind.hpp"
 
-#include "cpp/pybind11/decorators.hpp"
+#include <optional>
+
+#include <nanobind/nanobind.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 
 #include "expand.hpp"
-#include "expand_pybind.hpp"
 
 namespace ttnn::operations::data_movement {
-namespace py = pybind11;
+
+namespace nb = nanobind;
 
 namespace detail {
 template <typename data_movement_operation_t>
-void py_bind_expand(py::module& module, const data_movement_operation_t& operation, const char* doc) {
+void bind_expand(nb::module_& mod, const data_movement_operation_t& operation, const char* doc) {
     ttnn::bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const data_movement_operation_t& self,
                const ttnn::Tensor& input_tensor,
                const ttnn::SmallVector<int32_t> output_shape,
                const std::optional<ttnn::MemoryConfig>& memory_config,
                const QueueId queue_id) { return self(input_tensor, output_shape, memory_config, queue_id); },
-            py::arg("input_tensor"),
-            py::arg("output_shape"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId,
+            nb::arg("input_tensor"),
+            nb::arg("output_shape"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId,
         });
 }
 
 }  // namespace detail
 
-void py_bind_expand(py::module& module) {
+void bind_expand(nb::module_& mod) {
     auto doc =
         R"doc(expand(input: ttnn.Tensor, output_shape: List[int], memory_config: Optional[ttnn.MemoryConfig] = None) -> ttnn.Tensor
         Returns a new tensor where singleton dimensions are expanded to a larger side.
@@ -55,7 +58,7 @@ void py_bind_expand(py::module& module) {
 
         )doc";
 
-    detail::py_bind_expand(module, ttnn::expand, doc);
+    detail::bind_expand(mod, ttnn::expand, doc);
 }
 
 }  // namespace ttnn::operations::data_movement
