@@ -2,18 +2,23 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include "fill_pad_nanobind.hpp"
 
-#include "fill_pad_pybind.hpp"
+#include <optional>
+#include <fmt/format.h>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
 #include "fill_pad.hpp"
-#include "cpp/pybind11/decorators.hpp"
+#include "cpp/ttnn-nanobind/decorators.hpp"
 
 namespace ttnn::operations::data_movement {
 namespace detail {
-namespace py = pybind11;
 
-void bind_fill_pad_op(py::module& module) {
+namespace nb = nanobind;
+
+void bind_fill_pad_op(nb::module_& mod) {
     auto doc = fmt::format(
         R"doc(
 
@@ -44,24 +49,24 @@ void bind_fill_pad_op(py::module& module) {
 
     using OperationType = decltype(ttnn::fill_implicit_tile_padding);
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::fill_implicit_tile_padding,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const OperationType& self,
                const Tensor& input_tensor,
                const float fill_value,
                const std::optional<MemoryConfig>& memory_config,
                QueueId queue_id) { return self(queue_id, input_tensor, fill_value, memory_config); },
-            py::arg("input_tensor"),
-            py::arg("fill_value"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId});
+            nb::arg("input_tensor"),
+            nb::arg("fill_value"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
 }  // namespace detail
 
-void bind_fill_pad(py::module& module) { detail::bind_fill_pad_op(module); }
+void bind_fill_pad(nb::module_& mod) { detail::bind_fill_pad_op(mod); }
 
 }  // namespace ttnn::operations::data_movement
