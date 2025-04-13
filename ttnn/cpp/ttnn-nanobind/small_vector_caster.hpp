@@ -4,16 +4,16 @@
 
 #pragma once
 
-#include <pybind11/operators.h>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-
 #include <tt-metalium/small_vector.hpp>
+#include <nanobind/stl/detail/nb_list.h>
 
-namespace PYBIND11_NAMESPACE {
-namespace detail {
+NAMESPACE_BEGIN(NB_NAMESPACE)
+NAMESPACE_BEGIN(detail)
+
 template <typename T, size_t PREALLOCATED_SIZE>
-struct type_caster<ttnn::SmallVector<T, PREALLOCATED_SIZE>> : list_caster<ttnn::SmallVector<T, PREALLOCATED_SIZE>, T> {
-};
-}  // namespace detail
-}  // namespace PYBIND11_NAMESPACE
+struct type_caster<ttnn::SmallVector<T, PREALLOCATED_SIZE>>
+    : list_caster<ttnn::SmallVector<T, PREALLOCATED_SIZE>, T> {};
+
+NAMESPACE_END(detail)
+NAMESPACE_END(NB_NAMESPACE)
+

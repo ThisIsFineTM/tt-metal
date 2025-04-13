@@ -4,16 +4,25 @@
 
 #pragma once
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-#include <type_traits>
+#include <string>
+#include <type_traits> // decay
+#include <tuple>       // forward_as_tuple, apply
+#include <utility>     // forward
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/string.h>
+#include <nanobind/stl/tuple.h>
+#include <nanobind/stl/optional.h>
 
 #include "ttnn/decorators.hpp"
-#include "small_vector_caster.hpp"  // NOLINT - for pybind11 SmallVector binding support.
+#include "ttnn/common/queue_id.hpp"
+
+#include "small_vector_caster.hpp"  // NOLINT - for nanobind11 SmallVector binding support.
 #include "ttnn/types.hpp"
 #include "types.hpp"
 
-namespace py = pybind11;
+
 
 namespace ttnn {
 namespace decorators {
@@ -48,22 +57,22 @@ constexpr auto resolve_primitive_operation_call_method(F) {
 }
 
 template <typename... py_args_t>
-struct pybind_arguments_t {
+struct nanobind_arguments_t {
     std::tuple<py_args_t...> value;
 
-    pybind_arguments_t(py_args_t... args) : value(std::forward_as_tuple(args...)) {}
+    nanobind_arguments_t(py_args_t... args) : value(std::forward_as_tuple(args...)) {}
 };
 
 template <typename function_t, typename... py_args_t>
-struct pybind_overload_t {
+struct nanobind_overload_t {
     function_t function;
-    pybind_arguments_t<py_args_t...> args;
+    nanobind_arguments_t<py_args_t...> args;
 
-    pybind_overload_t(function_t function, py_args_t... args) : function{function}, args{args...} {}
+    nanobind_overload_t(function_t function, py_args_t... args) : function{function}, args{args...} {}
 };
 
 template <typename registered_operation_t, typename operation_t, typename py_operation_t, typename... py_args_t>
-void def_call_operator(py_operation_t& py_operation, const pybind_arguments_t<py_args_t...>& overload) {
+void def_call_operator(py_operation_t& py_operation, const nanobind_arguments_t<py_args_t...>& overload) {
     std::apply(
         [&py_operation](auto... args) {
             py_operation.def("__call__", resolve_call_method<registered_operation_t>(&operation_t::invoke), args...);
@@ -78,14 +87,14 @@ template <
     typename function_t,
     typename... py_args_t>
     requires PrimitiveOperationConcept<operation_t>
-void def_call_operator(py_operation_t& py_operation, const pybind_overload_t<function_t, py_args_t...>& overload) {
+void def_call_operator(py_operation_t& py_operation, const nanobind_overload_t<function_t, py_args_t...>& overload) {
     std::apply(
         [&py_operation, &overload](auto... args) {
             py_operation.def(
                 "__call__",
                 resolve_primitive_operation_call_method(overload.function),
                 args...,
-                py::arg("queue_id") = DefaultQueueId);
+                nb::arg("queue_id") = DefaultQueueId);
         },
         overload.args.value);
 }
@@ -97,7 +106,7 @@ template <
     typename function_t,
     typename... py_args_t>
     requires CompositeOperationConcept<operation_t>
-void def_call_operator(py_operation_t& py_operation, const pybind_overload_t<function_t, py_args_t...>& overload) {
+void def_call_operator(py_operation_t& py_operation, const nanobind_overload_t<function_t, py_args_t...>& overload) {
     std::apply(
         [&py_operation, &overload](auto... args) { py_operation.def("__call__", overload.function, args...); },
         overload.args.value);
@@ -105,7 +114,7 @@ void def_call_operator(py_operation_t& py_operation, const pybind_overload_t<fun
 
 template <typename py_operation_t, typename function_t, typename... py_args_t>
 void def_primitive_operation_method(
-    py_operation_t& py_operation, const pybind_overload_t<function_t, py_args_t...>& overload, auto name, auto method) {
+    py_operation_t& py_operation, const nanobind_overload_t<function_t, py_args_t...>& overload, auto name, auto method) {
     std::apply(
         [&py_operation, &overload, &name, &method](auto... args) {
             py_operation.def(name, resolve_primitive_operation_method(overload.function, method), args...);
@@ -119,30 +128,30 @@ template <
     bool auto_launch_op,
     typename... overload_t>
 auto bind_registered_operation(
-    py::module& module,
+    nb::module_& mod,
     const registered_operation_t<cpp_fully_qualified_name, operation_t, auto_launch_op>& operation,
     const std::string& doc,
     overload_t&&... overloads) {
     using registered_operation_t = std::decay_t<decltype(operation)>;
-    py::class_<registered_operation_t> py_operation(module, operation.class_name().c_str());
+    nb::class_<registered_operation_t> py_operation(mod, operation.class_name().c_str());
 
     py_operation.doc() = doc;
 
-    py_operation.def_property_readonly(
+    py_operation.def_prop_ro(
         "name",
         [](const registered_operation_t& self) -> const std::string { return self.base_name(); },
         "Shortened name of the api");
 
-    py_operation.def_property_readonly(
+    py_operation.def_prop_ro(
         "python_fully_qualified_name",
         [](const registered_operation_t& self) -> const std::string { return self.python_fully_qualified_name(); },
         "Fully qualified name of the api");
 
     // Attribute to identify of ttnn operations
-    py_operation.def_property_readonly(
+    py_operation.def_prop_ro(
         "__ttnn_operation__", [](const registered_operation_t& self) { return std::nullopt; });
 
-    py_operation.def_property_readonly(
+    py_operation.def_prop_ro(
         "is_primitive",
         [](const registered_operation_t& self) -> bool { return registered_operation_t::is_primitive; },
         "Specifies if the operation maps to a single program");
@@ -153,7 +162,7 @@ auto bind_registered_operation(
         }(overloads),
         ...);
 
-    module.attr(operation.base_name().c_str()) = operation;  // Bind an instance of the operation to the module
+    mod.attr(operation.base_name().c_str()) = operation;  // Bind an instance of the operation to the module
 
     return py_operation;
 }
@@ -161,7 +170,7 @@ auto bind_registered_operation(
 }  // namespace decorators
 
 using decorators::bind_registered_operation;
-using decorators::pybind_arguments_t;
-using decorators::pybind_overload_t;
+using decorators::nanobind_arguments_t;
+using decorators::nanobind_overload_t;
 
 }  // namespace ttnn
