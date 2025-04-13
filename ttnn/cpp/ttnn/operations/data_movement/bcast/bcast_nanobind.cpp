@@ -2,16 +2,19 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include "bcast_nanobind.hpp"
 
-#include "cpp/pybind11/decorators.hpp"
+#include <optional>
+
+#include <nanobind/nanobind.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "ttnn/operations/data_movement/bcast/bcast.hpp"
 
 namespace ttnn::operations::data_movement::detail {
-namespace py = pybind11;
+namespace nb = nanobind;
 
-void py_bind_bcast(py::module& module) {
+void bind_bcast(nb::module_& mod) {
     auto doc =
         R"doc(bcast(input_tensor_a: ttnn.Tensor, input_tensor_b: ttnn.Tensor, *, math_op[ADD, SUB, MUL],  dim: Optional[int] = None, memory_config: Optional[MemoryConfig] = std::nullopt, output_tensor: Optional[Tensor]) -> ttnn.Tensor
 
@@ -54,10 +57,10 @@ void py_bind_bcast(py::module& module) {
 
     using OperationType = decltype(ttnn::bcast);
     bind_registered_operation(
-        module,
+        mod,
         ttnn::bcast,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const OperationType& self,
                const ttnn::Tensor& input_tensor_a,
                const ttnn::Tensor& input_tensor_b,
@@ -69,14 +72,14 @@ void py_bind_bcast(py::module& module) {
                 return self(
                     queue_id, input_tensor_a, input_tensor_b, bcast_op, bcast_dim, memory_config, output_tensor);
             },
-            py::arg("input_a").noconvert(),
-            py::arg("input_b").noconvert(),
-            py::arg("math_op"),
-            py::arg("dim"),
-            py::kw_only(),
-            py::arg("output_tensor") = std::nullopt,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId});
+            nb::arg("input_a").noconvert(),
+            nb::arg("input_b").noconvert(),
+            nb::arg("math_op"),
+            nb::arg("dim"),
+            nb::kw_only(),
+            nb::arg("output_tensor") = std::nullopt,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
 }  // namespace ttnn::operations::data_movement::detail
