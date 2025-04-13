@@ -2,13 +2,19 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "bernoulli_pybind.hpp"
+#include "bernoulli_nanobind.hpp"
+
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/string.h>
 
 #include "bernoulli.hpp"
-#include "pybind11/decorators.hpp"
+#include "ttnn-nanobind/decorators.hpp"
 
 namespace ttnn::operations::bernoulli {
-void bind_bernoulli_operation(py::module& module) {
+
+void bind_bernoulli_operation(nb::module_& mod) {
     std::string doc =
         R"doc(
         Generates a tensor to draw binary random numbers (0 or 1) from a Bernoulli distribution.
@@ -32,16 +38,16 @@ void bind_bernoulli_operation(py::module& module) {
         )doc";
 
     bind_registered_operation(
-        module,
+        mod,
         ttnn::bernoulli,
         doc,
-        ttnn::pybind_arguments_t{
-            py::arg("input"),
-            py::arg("seed") = 0,
-            py::kw_only(),
-            py::arg("output") = std::nullopt,
-            py::arg("dtype") = std::nullopt,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("compute_kernel_config") = std::nullopt});
+        ttnn::nanobind_arguments_t{
+            nb::arg("input"),
+            nb::arg("seed") = 0,
+            nb::kw_only(),
+            nb::arg("output") = std::nullopt,
+            nb::arg("dtype") = std::nullopt,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("compute_kernel_config") = std::nullopt});
 }
 }  // namespace ttnn::operations::bernoulli

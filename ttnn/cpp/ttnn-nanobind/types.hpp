@@ -4,17 +4,13 @@
 
 #pragma once
 
-#include <pybind11/pybind11.h>
+#include <ttnn-nanobind/nanobind_fwd.hpp>
 
-#include "small_vector_caster.hpp"  // NOLINT - for pybind11 SmallVector binding support.
+namespace ttnn::types {
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
-namespace ttnn {
-namespace types {
+void py_module_types(nb::module_& mod);
+void py_module(nb::module_& mod);
 
-void py_module_types(py::module& module);
-void py_module(py::module& module);
-
-}  // namespace types
-}  // namespace ttnn
+}  // namespace ttnn::types
