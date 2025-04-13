@@ -2,12 +2,14 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "reshape_pybind.hpp"
+#include "reshape_nanobind.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <optional>
 
-#include "cpp/pybind11/decorators.hpp"
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "ttnn/operations/data_movement/reshape_on_device/reshape.hpp"
 #include "ttnn/types.hpp"
 
@@ -16,12 +18,12 @@ namespace ttnn::operations::data_movement {
 namespace detail {
 
 template <typename data_movement_operation_t>
-void bind_reshape(pybind11::module& module, const data_movement_operation_t& operation, const char* doc) {
+void bind_reshape(nb::module_& mod, const data_movement_operation_t& operation, const char* doc) {
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const data_movement_operation_t& self,
                const ttnn::Tensor& input_tensor,
                int W,
@@ -32,21 +34,21 @@ void bind_reshape(pybind11::module& module, const data_movement_operation_t& ope
                QueueId queue_id) -> ttnn::Tensor {
                 return self(queue_id, input_tensor, ttnn::SmallVector<int32_t>{W, Z, Y, X}, memory_config);
             },
-            py::arg("input_tensor"),
-            py::arg("W"),
-            py::arg("Z"),
-            py::arg("Y"),
-            py::arg("X"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId});
+            nb::arg("input_tensor"),
+            nb::arg("W"),
+            nb::arg("Z"),
+            nb::arg("Y"),
+            nb::arg("X"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
 }  // namespace detail
 
-void py_bind_reshape(pybind11::module& module) {
+void bind_reshape(nb::module_& mod) {
     detail::bind_reshape(
-        module,
+        mod,
         ttnn::reshape_on_device,
         R"doc(reshape(input_tensor: ttnn.Tensor, W: int, Z: int, Y: int, X: int, *, Optional[ttnn.MemoryConfig] = None) -> ttnn.Tensor
 
