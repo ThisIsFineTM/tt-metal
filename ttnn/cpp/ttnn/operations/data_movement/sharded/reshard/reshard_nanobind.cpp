@@ -2,10 +2,14 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include "reshard_nanobind.hpp"
 
-#include "cpp/pybind11/decorators.hpp"
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "reshard.hpp"
 #include "ttnn/types.hpp"
 #include <tt-metalium/core_coord.hpp>
@@ -14,13 +18,15 @@ namespace ttnn::operations::data_movement {
 
 namespace detail {
 
+namespace nb = nanobind;
+
 template <typename data_movement_sharded_operation_t>
-void bind_reshard(pybind11::module& module, const data_movement_sharded_operation_t& operation, const char* doc) {
+void bind_reshard(nb::module_& mod, const data_movement_sharded_operation_t& operation, const char* doc) {
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const data_movement_sharded_operation_t& self,
                const ttnn::Tensor& input_tensor,
                const MemoryConfig& output_memory_config,
@@ -28,11 +34,11 @@ void bind_reshard(pybind11::module& module, const data_movement_sharded_operatio
                QueueId queue_id) -> ttnn::Tensor {
                 return self(queue_id, input_tensor, output_memory_config, output_tensor);
             },
-            py::arg("input_tensor").noconvert(),
-            py::arg("output_memory_config"),
-            py::arg("output_tensor").noconvert() = std::nullopt,
-            py::kw_only(),
-            py::arg("queue_id") = DefaultQueueId,
+            nb::arg("input_tensor").noconvert(),
+            nb::arg("output_memory_config"),
+            nb::arg("output_tensor").noconvert() = std::nullopt,
+            nb::kw_only(),
+            nb::arg("queue_id") = DefaultQueueId,
 
         });
 }
@@ -40,9 +46,9 @@ void bind_reshard(pybind11::module& module, const data_movement_sharded_operatio
 }  // namespace detail
 
 // TODO: Add more descriptions to the arguments
-void py_bind_reshard(pybind11::module& module) {
+void bind_reshard(nb::module_& mod) {
     detail::bind_reshard(
-        module,
+        mod,
         ttnn::reshard,
         R"doc(reshard(input_tensor: ttnn.Tensor,  output_memory_config: MemoryConfig *, output_tensor: Optional[ttnn.Tensor] = None) -> ttnn.Tensor
 
