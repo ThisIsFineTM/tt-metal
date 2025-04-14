@@ -2,19 +2,22 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include "typecast_nanobind.hpp"
 
-#include "cpp/pybind11/decorators.hpp"
+#include <optional>
 
-#include "typecast_pybind.hpp"
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
+
 #include "typecast.hpp"
 
-namespace ttnn::operations::experimental::copy::detail {
+namespace ttnn::operations::experimental::conb::detail {
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
-void py_bind_typecast(py::module& module) {
+void bind_typecast(nb::module_& mod) {
     auto doc = R"doc(
         Returns a new tensor which is a typecast of input tensor with new datatype``{0}``.
 
@@ -33,21 +36,21 @@ void py_bind_typecast(py::module& module) {
     )doc";
 
     bind_registered_operation(
-        module,
+        mod,
         ttnn::experimental::typecast,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const decltype(ttnn::experimental::typecast)& self,
                const ttnn::Tensor& input_tensor,
                const ttnn::DataType dtype,
                const std::optional<ttnn::MemoryConfig>& memory_config,
                const std::optional<ttnn::Tensor>& optional_output_tensor,
                QueueId queue_id) { return self(queue_id, input_tensor, dtype, memory_config, optional_output_tensor); },
-            py::arg("input_tensor").noconvert(),
-            py::arg("dtype").noconvert(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("optional_output_tensor") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId});
+            nb::arg("input_tensor").noconvert(),
+            nb::arg("dtype").noconvert(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("optional_output_tensor") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
-}  // namespace ttnn::operations::experimental::copy::detail
+}  // namespace ttnn::operations::experimental::conb::detail
