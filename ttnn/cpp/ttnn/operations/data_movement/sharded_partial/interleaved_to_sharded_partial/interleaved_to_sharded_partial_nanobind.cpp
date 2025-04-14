@@ -2,10 +2,14 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include "interleaved_to_sharded_partial_nanobind.hpp"
 
-#include "cpp/pybind11/decorators.hpp"
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "interleaved_to_sharded_partial.hpp"
 #include "ttnn/types.hpp"
 #include <tt-metalium/core_coord.hpp>
@@ -16,12 +20,12 @@ namespace detail {
 
 template <typename data_movement_sharded_operation_t>
 void bind_interleaved_to_sharded_partial(
-    pybind11::module& module, const data_movement_sharded_operation_t& operation, const char* doc) {
+    nb::module_& mod, const data_movement_sharded_operation_t& operation, const char* doc) {
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const data_movement_sharded_operation_t& self,
                const ttnn::Tensor& input_tensor,
                const std::variant<CoreCoord, CoreRangeSet>& grid,
@@ -43,16 +47,16 @@ void bind_interleaved_to_sharded_partial(
                     shard_orientation,
                     output_dtype);
             },
-            py::arg("input_tensor").noconvert(),
-            py::arg("grid"),
-            py::arg("shard_shape"),
-            py::arg("num_slices"),
-            py::arg("slice_index"),
-            py::arg("shard_scheme"),
-            py::arg("shard_orientation"),
-            py::kw_only(),
-            py::arg("output_dtype") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId,
+            nb::arg("input_tensor").noconvert(),
+            nb::arg("grid"),
+            nb::arg("shard_shape"),
+            nb::arg("num_slices"),
+            nb::arg("slice_index"),
+            nb::arg("shard_scheme"),
+            nb::arg("shard_orientation"),
+            nb::kw_only(),
+            nb::arg("output_dtype") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId,
 
         });
 }
@@ -60,9 +64,9 @@ void bind_interleaved_to_sharded_partial(
 }  // namespace detail
 
 // TODO: Add more descriptions to the arguments
-void py_bind_interleaved_to_sharded_partial(pybind11::module& module) {
+void bind_interleaved_to_sharded_partial(nb::module_& mod) {
     detail::bind_interleaved_to_sharded_partial(
-        module,
+        mod,
         ttnn::interleaved_to_sharded_partial,
         R"doc(interleaved_to_sharded_partial(input_tensor: ttnn.Tensor, grid: ttnn.CoreGrid,  num_slices: int, slice_index: int, shard_scheme: ttl.tensor.TensorMemoryLayout, shard_orientation: ttl.tensor.ShardOrientation,  *, output_dtype: Optional[ttnn.dtype] = None) -> ttnn.Tensor
 
