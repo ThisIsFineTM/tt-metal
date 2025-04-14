@@ -4,15 +4,11 @@
 
 #pragma once
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-
-#include "cpp/pybind11/decorators.hpp"
-
-#include "transpose.hpp"
+#include "ttnn-nanobind/nanobind_fwd.hpp"
 
 namespace ttnn::operations::data_movement::detail {
-namespace py = pybind11;
 
-void bind_transpose(py::module& module);
+namespace nb = nanobind;
+
+void bind_transpose(nb::module_& mod);
 }  // namespace ttnn::operations::data_movement::detail
