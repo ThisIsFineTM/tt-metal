@@ -4,43 +4,42 @@
 
 #pragma once
 
-#include <pybind11/operators.h>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/pair.h>
 
 #include "export_enum.hpp"
 #include "ttnn/operations/eltwise/unary/common/unary_op_utils.hpp"
 
-namespace py = pybind11;
+namespace ttnn::activation {
 
-namespace ttnn {
-namespace activation {
+namespace nb = nanobind;
 
-void py_module_types(py::module& m) {
+void py_module_types(nb::module_& mod) {
     using namespace ttnn::operations::unary;
-    export_enum<UnaryOpType>(m, "UnaryOpType");
+    export_enum<UnaryOpType>(mod, "UnaryOpType");
 
-    py::class_<UnaryWithParam>(m, "UnaryWithParam");
+    nb::class_<UnaryWithParam>(mod, "UnaryWithParam");
 }
 
-void py_module(py::module& m) {
+void py_module(nb::module_& mod) {
     using namespace ttnn::operations::unary;
-
-    auto unary_with_param = static_cast<py::class_<UnaryWithParam>>(m.attr("UnaryWithParam"));
-    unary_with_param.def(py::init<UnaryOpType>())
-        .def(py::init<UnaryOpType, float>())
-        .def(py::init<>([](std::pair<UnaryOpType, float> arg) { return UnaryWithParam{arg.first, arg.second}; }))
-        .def_readonly("op_type", &UnaryWithParam::op_type);
-
+    
     // Allow implicit construction of UnaryWithParam object without user explicitly creating it
     // Can take in just the op type, or sequence container of op type and param value
-    py::implicitly_convertible<UnaryOpType, UnaryWithParam>();
-    py::implicitly_convertible<std::pair<UnaryOpType, float>, UnaryWithParam>();
-    py::implicitly_convertible<std::pair<UnaryOpType, int>, UnaryWithParam>();
-    py::implicitly_convertible<std::pair<UnaryOpType, bool>, UnaryWithParam>();
 
-    m.def("string_to_unary_with_param", &utils::string_to_unary_with_param);
+    auto unary_with_param = static_cast<nb::class_<UnaryWithParam>>(mod.attr("UnaryWithParam"));
+    unary_with_param
+        .def(nb::init<UnaryOpType>())
+        .def(nb::init<UnaryOpType, float>())
+        .def("__init__", [](UnaryWithParam* t, std::pair<UnaryOpType, float> arg) {
+                new (t) UnaryWithParam{arg.first, arg.second};})
+        .def_ro("op_type", &UnaryWithParam::op_type)
+        .def(nb::init_implicit<UnaryOpType>())
+        .def(nb::init_implicit<std::pair<UnaryOpType, float>>())
+        .def(nb::init_implicit<std::pair<UnaryOpType, int>>())
+        .def(nb::init_implicit<std::pair<UnaryOpType, bool>>());
+
+    mod.def("string_to_unary_with_param", &utils::string_to_unary_with_param);
 }
 
-}  // namespace activation
-}  // namespace ttnn
+}  // namespace ttnn::activation
