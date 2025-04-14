@@ -2,12 +2,21 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "transpose_pybind.hpp"
+#include "transpose_nanobind.hpp"
+
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
+
+#include "transpose.hpp"
 
 namespace ttnn::operations::data_movement::detail {
-namespace py = pybind11;
+namespace nb = nanobind;
 
-void bind_transpose(py::module& module) {
+void bind_transpose(nb::module_& mod) {
     auto doc =
         R"doc(
             transpose(input_tensor: ttnn.Tensor, dim1: int, dim2: int, *, Optional[ttnn.MemoryConfig] = None) -> ttnn.Tensor
@@ -33,10 +42,10 @@ void bind_transpose(py::module& module) {
 
     using OperationType = decltype(ttnn::transpose);
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::transpose,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const OperationType& self,
                const ttnn::Tensor& input_tensor,
                const int64_t& dim1,
@@ -46,13 +55,13 @@ void bind_transpose(py::module& module) {
                const std::optional<float>& pad_value) {
                 return self(queue_id, input_tensor, dim1, dim2, memory_config, pad_value);
             },
-            py::arg("input_tensor"),
-            py::arg("dim1"),
-            py::arg("dim2"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId,
-            py::arg("pad_value") = 0.0f,
+            nb::arg("input_tensor"),
+            nb::arg("dim1"),
+            nb::arg("dim2"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId,
+            nb::arg("pad_value") = 0.0f,
         });
 }
 }  // namespace ttnn::operations::data_movement::detail
