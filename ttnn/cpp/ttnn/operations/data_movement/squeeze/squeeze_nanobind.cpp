@@ -2,48 +2,51 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "squeeze_pybind.hpp"
+#include "squeeze_nanobind.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <nanobind/nanobind.h>
 
-#include "cpp/pybind11/decorators.hpp"
+#include "cpp/ttnn-nanobind/small_vector_caster.hpp"
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "ttnn/operations/data_movement/squeeze/squeeze.hpp"
+
+namespace nb = nanobind;
 
 namespace ttnn::operations::data_movement {
 
 namespace detail {
 
 template <typename data_movement_operation_t>
-void bind_squeeze(pybind11::module& module, const data_movement_operation_t& operation, const char* doc) {
+void bind_squeeze(nb::module_& mod, const data_movement_operation_t& operation, const char* doc) {
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        ttnn::pybind_overload_t{
-            [](const data_movement_operation_t& self, const ttnn::Tensor& input_tensor, const pybind11::object& dim)
+        ttnn::nanobind_overload_t{
+            [](const data_movement_operation_t& self, const ttnn::Tensor& input_tensor, const nb::object& dim)
                 -> ttnn::Tensor {
                 if (dim.is_none()) {  // None
                     return self(input_tensor);
-                } else if (pybind11::isinstance<pybind11::int_>(dim)) {  // int
-                    return self(input_tensor, dim.cast<int>());
-                } else if (pybind11::isinstance<pybind11::list>(dim)) {  // List[int]
-                    auto dims = dim.cast<ttnn::SmallVector<int>>();
+                } else if (nb::isinstance<nb::int_>(dim)) {  // int
+                    return self(input_tensor, nb::cast<int>(dim));
+                } else if (nb::isinstance<nb::list>(dim)) {  // List[int]
+                    auto dims = nb::cast<ttnn::SmallVector<int>>(dim);
                     return self(input_tensor, dims);
                 } else {
                     throw std::invalid_argument("dim must be an int, a list of ints, or None");
                 }
             },
-            py::arg("input_tensor"),
-            py::arg("dim") = pybind11::none()  // Default value is None
+            nb::arg("input_tensor"),
+            nb::arg("dim") = nb::none()  // Default value is None
         });
 }
 
 }  // namespace detail
 
-void py_bind_squeeze(pybind11::module& module) {
+void bind_squeeze(nb::module_& mod) {
     detail::bind_squeeze(
-        module,
+        mod,
         ttnn::squeeze,
         R"doc(squeeze(input_tensor: ttnn.Tensor,  dim: int) -> ttnn.Tensor
 
