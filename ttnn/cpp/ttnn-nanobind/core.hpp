@@ -4,40 +4,52 @@
 
 #pragma once
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-#include <pybind11/stl/filesystem.h>
+#include <memory>
+#include <string>
+#include <vector>
+
+#include <fmt/format.h>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/vector.h>
+#include <nanobind/stl/filesystem.h>
+#include <nanobind/stl/string.h>
+#include <nanobind/stl/unique_ptr.h>
 
 #include "ttnn/core.hpp"
 #include "tt-metalium/lightmetal_binary.hpp"
 #include "tt-metalium/lightmetal_replay.hpp"
 
-namespace py = pybind11;
 
-namespace ttnn {
-namespace core {
+namespace ttnn::core {
 
-void py_module_types(py::module& module) { py::class_<ttnn::Config>(module, "Config"); }
+namespace nb = nanobind;
 
-void py_module(py::module& module) {
+void py_module_types(nb::module_& mod) {
+    nb::class_<ttnn::Config>(mod, "Config");
+}
+
+void py_module(nb::module_& mod) {
     using tt::tt_metal::LightMetalBeginCapture;
     using tt::tt_metal::LightMetalBinary;
     using tt::tt_metal::LightMetalEndCapture;
-    auto py_config = static_cast<py::class_<ttnn::Config>>(module.attr("Config"));
-    py_config.def(py::init<const ttnn::Config&>()).def("__repr__", [](const ttnn::Config& config) {
-        return fmt::format("{}", config);
-    });
+    auto py_config = static_cast<nb::class_<ttnn::Config>>(mod.attr("Config"));
+    py_config
+        .def(nb::init<const ttnn::Config&>())
+        .def("__repr__", [](const ttnn::Config& config) {
+            return fmt::format("{}", config);
+        });
     reflect::for_each<ttnn::Config::attributes_t>([&py_config](auto I) {
         py_config.def_property(
             std::string{reflect::member_name<I, ttnn::Config::attributes_t>()}.c_str(),
             &ttnn::Config::get<I>,
             &ttnn::Config::set<I>);
     });
-    py_config.def_property_readonly("report_path", &ttnn::Config::get<"report_path">);
+    py_config.def_prop_ro("report_path", &ttnn::Config::get<"report_path">);
 
-    py::class_<LightMetalBinary>(module, "LightMetalBinary")
-        .def(py::init<>())
-        .def(py::init<std::vector<uint8_t>>())
+    nb::class_<LightMetalBinary>(mod, "LightMetalBinary")
+        .def(nb::init<>())
+        .def(nb::init<std::vector<uint8_t>>())
         .def("get_data", &LightMetalBinary::get_data)
         .def("set_data", &LightMetalBinary::set_data)
         .def("size", &LightMetalBinary::size)
@@ -45,25 +57,25 @@ void py_module(py::module& module) {
         .def("save_to_file", &LightMetalBinary::save_to_file)
         .def_static("load_from_file", &LightMetalBinary::load_from_file);
 
-    py::class_<tt::tt_metal::LightMetalReplay>(module, "LightMetalReplay")
+    nb::class_<tt::tt_metal::LightMetalReplay>(mod, "LightMetalReplay")
         .def_static(
             "create",
             [](LightMetalBinary binary, IDevice* device = nullptr) {
                 return std::make_unique<tt::tt_metal::LightMetalReplay>(std::move(binary), device);
             },
-            py::arg("binary"),
-            py::arg("device") = nullptr)
+            nb::arg("binary"),
+            nb::arg("device") = nullptr)
         .def("run", &tt::tt_metal::LightMetalReplay::run);
 
-    module.def("get_memory_config", &ttnn::get_memory_config);
-    module.def("light_metal_begin_capture", &LightMetalBeginCapture);
-    module.def("light_metal_end_capture", &LightMetalEndCapture);
+    mod.def("get_memory_config", &ttnn::get_memory_config);
+    mod.def("light_metal_begin_capture", &LightMetalBeginCapture);
+    mod.def("light_metal_end_capture", &LightMetalEndCapture);
 
-    module.def(
+    mod.def(
         "set_printoptions",
         &ttnn::set_printoptions,
-        py::kw_only(),
-        py::arg("profile"),
+        nb::kw_only(),
+        nb::arg("profile"),
         R"doc(
 
         Set print options for tensor output.
@@ -78,8 +90,7 @@ void py_module(py::module& module) {
             >>> ttnn.set_printoptions(profile="short")
         )doc");
 
-    module.def("dump_stack_trace_on_segfault", &ttnn::core::dump_stack_trace_on_segfault);
+    mod.def("dump_stack_trace_on_segfault", &ttnn::core::dump_stack_trace_on_segfault);
 }
 
-}  // namespace core
-}  // namespace ttnn
+}  // namespace ttnn::core
