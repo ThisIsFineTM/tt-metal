@@ -4,7 +4,7 @@
 
 #include "cluster.hpp"
 
-#include <pybind11/pybind11.h>
+#include <nanobind/nanobind.h>
 
 #include <tt-metalium/tt_metal.hpp>
 
@@ -12,13 +12,12 @@
 
 using namespace tt::tt_metal;
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
-namespace ttnn {
-namespace cluster {
+namespace ttnn::cluster {
 
-void py_cluster_module(py::module& module) {
-    module.def(
+void py_cluster_module(nb::module_& mod) {
+    mod.def(
         "serialize_cluster_descriptor",
         &ttnn::cluster::serialize_cluster_descriptor,
         R"doc(
@@ -26,5 +25,4 @@ void py_cluster_module(py::module& module) {
              )doc");
 }
 
-}  // namespace cluster
-}  // namespace ttnn
+}  // namespace ttnn::cluster
