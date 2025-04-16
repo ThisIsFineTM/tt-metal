@@ -2,20 +2,26 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "pybind11/decorators.hpp"
+#include "quantization_nanobind.hpp"
 
-#include "quantization_pybind.hpp"
-#include "quantization.hpp"
-
+#include <optional>
 #include <string>
 #include <variant>
+
+#include <fmt/format.h>
+#include <nanobind/nanobind.h>
+
+#include "ttnn-nanobind/decorators.hpp"
+
+#include "quantization.hpp"
+
 
 namespace ttnn::operations::quantization {
 namespace detail {
 
 template <typename T>
 void bind_quantize_operation(
-    py::module& module,
+    nb::module_& mod,
     const T& operation,
     const std::string& description,
     const std::string& supported_dtype = "BFLOAT16") {
@@ -62,10 +68,10 @@ void bind_quantize_operation(
         supported_dtype);
 
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const T& self,
                const ttnn::Tensor& input_tensor,
                const std::variant<ttnn::Tensor, float>& scale,
@@ -77,20 +83,20 @@ void bind_quantize_operation(
                QueueId queue_id) -> ttnn::Tensor {
                 return self(queue_id, input_tensor, scale, zero_point, axis, dtype, memory_config, output_tensor);
             },
-            py::arg("input_tensor"),
-            py::arg("scale"),
-            py::arg("zero_point"),
-            py::kw_only(),
-            py::arg("axis") = std::nullopt,
-            py::arg("dtype") = std::nullopt,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("output_tensor") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId});
+            nb::arg("input_tensor"),
+            nb::arg("scale"),
+            nb::arg("zero_point"),
+            nb::kw_only(),
+            nb::arg("axis") = std::nullopt,
+            nb::arg("dtype") = std::nullopt,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("output_tensor") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
 template <typename T>
 void bind_requantize_operation(
-    py::module& module,
+    nb::module_& mod,
     const T& operation,
     const std::string& description,
     const std::string& supported_dtype = "BFLOAT16") {
@@ -141,10 +147,10 @@ void bind_requantize_operation(
         supported_dtype);
 
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const T& self,
                const ttnn::Tensor& input_tensor,
                const std::variant<ttnn::Tensor, float>& in_scale,
@@ -168,22 +174,22 @@ void bind_requantize_operation(
                     memory_config,
                     output_tensor);
             },
-            py::arg("input_tensor"),
-            py::arg("in_scale"),
-            py::arg("in_zero_point"),
-            py::arg("out_scale"),
-            py::arg("out_zero_point"),
-            py::kw_only(),
-            py::arg("axis") = std::nullopt,
-            py::arg("dtype") = std::nullopt,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("output_tensor") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId});
+            nb::arg("input_tensor"),
+            nb::arg("in_scale"),
+            nb::arg("in_zero_point"),
+            nb::arg("out_scale"),
+            nb::arg("out_zero_point"),
+            nb::kw_only(),
+            nb::arg("axis") = std::nullopt,
+            nb::arg("dtype") = std::nullopt,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("output_tensor") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
 template <typename T>
 void bind_dequantize_operation(
-    py::module& module,
+    nb::module_& mod,
     const T& operation,
     const std::string& description,
     const std::string& supported_dtype = "BFLOAT16") {
@@ -230,10 +236,10 @@ void bind_dequantize_operation(
         supported_dtype);
 
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const T& self,
                const ttnn::Tensor& input_tensor,
                const std::variant<ttnn::Tensor, float>& scale,
@@ -245,22 +251,22 @@ void bind_dequantize_operation(
                QueueId queue_id) -> ttnn::Tensor {
                 return self(queue_id, input_tensor, scale, zero_point, axis, dtype, memory_config, output_tensor);
             },
-            py::arg("input_tensor"),
-            py::arg("scale"),
-            py::arg("zero_point"),
-            py::kw_only(),
-            py::arg("axis") = std::nullopt,
-            py::arg("dtype") = std::nullopt,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("output_tensor") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId});
+            nb::arg("input_tensor"),
+            nb::arg("scale"),
+            nb::arg("zero_point"),
+            nb::kw_only(),
+            nb::arg("axis") = std::nullopt,
+            nb::arg("dtype") = std::nullopt,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("output_tensor") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
 }  // namespace detail
 
-void py_module(py::module& module) {
-    detail::bind_quantize_operation(module, ttnn::quantize, "Quantize Operation");
-    detail::bind_requantize_operation(module, ttnn::requantize, "Re-quantize Operation");
-    detail::bind_dequantize_operation(module, ttnn::dequantize, "De-quantize Operation");
+void py_module(nb::module_& mod) {
+    detail::bind_quantize_operation(mod, ttnn::quantize, "Quantize Operation");
+    detail::bind_requantize_operation(mod, ttnn::requantize, "Re-quantize Operation");
+    detail::bind_dequantize_operation(mod, ttnn::dequantize, "De-quantize Operation");
 }
 }  // namespace ttnn::operations::quantization
