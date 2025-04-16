@@ -4,12 +4,11 @@
 
 #pragma once
 
-#include <pybind11/pybind11.h>
-
-namespace py = pybind11;
+#include "ttnn-nanobind/nanobind_fwd.hpp"
 
 namespace ttnn::operations::examples {
 
-void bind_example_multiple_return_operation(py::module& module);
+namespace nb = nanobind;
+void bind_example_multiple_return_operation(nb::module_& mod);
 
 }  // namespace ttnn::operations::examples
