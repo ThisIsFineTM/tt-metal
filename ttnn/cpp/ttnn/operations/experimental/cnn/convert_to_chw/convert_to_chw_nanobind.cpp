@@ -2,38 +2,40 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "convert_to_chw_pybind.hpp"
+#include "convert_to_chw_nanobind.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
 
 #include "convert_to_chw.hpp"
-#include "cpp/pybind11/decorators.hpp"
+#include "cpp/ttnn-nanobind/decorators.hpp"
 
 namespace ttnn::operations::experimental::cnn::detail {
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
-void bind_convert_to_chw(py::module& module) {
+void bind_convert_to_chw(nb::module_& mod) {
     using OperationType = decltype(ttnn::experimental::convert_to_chw);
 
     const auto doc = R"doc(TODO!)doc";
 
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::experimental::convert_to_chw,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const OperationType& self,
                const ttnn::Tensor& input,
                const std::optional<MemoryConfig>& memory_config,
                const std::optional<DataType> dtype,
                QueueId queue_id) { return self(queue_id, input, memory_config, dtype); },
-            py::arg("input"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("dtype") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId});
+            nb::arg("input"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("dtype") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
 }  // namespace ttnn::operations::experimental::cnn::detail
