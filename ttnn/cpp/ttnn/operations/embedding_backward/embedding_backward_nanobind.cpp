@@ -2,17 +2,20 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include "ttnn/operations/embedding_backward/embedding_backward_nanobind.hpp"
 
-#include "cpp/pybind11/decorators.hpp"
-#include "ttnn/operations/embedding_backward/embedding_backward_pybind.hpp"
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "ttnn/operations/embedding_backward/embedding_backward.hpp"
 
 namespace ttnn::operations::embedding_backward {
-namespace py = pybind11;
+namespace nb = nanobind;
 
-void py_bind_embedding_backward(py::module& module) {
+void bind_embedding_backward(nb::module_& mod) {
     const auto doc =
         R"doc(
 
@@ -59,10 +62,10 @@ void py_bind_embedding_backward(py::module& module) {
 
     using OperationType = decltype(ttnn::embedding_bw);
     bind_registered_operation(
-        module,
+        mod,
         ttnn::embedding_bw,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const OperationType& self,
                const ttnn::Tensor& input_tensor,
                const ttnn::Tensor& weight_tensor,
@@ -80,14 +83,14 @@ void py_bind_embedding_backward(py::module& module) {
                     memory_config,
                     optional_output_tensor);
             },
-            py::arg("input_tensor").noconvert(),
-            py::arg("weight_tensor").noconvert(),
-            py::arg("output_gradient_tensor").noconvert(),
-            py::kw_only(),
-            py::arg("dtype").noconvert() = std::nullopt,
-            py::arg("output_tensor").noconvert() = std::nullopt,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId});
+            nb::arg("input_tensor").noconvert(),
+            nb::arg("weight_tensor").noconvert(),
+            nb::arg("output_gradient_tensor").noconvert(),
+            nb::kw_only(),
+            nb::arg("dtype").noconvert() = std::nullopt,
+            nb::arg("output_tensor").noconvert() = std::nullopt,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
 }  // namespace ttnn::operations::embedding_backward
