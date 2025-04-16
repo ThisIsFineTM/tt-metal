@@ -4,10 +4,11 @@
 
 #pragma once
 
-#include "pybind11/pybind_fwd.hpp"
+#include "ttnn-nanobind/nanobind_fwd.hpp"
 
 namespace ttnn::operations::experimental::cnn::detail {
 
-void bind_convert_to_chw(pybind11::module& module);
+namespace nb = nanobind;
+void bind_convert_to_chw(nb::module_& mod);
 
 }  // namespace ttnn::operations::experimental::cnn::detail
