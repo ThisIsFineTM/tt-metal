@@ -2,15 +2,24 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "cpp/pybind11/decorators.hpp"
+#include "ttnn/operations/experimental/dropout/dropout_nanobind.hpp"
+
+#include <cstdint>
+#include <optional>
+
+#include <fmt/format.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 
 #include "ttnn/operations/experimental/dropout/dropout.hpp"
-#include "ttnn/operations/experimental/dropout/dropout_pybind.hpp"
+
+namespace nb = nanobind;
 
 namespace ttnn::operations::experimental::dropout::detail {
-namespace py = pybind11;
 
-void bind_experimental_dropout_operation(py::module& module) {
+void bind_experimental_dropout_operation(nb::module_& mod) {
     auto doc = fmt::format(
         R"doc(
 
@@ -54,12 +63,13 @@ void bind_experimental_dropout_operation(py::module& module) {
         )doc",
         ttnn::experimental::dropout.base_name(),
         ttnn::experimental::dropout.python_fully_qualified_name());
+
     using OperationType = decltype(ttnn::experimental::dropout);
     bind_registered_operation(
-        module,
+        mod,
         ttnn::experimental::dropout,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const OperationType& self,
                const Tensor& input,
                const float probability,
@@ -67,12 +77,12 @@ void bind_experimental_dropout_operation(py::module& module) {
                const uint32_t seed,
                const std::optional<MemoryConfig>& memory_config,
                const std::optional<Tensor>& output_tensor) { return self(input, probability, scale, seed); },
-            py::arg("input_tensor"),
-            py::arg("probability"),
-            py::arg("scale"),
-            py::arg("seed"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("output_tensor") = std::nullopt});
+            nb::arg("input_tensor"),
+            nb::arg("probability"),
+            nb::arg("scale"),
+            nb::arg("seed"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("output_tensor") = std::nullopt});
 }
 }  // namespace ttnn::operations::experimental::dropout::detail
