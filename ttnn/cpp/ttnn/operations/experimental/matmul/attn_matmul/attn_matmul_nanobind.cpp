@@ -2,22 +2,31 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "cpp/pybind11/decorators.hpp"
+#include "ttnn/operations/experimental/matmul/attn_matmul/attn_matmul_nanobind.hpp"
 
-#include "ttnn/operations/experimental/matmul/attn_matmul/attn_matmul_pybind.hpp"
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
+
 #include "ttnn/operations/experimental/matmul/attn_matmul/attn_matmul.hpp"
+
+namespace nb = nanobind;
 
 namespace ttnn::operations::experimental::matmul::detail {
 
-void bind_attn_matmul(pybind11::module& module) {
+void bind_attn_matmul(nb::module_& mod) {
     using OperationType = decltype(ttnn::experimental::attn_matmul);
+
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::experimental::attn_matmul,
         R"doc(
             Performs a special pre-softmax matmul with [q_len, q_heads, batch, head_dim] and [batch, kv_heads, head_dim, kv_len]. q_len and kv_heads must be 1 and an intermediate value of [q_heads, batch, batch, kv_len] is produced (only on device cores). Batch dim from Z and Y is combined by taking the 1st, 2nd, ..., and 32nd row of Y from the batches in Z. Final output tensor is [1, q_heads, batch, kv_len]. In PyTorch, this is equivalent to: torch.matmul(A.transpose(0, 2), B).transpose(0, 2). Similar concept for post-softmax matmul.
         )doc",
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const OperationType& self,
                const Tensor& input_tensor_a,
                const Tensor& input_tensor_b,
@@ -37,26 +46,27 @@ void bind_attn_matmul(pybind11::module& module) {
                     memory_config,
                     optional_output_tensor);
             },
-            pybind11::arg("input_tensor_a").noconvert(),
-            pybind11::arg("input_tensor_b").noconvert(),
-            pybind11::kw_only(),
-            pybind11::arg("compute_with_storage_grid_size").noconvert(),
-            pybind11::arg("dtype").noconvert() = std::nullopt,
-            pybind11::arg("compute_kernel_config").noconvert() = std::nullopt,
-            pybind11::arg("memory_config") = std::nullopt,
-            pybind11::arg("output_tensor") = std::nullopt,
-            pybind11::arg("queue_id") = DefaultQueueId});
+            nb::arg("input_tensor_a").noconvert(),
+            nb::arg("input_tensor_b").noconvert(),
+            nb::kw_only(),
+            nb::arg("compute_with_storage_grid_size").noconvert(),
+            nb::arg("dtype").noconvert() = std::nullopt,
+            nb::arg("compute_kernel_config").noconvert() = std::nullopt,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("output_tensor") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
-void bind_attn_matmul_from_cache(pybind11::module& module) {
+void bind_attn_matmul_from_cache(nb::module_& mod) {
     using OperationType = decltype(ttnn::experimental::attn_matmul_from_cache);
+
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::experimental::attn_matmul_from_cache,
         R"doc(
             Performs the same matmul as attn_matmul, but fuses additional functionality for reading in in1. For in1, read num_tokens (rounded up to 32) from full cache along in1.get_padded_shape()[2] (num_tokens must be > 0 and <= max_cache_len). For example, 64 tokens will be read for 32 < token_idx <= 64. Additional option to apply transpose_hw to in1 for pre-attention matmul with transpose_hw=true. For post-attention matmul, transpose_hw should be false.
         )doc",
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const OperationType& self,
                const Tensor& input_tensor_a,
                const Tensor& input_tensor_b,
@@ -78,16 +88,16 @@ void bind_attn_matmul_from_cache(pybind11::module& module) {
                     dtype,
                     compute_kernel_config);
             },
-            pybind11::arg("input_tensor_a").noconvert(),
-            pybind11::arg("input_tensor_b").noconvert(),
-            pybind11::kw_only(),
-            pybind11::arg("num_tokens").noconvert(),
-            pybind11::arg("transpose_hw").noconvert(),
-            pybind11::arg("compute_with_storage_grid_size").noconvert(),
-            pybind11::arg("memory_config") = std::nullopt,
-            pybind11::arg("dtype") = std::nullopt,
-            pybind11::arg("compute_kernel_config") = std::nullopt,
-            pybind11::arg("queue_id") = DefaultQueueId});
+            nb::arg("input_tensor_a").noconvert(),
+            nb::arg("input_tensor_b").noconvert(),
+            nb::kw_only(),
+            nb::arg("num_tokens").noconvert(),
+            nb::arg("transpose_hw").noconvert(),
+            nb::arg("compute_with_storage_grid_size").noconvert(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("dtype") = std::nullopt,
+            nb::arg("compute_kernel_config") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
 }  // namespace ttnn::operations::experimental::matmul::detail
