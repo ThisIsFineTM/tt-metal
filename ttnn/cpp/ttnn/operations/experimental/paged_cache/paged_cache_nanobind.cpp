@@ -2,16 +2,25 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "cpp/pybind11/decorators.hpp"
+#include "ttnn/operations/experimental/paged_cache/paged_cache_nanobind.hpp"
+
+#include <cstdint>
+#include <optional>
+#include <vector>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+#include <nanobind/stl/vector.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 
 #include "ttnn/operations/experimental/paged_cache/paged_cache.hpp"
-#include "ttnn/operations/experimental/paged_cache/paged_cache_pybind.hpp"
+
+namespace nb = nanobind;
 
 namespace ttnn::operations::experimental::paged_cache::detail {
 
-namespace py = pybind11;
-
-void bind_experimental_paged_cache_operations(py::module& module) {
+void bind_experimental_paged_cache_operations(nb::module_& mod) {
     auto paged_update_cache_doc =
         R"doc(
          Paged update cache operation. This operation expects the following inputs: cache_tensor of shape [B, 1, kv_len, head_dim] and input_tensor of shape [1, B, 1[32], head_dim] where input_tensor is height sharded on B cores. update_idxs will specify for each batch element which token to update in the cache.
@@ -19,10 +28,10 @@ void bind_experimental_paged_cache_operations(py::module& module) {
 
     using PagedUpdateCacheType = decltype(ttnn::experimental::paged_update_cache);
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::experimental::paged_update_cache,
         paged_update_cache_doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const PagedUpdateCacheType& self,
                const ttnn::Tensor& cache_tensor,
                const ttnn::Tensor& input_tensor,
@@ -42,15 +51,15 @@ void bind_experimental_paged_cache_operations(py::module& module) {
                     batch_offset,
                     compute_kernel_config);
             },
-            py::arg("cache_tensor").noconvert(),
-            py::arg("input_tensor").noconvert(),
-            py::kw_only(),
-            py::arg("update_idxs").noconvert() = std::vector<uint32_t>(),
-            py::arg("update_idxs_tensor").noconvert() = std::nullopt,
-            py::arg("share_cache").noconvert() = std::nullopt,
-            py::arg("page_table").noconvert() = std::nullopt,
-            py::arg("batch_offset") = 0,
-            py::arg("compute_kernel_config").noconvert() = std::nullopt,
+            nb::arg("cache_tensor").noconvert(),
+            nb::arg("input_tensor").noconvert(),
+            nb::kw_only(),
+            nb::arg("update_idxs").noconvert() = std::vector<uint32_t>(),
+            nb::arg("update_idxs_tensor").noconvert() = std::nullopt,
+            nb::arg("share_cache").noconvert() = std::nullopt,
+            nb::arg("page_table").noconvert() = std::nullopt,
+            nb::arg("batch_offset") = 0,
+            nb::arg("compute_kernel_config").noconvert() = std::nullopt,
         });
 
     auto paged_fused_update_cache_doc =
@@ -77,11 +86,12 @@ void bind_experimental_paged_cache_operations(py::module& module) {
         )doc";
 
     using PagedFusedUpdateCacheType = decltype(ttnn::experimental::paged_fused_update_cache);
+
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::experimental::paged_fused_update_cache,
         paged_fused_update_cache_doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const PagedFusedUpdateCacheType& self,
                const ttnn::Tensor& cache_tensor1,
                const ttnn::Tensor& input_tensor1,
@@ -105,17 +115,17 @@ void bind_experimental_paged_cache_operations(py::module& module) {
                     batch_offset,
                     compute_kernel_config);
             },
-            py::arg("cache_tensor1").noconvert(),
-            py::arg("input_tensor1").noconvert(),
-            py::arg("cache_tensor2").noconvert(),
-            py::arg("input_tensor2").noconvert(),
-            py::kw_only(),
-            py::arg("update_idxs").noconvert() = std::vector<uint32_t>(),
-            py::arg("update_idxs_tensor").noconvert() = std::nullopt,
-            py::arg("share_cache").noconvert() = std::nullopt,
-            py::arg("page_table").noconvert() = std::nullopt,
-            py::arg("batch_offset") = 0,
-            py::arg("compute_kernel_config").noconvert() = std::nullopt,
+            nb::arg("cache_tensor1").noconvert(),
+            nb::arg("input_tensor1").noconvert(),
+            nb::arg("cache_tensor2").noconvert(),
+            nb::arg("input_tensor2").noconvert(),
+            nb::kw_only(),
+            nb::arg("update_idxs").noconvert() = std::vector<uint32_t>(),
+            nb::arg("update_idxs_tensor").noconvert() = std::nullopt,
+            nb::arg("share_cache").noconvert() = std::nullopt,
+            nb::arg("page_table").noconvert() = std::nullopt,
+            nb::arg("batch_offset") = 0,
+            nb::arg("compute_kernel_config").noconvert() = std::nullopt,
         });
 
     auto paged_fill_cache_doc =
@@ -124,11 +134,12 @@ void bind_experimental_paged_cache_operations(py::module& module) {
         )doc";
 
     using PagedFillCacheType = decltype(ttnn::experimental::paged_fill_cache);
+
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::experimental::paged_fill_cache,
         paged_fill_cache_doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const PagedFillCacheType& self,
                const ttnn::Tensor& cache_tensor,
                const ttnn::Tensor& input_tensor,
@@ -137,12 +148,12 @@ void bind_experimental_paged_cache_operations(py::module& module) {
                std::optional<const ttnn::DeviceComputeKernelConfig> compute_kernel_config) {
                 return self(cache_tensor, input_tensor, page_table, batch_idx, compute_kernel_config);
             },
-            py::arg("cache_tensor").noconvert(),
-            py::arg("input_tensor").noconvert(),
-            py::arg("page_table").noconvert(),
-            py::kw_only(),
-            py::arg("batch_idx") = 0,
-            py::arg("compute_kernel_config").noconvert() = std::nullopt,
+            nb::arg("cache_tensor").noconvert(),
+            nb::arg("input_tensor").noconvert(),
+            nb::arg("page_table").noconvert(),
+            nb::kw_only(),
+            nb::arg("batch_idx") = 0,
+            nb::arg("compute_kernel_config").noconvert() = std::nullopt,
         });
 }
 
