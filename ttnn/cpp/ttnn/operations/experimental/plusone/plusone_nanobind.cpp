@@ -2,14 +2,22 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "cpp/pybind11/decorators.hpp"
+#include "ttnn/operations/experimental/plusone/plusone_nanobind.hpp"
+
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 
 #include "ttnn/operations/experimental/plusone/plusone.hpp"
-#include "ttnn/operations/experimental/plusone/plusone_pybind.hpp"
 
 namespace ttnn::operations::experimental::plusone::detail {
-namespace py = pybind11;
-void bind_experimental_plusone_operation(py::module& module) {
+
+namespace nb = nanobind;
+
+void bind_experimental_plusone_operation(nb::module_& mod) {
     auto doc =
         R"doc(plus_one(input_tensor: ttnn.Tensor) -> ttnn.Tensor
 
@@ -31,15 +39,15 @@ void bind_experimental_plusone_operation(py::module& module) {
 
     using OperationType = decltype(ttnn::plus_one);
     bind_registered_operation(
-        module,
+        mod,
         ttnn::plus_one,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const OperationType& self,
                const ttnn::Tensor& input_tensor,
                const std::optional<CoreRangeSet>& sub_core_grids) { return self(input_tensor, sub_core_grids); },
-            py::arg("input_tensor").noconvert(),
-            py::arg("sub_core_grids") = std::nullopt});
+            nb::arg("input_tensor").noconvert(),
+            nb::arg("sub_core_grids") = std::nullopt});
 }
 
 }  // namespace ttnn::operations::experimental::plusone::detail
