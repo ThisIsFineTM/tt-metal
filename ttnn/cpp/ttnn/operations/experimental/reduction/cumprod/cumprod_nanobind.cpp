@@ -2,11 +2,23 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "cumprod_pybind.hpp"
+#include "cumprod_nanobind.hpp"
+
+#include <cstdint>
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
 #include "ttnn/common/queue_id.hpp"
 
+#include "cpp/ttnn-nanobind/decorators.hpp"
+#include "ttnn/operations/experimental/reduction/cumprod/cumprod.hpp"
+#include "ttnn/types.hpp"
+
 namespace ttnn::operations::experimental::reduction::cumprod::detail {
-void bind_cumprod_operation(py::module& module) {
+
+void bind_cumprod_operation(nb::module_& mod) {
     auto doc =
         R"doc(
 
@@ -49,11 +61,12 @@ void bind_cumprod_operation(py::module& module) {
             )doc";
 
     using OperationType = decltype(ttnn::experimental::cumprod);
+
     bind_registered_operation(
-        module,
+        mod,
         ttnn::experimental::cumprod,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const OperationType& self,
                const ttnn::Tensor& input_tensor,
                const int32_t dim,
@@ -62,12 +75,12 @@ void bind_cumprod_operation(py::module& module) {
                const QueueId& queue_id = DefaultQueueId) {
                 return self(input_tensor, dim, optional_out, memory_config, queue_id);
             },
-            py::arg("input_tensor").noconvert(),
-            py::arg("dim"),
-            py::kw_only(),
-            py::arg("out") = std::nullopt,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId});
+            nb::arg("input_tensor").noconvert(),
+            nb::arg("dim"),
+            nb::kw_only(),
+            nb::arg("out") = std::nullopt,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
 }  // namespace ttnn::operations::experimental::reduction::cumprod::detail

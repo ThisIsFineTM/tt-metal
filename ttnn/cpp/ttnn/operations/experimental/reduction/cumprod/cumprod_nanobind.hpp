@@ -4,15 +4,12 @@
 
 #pragma once
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include "ttnn-nanobind/nanobind_fwd.hpp"
 
-#include "cpp/pybind11/decorators.hpp"
-
-#include "ttnn/operations/experimental/reduction/cumprod/cumprod.hpp"
-#include "ttnn/types.hpp"
 namespace ttnn::operations::experimental::reduction::cumprod::detail {
 
-void bind_cumprod_operation(py::module& module);
+namespace nb = nanobind;
+
+void bind_cumprod_operation(nb::module_& mod);
 
 }  // namespace ttnn::operations::experimental::reduction::cumprod::detail
