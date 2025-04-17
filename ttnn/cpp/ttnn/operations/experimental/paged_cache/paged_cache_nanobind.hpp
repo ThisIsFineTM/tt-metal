@@ -3,11 +3,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#include "pybind11/pybind_fwd.hpp"
+
+#include "ttnn-nanobind/nanobind_fwd.hpp"
 
 namespace ttnn::operations::experimental::paged_cache::detail {
 
-namespace py = pybind11;
+namespace nb = nanobind;
+void bind_experimental_paged_cache_operations(nb::module_& mod);
 
-void bind_experimental_paged_cache_operations(py::module& module);
 }  // namespace ttnn::operations::experimental::paged_cache::detail
