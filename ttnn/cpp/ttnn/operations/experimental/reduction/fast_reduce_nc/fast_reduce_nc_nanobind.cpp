@@ -2,22 +2,31 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "cpp/pybind11/decorators.hpp"
+#include "ttnn/operations/experimental/reduction/fast_reduce_nc/fast_reduce_nc_nanobind.hpp"
+
+#include <cstdint>
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include <cpp/ttnn-nanobind/small_vector_caster.hpp>
+#include "cpp/ttnn-nanobind/decorators.hpp"
 
 #include "ttnn/operations/experimental/reduction/fast_reduce_nc/fast_reduce_nc.hpp"
-#include "ttnn/operations/experimental/reduction/fast_reduce_nc/fast_reduce_nc_pybind.hpp"
 
 namespace ttnn::operations::experimental::reduction::detail {
 
-void bind_fast_reduce_nc(pybind11::module& module) {
+void bind_fast_reduce_nc(nb::module_& mod) {
     using OperationType = decltype(ttnn::experimental::reduction::fast_reduce_nc);
+
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::experimental::reduction::fast_reduce_nc,
         R"doc(
               Performs optimized reduction operation on dim 0, 1, or [0,1]. Returns an output tensor.
         )doc",
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const OperationType& self,
                const ttnn::Tensor& input,
                const ttnn::SmallVector<int32_t>& dims,
@@ -25,13 +34,13 @@ void bind_fast_reduce_nc(pybind11::module& module) {
                const ttnn::MemoryConfig& memory_config,
                std::optional<const ttnn::DeviceComputeKernelConfig> compute_kernel_config,
                QueueId queue_id) { return self(queue_id, input, dims, output, memory_config, compute_kernel_config); },
-            pybind11::arg("input").noconvert(),
-            pybind11::kw_only(),
-            pybind11::arg("dims").noconvert() = ttnn::SmallVector<int32_t>(),
-            pybind11::arg("output").noconvert() = std::nullopt,
-            pybind11::arg("memory_config").noconvert() = tt::tt_metal::operation::DEFAULT_OUTPUT_MEMORY_CONFIG,
-            pybind11::arg("compute_kernel_config").noconvert() = std::nullopt,
-            pybind11::arg("queue_id") = DefaultQueueId});
+            nb::arg("input").noconvert(),
+            nb::kw_only(),
+            nb::arg("dims").noconvert() = ttnn::SmallVector<int32_t>(),
+            nb::arg("output").noconvert() = std::nullopt,
+            nb::arg("memory_config").noconvert() = tt::tt_metal::operation::DEFAULT_OUTPUT_MEMORY_CONFIG,
+            nb::arg("compute_kernel_config").noconvert() = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
 }  // namespace ttnn::operations::experimental::reduction::detail

@@ -4,9 +4,11 @@
 
 #pragma once
 
-#include "pybind11/pybind_fwd.hpp"
+#include "ttnn-nanobind/nanobind_fwd.hpp"
 
 namespace ttnn::operations::experimental::reduction::detail {
 
-void bind_fast_reduce_nc(pybind11::module& module);
+namespace nb = nanobind;
+
+void bind_fast_reduce_nc(nb::module_& mod);
 }  // namespace ttnn::operations::experimental::reduction::detail
