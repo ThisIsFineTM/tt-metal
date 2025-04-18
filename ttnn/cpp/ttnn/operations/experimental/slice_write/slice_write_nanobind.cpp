@@ -2,17 +2,22 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-#include "cpp/pybind11/decorators.hpp"
+#include "slice_write_nanobind.hpp"
+
+#include <array>
+#include <cstdint>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/array.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 
 #include "slice_write.hpp"
-#include "slice_write_pybind.hpp"
 
 namespace ttnn::operations::experimental::slice_write {
-namespace py = pybind11;
+namespace nb = nanobind;
 
-void bind_slice_write(py::module& module) {
+void bind_slice_write(nb::module_& mod) {
     auto doc =
         R"doc(
             Writes the input tensor to a slice of the output tensor.
@@ -44,14 +49,15 @@ void bind_slice_write(py::module& module) {
                 >>> ttnn.slice_write(ttnn_input_tensor, ttnn_output_tensor, output_start_indices, output_end_indices, strides)
                 )doc";
 
-    // TODO: implementing the array version and overloading the pybind with all the possible array sizes is better than
+    // TODO: implementing the array version and overloading the nanobind with all the possible array sizes is better than
     // a vector with a fixed size default value
     using OperationType = decltype(ttnn::experimental::slice_write);
+
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::experimental::slice_write,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const OperationType& self,
                const ttnn::Tensor& input_tensor,
                const ttnn::Tensor& output_tensor,
@@ -59,13 +65,13 @@ void bind_slice_write(py::module& module) {
                const std::array<uint32_t, 4>& end,
                const std::array<uint32_t, 4>& step,
                QueueId queue_id) { return self(queue_id, input_tensor, output_tensor, start, end, step); },
-            py::arg("input_tensor"),
-            py::arg("output_tensor"),
-            py::arg("start"),
-            py::arg("end"),
-            py::arg("step"),
-            py::kw_only(),
-            py::arg("queue_id") = DefaultQueueId,
+            nb::arg("input_tensor"),
+            nb::arg("output_tensor"),
+            nb::arg("start"),
+            nb::arg("end"),
+            nb::arg("step"),
+            nb::kw_only(),
+            nb::arg("queue_id") = DefaultQueueId,
         });
 }
 }  // namespace ttnn::operations::experimental::slice_write
