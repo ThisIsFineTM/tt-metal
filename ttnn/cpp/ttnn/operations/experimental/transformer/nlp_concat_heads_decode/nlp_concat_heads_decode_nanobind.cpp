@@ -2,14 +2,16 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "ttnn/operations/experimental/transformer/nlp_concat_heads_decode/nlp_concat_heads_decode.hpp"
+#include "nlp_concat_heads_decode_nanobind.hpp"
 
+#include <cstdint>
 #include <optional>
 
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/optional.h>
 
 #include "cpp/ttnn-nanobind/decorators.hpp"
+#include "ttnn/operations/experimental/transformer/nlp_concat_heads_decode/nlp_concat_heads_decode.hpp"
 
 namespace nb = nanobind;
 

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "ttnn/operations/experimental/transformer/nlp_concat_heads/nlp_concat_heads.hpp"
+#include "nlp_concat_heads_nanobind.hpp"
 
 #include <optional>
 
@@ -10,6 +10,7 @@
 #include <nanobind/stl/optional.h>
 
 #include "cpp/ttnn-nanobind/decorators.hpp"
+#include "ttnn/operations/experimental/transformer/nlp_concat_heads/nlp_concat_heads.hpp"
 
 namespace ttnn::operations::experimental::transformer::detail {
 
