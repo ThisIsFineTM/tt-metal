@@ -1,17 +1,27 @@
 // SPDX-FileCopyrightText: © 2025 Tenstorrent Inc.
 //
 // SPDX-License-Identifier: Apache-2.0
-#include "sort_pybind.hpp"
+#include "sort_nanobind.hpp"
 
-#include "pybind11/decorators.hpp"
+#include <cstdint>
+#include <optional>
+#include <tuple>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+#include <nanobind/stl/tuple.h>
+
+#include "ttnn-nanobind/decorators.hpp"
 
 #include "sort.hpp"
 #include "device/sort_device_operation.hpp"
 
 namespace ttnn::operations::experimental::reduction::detail {
-namespace py = pybind11;
 
-void bind_reduction_sort_operation(py::module& module) {
+namespace nb = nanobind;
+
+
+void bind_reduction_sort_operation(nb::module_& mod) {
     auto doc =
         R"doc(
             Sorts the elements of the input tensor along the specified dimension in ascending order by default.
@@ -55,10 +65,10 @@ void bind_reduction_sort_operation(py::module& module) {
 
     using OperationType = decltype(ttnn::experimental::sort);
     bind_registered_operation(
-        module,
+        mod,
         ttnn::experimental::sort,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const OperationType& self,
                const ttnn::Tensor& input_tensor,
                const int8_t dim,
@@ -69,14 +79,14 @@ void bind_reduction_sort_operation(py::module& module) {
                QueueId queue_id) {
                 return self(queue_id, input_tensor, dim, descending, stable, memory_config, optional_output_tensors);
             },
-            py::arg("input_tensor").noconvert(),
-            py::arg("dim") = -1,
-            py::arg("descending") = false,
-            py::arg("stable") = false,
-            py::kw_only(),
-            py::arg("out") = std::nullopt,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId});
+            nb::arg("input_tensor").noconvert(),
+            nb::arg("dim") = -1,
+            nb::arg("descending") = false,
+            nb::arg("stable") = false,
+            nb::kw_only(),
+            nb::arg("out") = std::nullopt,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
 }  // namespace ttnn::operations::experimental::reduction::detail
