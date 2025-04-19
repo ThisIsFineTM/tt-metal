@@ -2,21 +2,24 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "rotary_embedding_pybind.hpp"
+#include "rotary_embedding_nanobind.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <optional>
 
-#include "cpp/pybind11/decorators.hpp"
+#include <nanobind/nanobind.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 
 #include "rotary_embedding.hpp"
 
+namespace nb = nanobind;
+
 namespace ttnn::operations::experimental::transformer {
 
-void py_bind_rotary_embedding(pybind11::module& module) {
-    namespace py = pybind11;
+void bind_rotary_embedding(nb::module_& mod) {
+    
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::experimental::rotary_embedding,
         R"doc(
         Applies the rotary embedding to the input_tensor tensor using the cos_cache and sin_cache tensors.
@@ -40,14 +43,14 @@ void py_bind_rotary_embedding(pybind11::module& module) {
             ttnn.Tensor: the output tensor.
 
         )doc",
-        ttnn::pybind_arguments_t{
-            py::arg("input_tensor"),
-            py::arg("cos_cache"),
-            py::arg("sin_cache"),
-            py::arg("token_index") = std::nullopt,
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("compute_kernel_config") = std::nullopt});
+        ttnn::nanobind_arguments_t{
+            nb::arg("input_tensor"),
+            nb::arg("cos_cache"),
+            nb::arg("sin_cache"),
+            nb::arg("token_index") = std::nullopt,
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("compute_kernel_config") = std::nullopt});
 }
 
 }  // namespace ttnn::operations::experimental::transformer
