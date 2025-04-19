@@ -2,22 +2,25 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "rotary_embedding_llama_pybind.hpp"
+#include "rotary_embedding_llama_nanobind.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <optional>
 
-#include "cpp/pybind11/decorators.hpp"
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 
 #include "rotary_embedding_llama.hpp"
 
+namespace nb = nanobind;
+
 namespace ttnn::operations::experimental::transformer {
 
-void py_bind_rotary_embedding_llama(pybind11::module& module) {
-    namespace py = pybind11;
+void bind_rotary_embedding_llama(nb::module_& mod) {
 
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::experimental::rotary_embedding_llama,
         R"doc(rotary_embedding_llama(input_tensor: ttnn.Tensor, cos_cache: ttnn.Tensor, sin_cache: ttnn.Tensor, trans_mat: ttnn.Tensor, is_decode_mode: bool, memory_config: MemoryConfig, compute_kernel_config: Optional[DeviceComputeKernelConfig]) -> ttnn.Tensor
 
@@ -34,15 +37,15 @@ void py_bind_rotary_embedding_llama(pybind11::module& module) {
                 * :attr:`memory_config`: Memory Config of the output tensor = DEFAULT_OUTPUT_MEMORY_CONFIG
                 * :attr:`compute_kernel_config`: Optional[DeviceComputeKernelConfig] = None
         )doc",
-        ttnn::pybind_arguments_t{
-            py::arg("input_tensor"),
-            py::arg("cos_cache"),
-            py::arg("sin_cache"),
-            py::arg("trans_mat"),
-            py::kw_only(),
-            py::arg("is_decode_mode") = false,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("compute_kernel_config") = std::nullopt});
+        ttnn::nanobind_arguments_t{
+            nb::arg("input_tensor"),
+            nb::arg("cos_cache"),
+            nb::arg("sin_cache"),
+            nb::arg("trans_mat"),
+            nb::kw_only(),
+            nb::arg("is_decode_mode") = false,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("compute_kernel_config") = std::nullopt});
 }
 
 }  // namespace ttnn::operations::experimental::transformer
