@@ -2,19 +2,21 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "repeat_and_interleave_eltwise_mul_pybind.hpp"
+#include "repeat_and_interleave_eltwise_mul_nanobind.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
 
 #include "repeat_and_interleave_eltwise_mul.hpp"
-#include "cpp/pybind11/decorators.hpp"
+#include "cpp/ttnn-nanobind/decorators.hpp"
+
+namespace nb = nanobind;
 
 namespace ttnn::operations::experimental::ssm::detail {
 
-namespace py = pybind11;
-
-void bind_repeat_and_interleave_eltwise_mul(py::module& module) {
+void bind_repeat_and_interleave_eltwise_mul(nb::module_& mod) {
     using OperationType = decltype(ttnn::experimental::repeat_and_interleave_eltwise_mul);
 
     const auto doc = R"doc(
@@ -22,10 +24,10 @@ void bind_repeat_and_interleave_eltwise_mul(py::module& module) {
             A.repeat(1, 1, 1, W) * B.repeat_interleave(32, dim=-1))doc";
 
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::experimental::repeat_and_interleave_eltwise_mul,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const OperationType& self,
                const ttnn::Tensor& a,
                const ttnn::Tensor& b,
@@ -33,13 +35,13 @@ void bind_repeat_and_interleave_eltwise_mul(py::module& module) {
                const std::optional<DataType> dtype,
                const std::optional<MathFidelity> math_fidelity,
                QueueId queue_id) { return self(queue_id, a, b, memory_config, dtype, math_fidelity); },
-            py::arg("a"),
-            py::arg("b"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("dtype") = std::nullopt,
-            py::arg("math_fidelity") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId});
+            nb::arg("a"),
+            nb::arg("b"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("dtype") = std::nullopt,
+            nb::arg("math_fidelity") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
 }  // namespace ttnn::operations::experimental::ssm::detail

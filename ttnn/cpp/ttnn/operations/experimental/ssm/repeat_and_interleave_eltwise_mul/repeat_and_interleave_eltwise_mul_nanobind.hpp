@@ -4,10 +4,11 @@
 
 #pragma once
 
-#include "pybind11/pybind_fwd.hpp"
+#include "ttnn-nanobind/nanobind_fwd.hpp"
 
 namespace ttnn::operations::experimental::ssm::detail {
 
-void bind_repeat_and_interleave_eltwise_mul(pybind11::module& module);
+namespace nb = nanobind;
+void bind_repeat_and_interleave_eltwise_mul(nb::module_& mod);
 
 }  // namespace ttnn::operations::experimental::ssm::detail
