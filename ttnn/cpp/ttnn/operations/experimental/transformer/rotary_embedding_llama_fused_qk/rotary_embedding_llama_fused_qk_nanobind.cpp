@@ -2,22 +2,25 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "rotary_embedding_llama_fused_qk_pybind.hpp"
+#include "rotary_embedding_llama_fused_qk_nanobind.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <optional>
 
-#include "cpp/pybind11/decorators.hpp"
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 
 #include "rotary_embedding_llama_fused_qk.hpp"
 
+namespace nb = nanobind;
+
 namespace ttnn::operations::experimental::transformer {
 
-void py_bind_rotary_embedding_llama_fused_qk(pybind11::module& module) {
-    namespace py = pybind11;
+void bind_rotary_embedding_llama_fused_qk(nb::module_& mod) {
 
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::experimental::rotary_embedding_llama_fused_qk,
         R"doc(
 
@@ -37,14 +40,14 @@ void py_bind_rotary_embedding_llama_fused_qk(pybind11::module& module) {
                 ttnn.Tensor, ttnn.Tensor: q and k output tensors with rotary embeddings applied.
 
         )doc",
-        ttnn::pybind_arguments_t{
-            py::arg("q_input_tensor"),
-            py::arg("k_input_tensor"),
-            py::arg("cos_cache"),
-            py::arg("sin_cache"),
-            py::arg("trans_mat"),
-            py::kw_only(),
-            py::arg("compute_kernel_config") = std::nullopt});
+        ttnn::nanobind_arguments_t{
+            nb::arg("q_input_tensor"),
+            nb::arg("k_input_tensor"),
+            nb::arg("cos_cache"),
+            nb::arg("sin_cache"),
+            nb::arg("trans_mat"),
+            nb::kw_only(),
+            nb::arg("compute_kernel_config") = std::nullopt});
 }
 
 }  // namespace ttnn::operations::experimental::transformer
