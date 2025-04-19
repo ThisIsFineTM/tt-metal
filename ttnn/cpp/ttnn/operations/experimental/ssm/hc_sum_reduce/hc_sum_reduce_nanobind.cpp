@@ -2,19 +2,21 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "hc_sum_reduce_pybind.hpp"
+#include "hc_sum_reduce_nanobind.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
 
 #include "hc_sum_reduce.hpp"
-#include "cpp/pybind11/decorators.hpp"
+#include "cpp/ttnn-nanobind/decorators.hpp"
 
 namespace ttnn::operations::experimental::ssm::detail {
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
-void bind_hc_sum_reduce(py::module& module) {
+void bind_hc_sum_reduce(nb::module_& mod) {
     using OperationType = decltype(ttnn::experimental::hc_sum_reduce);
 
     const auto doc = R"doc(
@@ -23,22 +25,22 @@ void bind_hc_sum_reduce(py::module& module) {
     )doc";
 
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::experimental::hc_sum_reduce,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const OperationType& self,
                const ttnn::Tensor& input,
                const std::optional<MemoryConfig>& memory_config,
                const std::optional<DataType> dtype,
                const std::optional<MathFidelity> math_fidelity,
                QueueId queue_id) { return self(queue_id, input, memory_config, dtype, math_fidelity); },
-            py::arg("input"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("dtype") = std::nullopt,
-            py::arg("math_fidelity") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId});
+            nb::arg("input"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("dtype") = std::nullopt,
+            nb::arg("math_fidelity") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
 }  // namespace ttnn::operations::experimental::ssm::detail
