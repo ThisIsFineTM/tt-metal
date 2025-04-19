@@ -2,14 +2,12 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "ttnn/operations/experimental/unary_backward/gelu_backward/gelu_backward_nanobind.hpp"
+#include "gelu_backward_nanobind.hpp"
 
-#include <string>
 #include <optional>
 
 #include <fmt/format.h>
 #include <nanobind/nanobind.h>
-#include <nanobind/stl/string.h>
 #include <nanobind/stl/optional.h>
 
 #include "cpp/ttnn-nanobind/decorators.hpp"
@@ -67,7 +65,7 @@ void bind_experimental_gelu_backward_operation(nb::module_& mod) {
 
     using OperationType = decltype(ttnn::experimental::gelu_bw);
     bind_registered_operation(
-        module,
+        mod,
         ttnn::experimental::gelu_bw,
         doc,
         ttnn::nanobind_overload_t{
