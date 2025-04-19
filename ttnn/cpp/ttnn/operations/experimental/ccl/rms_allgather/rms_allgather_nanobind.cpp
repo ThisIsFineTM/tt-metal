@@ -2,51 +2,53 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include "rms_allgather_nanobind.hpp"
 
-#include "cpp/pybind11/decorators.hpp"
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "ttnn/operations/experimental/ccl/rms_allgather/rms_allgather.hpp"
 #include "ttnn/operations/ccl/ccl_host_datastructures.hpp"
 #include "ttnn/distributed/types.hpp"
 #include "cpp/ttnn/global_semaphore.hpp"
 
-#include "rms_allgather_pybind.hpp"
+namespace nb = nanobind;
 
 namespace ttnn::operations::experimental::ccl {
 
-namespace py = pybind11;
-
-void bind_fused_rms_1_1_32_8192(py::module& module) {
+void bind_fused_rms_1_1_32_8192(nb::module_& mod) {
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::fused_rms_1_1_32_8192,
         R"doc(Only works for sharded shape (1,1,32,8192) sharded on 1 core
         )doc",
         // Stats is internally computed
-        ttnn::pybind_arguments_t{
+        ttnn::nanobind_arguments_t{
             // Used by all
-            py::arg("input_tensor"),
-            py::arg("program_config"),
-            py::arg("cluster_axis"),
-            py::arg("mesh_device"),
-            py::arg("global_semaphore"),  // TODO: Build this internally
-            py::kw_only(),
+            nb::arg("input_tensor"),
+            nb::arg("program_config"),
+            nb::arg("cluster_axis"),
+            nb::arg("mesh_device"),
+            nb::arg("global_semaphore"),  // TODO: Build this internally
+            nb::kw_only(),
             // all gather
-            py::arg("persistent_output_tensor") = std::nullopt,
-            py::arg("num_links") = std::nullopt,
-            py::arg("topology") = ttnn::ccl::Topology::Linear,
-            py::arg("subdevice_id") = std::nullopt,
+            nb::arg("persistent_output_tensor") = std::nullopt,
+            nb::arg("num_links") = std::nullopt,
+            nb::arg("topology") = ttnn::ccl::Topology::Linear,
+            nb::arg("subdevice_id") = std::nullopt,
             // common
-            py::arg("dtype") = std::nullopt,  // Should default to BFLOAT 16 on pre, nullopt on post
-            py::arg("compute_kernel_config") = std::nullopt,
-            py::arg("memory_config") = std::nullopt,
+            nb::arg("dtype") = std::nullopt,  // Should default to BFLOAT 16 on pre, nullopt on post
+            nb::arg("compute_kernel_config") = std::nullopt,
+            nb::arg("memory_config") = std::nullopt,
             // on pre only
-            py::arg("residual_input_tensor") = std::nullopt,
+            nb::arg("residual_input_tensor") = std::nullopt,
             // on post only
-            py::arg("epsilon") = 1e-12,  // constant 1e-12 on pre, value only affects post
-            py::arg("weight") = std::nullopt,
-            py::arg("stats") = std::nullopt,
-            py::arg("is_pre") = true});
+            nb::arg("epsilon") = 1e-12,  // constant 1e-12 on pre, value only affects post
+            nb::arg("weight") = std::nullopt,
+            nb::arg("stats") = std::nullopt,
+            nb::arg("is_pre") = true});
 }
 }  // namespace ttnn::operations::experimental::ccl
