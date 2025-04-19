@@ -2,22 +2,31 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "cpp/pybind11/decorators.hpp"
+#include "ttnn/operations/experimental/transformer/nlp_create_qkv_heads/nlp_create_qkv_heads_nanobind.hpp"
+
+#include <optional>
+#include <vector>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+#include <nanobind/stl/vector.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 
 #include "ttnn/operations/experimental/transformer/nlp_create_qkv_heads/nlp_create_qkv_heads.hpp"
-#include "ttnn/operations/experimental/transformer/nlp_create_qkv_heads/nlp_create_qkv_heads_pybind.hpp"
 
 namespace ttnn::operations::experimental::transformer::detail {
 
+namespace {
 template <typename transformer_operation_t>
-void bind_nlp_create_qkv_heads_template(pybind11::module& module, const transformer_operation_t& operation) {
+void bind_nlp_create_qkv_heads_template(nb::module_& mod, const transformer_operation_t& operation) {
     ttnn::bind_registered_operation(
-        module,
+        mod,
         operation,
         R"doc(
              Shuffles [B, 1, S, 3 * head_dim * num_heads] fused qkv matrix into 3 Q, K, and V heads with shapes [B, num_heads, S, head_dim], [B, num_kv_heads, head_dim, S], and [B, num_kv_heads, S, head_dim]. If optional ``input_kv`` tensor is provided, K and V will be created from ``input_kv`` and ``input`` should have shape [B, 1, S, head_dim * num_heads] instead. ``num_kv_heads`` defaults to ``num_heads`` if not provided. An additional transpose along the last two dims is performed by default for K heads, but this can be skipped with ``transpose_k_heads=false``.
         )doc",
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const transformer_operation_t& self,
                const ttnn::Tensor& input_tensor_q,
                const std::optional<ttnn::Tensor>& input_tensor_kv,
@@ -37,18 +46,19 @@ void bind_nlp_create_qkv_heads_template(pybind11::module& module, const transfor
                     memory_config,
                     optional_output_tensors);
             },
-            pybind11::arg("input").noconvert(),
-            pybind11::arg("input_kv").noconvert() = std::nullopt,
-            pybind11::kw_only(),
-            pybind11::arg("num_heads").noconvert(),
-            pybind11::arg("num_kv_heads").noconvert() = std::nullopt,
-            pybind11::arg("transpose_k_heads").noconvert() = true,
-            pybind11::arg("memory_config").noconvert() = std::nullopt,
-            pybind11::arg("output_tensors").noconvert() = std::nullopt,
-            pybind11::arg("queue_id") = DefaultQueueId});
+            nb::arg("input").noconvert(),
+            nb::arg("input_kv").noconvert() = std::nullopt,
+            nb::kw_only(),
+            nb::arg("num_heads").noconvert(),
+            nb::arg("num_kv_heads").noconvert() = std::nullopt,
+            nb::arg("transpose_k_heads").noconvert() = true,
+            nb::arg("memory_config").noconvert() = std::nullopt,
+            nb::arg("output_tensors").noconvert() = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId});
 };
+} // namespace (for internal linkage)
 
-void bind_nlp_create_qkv_heads(pybind11::module& module) {
-    bind_nlp_create_qkv_heads_template(module, ttnn::experimental::nlp_create_qkv_heads);
+void bind_nlp_create_qkv_heads(nb::module_& mod) {
+    bind_nlp_create_qkv_heads_template(mod, ttnn::experimental::nlp_create_qkv_heads);
 }
 }  // namespace ttnn::operations::experimental::transformer::detail
