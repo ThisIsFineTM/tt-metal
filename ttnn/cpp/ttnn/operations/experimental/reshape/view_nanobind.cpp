@@ -2,20 +2,24 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "view_pybind.hpp"
+#include "view_nanobind.hpp"
+
+#include <cstdint>
+
+#include <nanobind/nanobind.h>
+
+#include "ttnn-nanobind/small_vector_caster.hpp"
+
 #include "view.hpp"
-
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-
-#include "cpp/pybind11/decorators.hpp"
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "ttnn/operations/data_movement/reshape_on_device/reshape.hpp"
 #include "ttnn/types.hpp"
 
 namespace ttnn::operations::experimental::reshape::detail {
-namespace py = pybind11;
 
-void py_bind_view(py::module& module) {
+namespace nb = nanobind;
+
+void bind_view(nb::module_& mod) {
     auto doc = R"doc(
         Note:
         - It is recommended to use ttnn.reshape if you are not sure which operation to use
@@ -32,28 +36,29 @@ void py_bind_view(py::module& module) {
             >>> tensor = ttnn.from_torch(torch.tensor((2, 1, 4), dtype=torch.bfloat16), device=device)
             >>> output = ttnn.experimental.view(tensor, (2, 1, 1, 4))
         )doc";
+
     bind_registered_operation(
-        module,
+        mod,
         ttnn::experimental::view,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const decltype(ttnn::experimental::view)& self, ttnn::Tensor& input_tensor, int N, int C, int H, int W) {
                 return self(input_tensor, infer_dims_for_reshape(input_tensor, ttnn::SmallVector<int>{N, C, H, W}));
             },
-            py::arg("input_tensor"),
-            py::arg("N"),
-            py::arg("C"),
-            py::arg("H"),
-            py::arg("W"),
+            nb::arg("input_tensor"),
+            nb::arg("N"),
+            nb::arg("C"),
+            nb::arg("H"),
+            nb::arg("W"),
         },
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const decltype(ttnn::experimental::view)& self,
                ttnn::Tensor& input_tensor,
                const ttnn::SmallVector<int32_t>& shape) {
                 return self(input_tensor, infer_dims_for_reshape(input_tensor, shape));
             },
-            py::arg("input_tensor"),
-            py::arg("shape"),
+            nb::arg("input_tensor"),
+            nb::arg("shape"),
         });
 }
 
