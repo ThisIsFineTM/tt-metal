@@ -4,10 +4,11 @@
 
 #pragma once
 
-#include "pybind11/pybind_fwd.hpp"
+#include "ttnn-nanobind/nanobind_fwd.hpp"
 
 namespace ttnn::operations::experimental::transformer {
 
-void py_bind_rotary_embedding_llama_fused_qk(pybind11::module& module);
+namespace nb = nanobind;
+void bind_rotary_embedding_llama_fused_qk(nb::module_& mod);
 
 }  // namespace ttnn::operations::experimental::transformer
