@@ -4,12 +4,17 @@
 
 #include "types.hpp"
 
+#include <cstddef>
+#include <cstdint>
+#include <string>
 #include <sstream>
 
-#include <pybind11/operators.h>
-#include <pybind11/stl.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/operators.h>
+#include <nanobind/stl/string.h>
 
 #include <tt-metalium/small_vector.hpp>
+#include "ttnn-nanobind/small_vector_caster.hpp"
 
 #include "export_enum.hpp"
 #include "ttnn/common/queue_id.hpp"
@@ -17,51 +22,75 @@
 #include "ttnn/types.hpp"
 #include "ttnn/operations/data_movement/bcast/bcast_types.hpp"
 
-namespace ttnn {
-namespace types {
+namespace ttnn::types {
 
-void py_module_types(py::module& module) {
-    py::class_<ttnn::CoreGrid>(module, "CoreGrid");
-    py::class_<ttnn::Shape>(module, "Shape");
-    py::class_<ttnn::QueueId>(module, "QueueId")
-        .def(py::init<uint8_t>())
+void py_module_types(nb::module_& mod) {
+    nb::class_<ttnn::CoreGrid>(mod, "CoreGrid");
+    nb::class_<ttnn::Shape>(mod, "Shape");
+    nb::class_<ttnn::QueueId>(mod, "QueueId")
+        .def(nb::init<uint8_t>())
         .def("__int__", [](const ttnn::QueueId& self) { return static_cast<int>(*self); })
         .def(
             "__repr__",
             [](const ttnn::QueueId& self) { return "QueueId(" + std::to_string(static_cast<int>(*self)) + ")"; })
-        .def(py::self == py::self);
+        .def(nb::self == nb::self,
+             nb::sig("def __eq__(self, arg: object, /) -> bool")) // see Typing in nb docs for explanation
+        .def("__init__",
+            [](ttnn::QueueId* t, nb::int_ arg) {
+                // QueueId uses a strong alias so we have to do this manually
+                new (t) ttnn::QueueId(static_cast<uint8_t>(arg));
+            })
+        .def("__init__",
+            [](ttnn::QueueId* t, unsigned char arg) {
+                // ttnn::maximum's binding wasn't working so this had to be added
+                new (t) ttnn::QueueId(static_cast<uint8_t>(arg));
+            })
+        ;
 
-    export_enum<ttnn::BcastOpMath>(module, "BcastOpMath");
-    export_enum<ttnn::BcastOpDim>(module, "BcastOpDim");
+    nb::implicitly_convertible<nb::int_, ttnn::QueueId>();
+    nb::implicitly_convertible<unsigned char, ttnn::QueueId>();
+    
+    export_enum<ttnn::BcastOpMath>(mod, "BcastOpMath");
+    export_enum<ttnn::BcastOpDim>(mod, "BcastOpDim");
 
-    py::implicitly_convertible<py::int_, ttnn::QueueId>();
-
-    module.attr("DRAM_MEMORY_CONFIG") = py::cast(DRAM_MEMORY_CONFIG);
-    module.attr("L1_MEMORY_CONFIG") = py::cast(L1_MEMORY_CONFIG);
+    mod.attr("DRAM_MEMORY_CONFIG") = nb::cast(DRAM_MEMORY_CONFIG);
+    mod.attr("L1_MEMORY_CONFIG") = nb::cast(L1_MEMORY_CONFIG);
 }
 
-void py_module(py::module& module) {
-    auto py_core_coord = static_cast<py::class_<ttnn::CoreGrid>>(module.attr("CoreGrid"));
-    py_core_coord.def(py::init<std::size_t, std::size_t>(), py::kw_only(), py::arg("x"), py::arg("y"))
-        .def_property_readonly("x", [](const ttnn::CoreGrid& self) { return self.x; })
-        .def_property_readonly("y", [](const ttnn::CoreGrid& self) { return self.y; })
-        .def_property_readonly("num_cores", [](const ttnn::CoreGrid& self) { return self.x * self.y; })
+void py_module(nb::module_& mod) {
+    auto py_core_coord = static_cast<nb::class_<ttnn::CoreGrid>>(mod.attr("CoreGrid"));
+    py_core_coord
+        .def(nb::init<std::size_t, std::size_t>(),
+             nb::kw_only(),
+             nb::arg("x"), nb::arg("y"))
+        .def_prop_ro("x", [](const ttnn::CoreGrid& self) { return self.x; })
+        .def_prop_ro("y", [](const ttnn::CoreGrid& self) { return self.y; })
+        .def_prop_ro("num_cores", [](const ttnn::CoreGrid& self) { return self.x * self.y; })
         .def("__repr__", [](const ttnn::CoreGrid& self) -> std::string {
             std::stringstream ss;
             ss << self;
             return ss.str();
         });
 
-    auto PyShape = static_cast<py::class_<ttnn::Shape>>(module.attr("Shape"));
-    PyShape.def(py::init<const ttnn::SmallVector<uint32_t>&>(), py::arg("shape"))
+    auto PyShape = static_cast<nb::class_<ttnn::Shape>>(mod.attr("Shape"));
+    PyShape
+        .def(nb::init<const ttnn::SmallVector<uint32_t>&>(), nb::arg("shape"))
         .def("__len__", [](const Shape& self) { return self.rank(); })
         .def("__getitem__", [](const Shape& self, std::int64_t index) { return self[index]; })
-        .def(
-            "__iter__",
-            [](const Shape& self) {
-                return py::iter(py::cast(ttnn::SmallVector<uint32_t>(self.cbegin(), self.cend())));
-            })
-        .def(pybind11::self == pybind11::self)
+        //.def(
+        //    "__iter__",
+        //    [](const Shape& self) {
+        //        return nb::iter(nb::cast(ttnn::SmallVector<uint32_t>(self.cbegin(), self.cend())));
+        //    })
+        //.def( // TODO: validate usage
+        //      // TODO: is this UB??
+        //    "__iter__",
+        //    [](const Shape& self) {
+        //        //return nb::iter(nb::cast(ttnn::SmallVector<uint32_t>(self.cbegin(), self.cend())));
+        //        //return nb::make_iterator()
+        //    }, nb::keep_alive<0,1>())
+        .def(nb::self == nb::self,
+             nb::sig("def __eq__(self, arg: object, /) -> bool")) // see Typing in nb docs for explanation
         .def(
             "__repr__",
             [](const Shape& self) {
@@ -69,7 +98,7 @@ void py_module(py::module& module) {
                 ss << self;
                 return ss.str();
             })
-        .def_property_readonly("rank", [](const Shape& self) -> std::size_t { return self.rank(); })
+        .def_prop_ro("rank", [](const Shape& self) -> std::size_t { return self.rank(); })
         .def("to_rank", [](const Shape& self, std::size_t new_rank) {
             SmallVector<uint32_t> new_shape(new_rank, 1);
 
@@ -83,9 +112,8 @@ void py_module(py::module& module) {
             }
 
             return ttnn::Shape(std::move(new_shape));
-        });
-    py::implicitly_convertible<ttnn::SmallVector<uint32_t>, ttnn::Shape>();
+        })
+        .def(nb::init_implicit<ttnn::SmallVector<uint32_t>>());
 }
 
-}  // namespace types
-}  // namespace ttnn
+}  // namespace ttnn::types
