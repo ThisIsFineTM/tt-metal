@@ -62,10 +62,10 @@ void py_module(nb::module_& mod) {
     transformer::detail::bind_nlp_create_qkv_heads_segformer(mod);
     transformer::detail::bind_nlp_kv_cache_load_slice(mod);
 
-    transformer::py_bind_rotary_embedding(mod);
-    transformer::py_bind_rotary_embedding_llama(mod);
-    transformer::py_bind_rotary_embedding_llama_fused_qk(mod);
-    transformer::py_bind_rotate_half(mod);
+    transformer::bind_rotary_embedding(mod);
+    transformer::bind_rotary_embedding_llama(mod);
+    transformer::bind_rotary_embedding_llama_fused_qk(mod);
+    transformer::bind_rotate_half(mod);
 
     reduction::detail::bind_argmax_operation(mod);
     reduction::detail::bind_argmin_operation(mod);
@@ -77,10 +77,10 @@ void py_module(nb::module_& mod) {
 
     cnn::detail::bind_convert_to_chw(mod);
 
-    ttnn::operations::experimental::conv3d::detail::py_bind_conv3d(mod);
+    ttnn::operations::experimental::conv3d::detail::bind_conv3d(mod);
     ttnn::operations::experimental::reduction::cumprod::detail::bind_cumprod_operation(mod);
 
-    conb::detail::py_bind_typecast(mod);
+    copy::detail::bind_typecast(mod);
 
     paged_cache::detail::bind_experimental_paged_cache_operations(mod);
     matmul::detail::bind_attn_matmul(mod);
@@ -89,7 +89,7 @@ void py_module(nb::module_& mod) {
 
     plusone::detail::bind_experimental_plusone_operation(mod);
     dropout::detail::bind_experimental_dropout_operation(mod);
-    reshape::detail::py_bind_view(mod);
+    reshape::detail::bind_view(mod);
 
     gelu_backward::detail::bind_experimental_gelu_backward_operation(mod);
 
