@@ -2,13 +2,24 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "llama_reduce_scatter_pybind.hpp"
-#include "llama_reduce_scatter.hpp"
-#include <tt-metalium/sub_device_types.hpp>
-namespace ttnn::operations::experimental::ccl {
-namespace py = pybind11;
+#include "llama_reduce_scatter_nanobind.hpp"
 
-void py_bind_llama_reduce_scatter(py::module& module) {
+#include <cstdint>
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
+#include <tt-metalium/sub_device_types.hpp>
+#include "llama_reduce_scatter.hpp"
+
+namespace ttnn::operations::experimental::ccl {
+
+namespace nb = nanobind;
+
+void bind_llama_reduce_scatter(nb::module_& mod) {
+
     auto doc =
         R"doc(llama_reduce_scatter(input_tensor: ttnn.Tensor, dims: List[int], memory_config: Optional[MemoryConfig] = std::nullopt, queue_id: int = 0) -> ttnn.Tensor
 
@@ -45,11 +56,12 @@ void py_bind_llama_reduce_scatter(py::module& module) {
                                 memory_config=output_mem_config))doc";
 
     using OperationType = decltype(ttnn::experimental::llama_reduce_scatter);
+
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::experimental::llama_reduce_scatter,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const OperationType& self,
                const ttnn::Tensor& input_tensor,
                ttnn::Tensor& intermediate_packet_buffer,
@@ -73,17 +85,17 @@ void py_bind_llama_reduce_scatter(py::module& module) {
                     num_links,
                     memory_config);
             },
-            py::arg("input_tensor").noconvert(),
-            py::arg("intermediate_packet_buffer").noconvert(),
-            py::arg("dim"),
-            py::arg("cross_device_semaphore"),
-            py::arg("subdevice_id"),
-            py::arg("cluster_axis"),
-            py::arg("mesh_device"),
-            py::kw_only(),
-            py::arg("num_links") = 1,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId,
+            nb::arg("input_tensor").noconvert(),
+            nb::arg("intermediate_packet_buffer").noconvert(),
+            nb::arg("dim"),
+            nb::arg("cross_device_semaphore"),
+            nb::arg("subdevice_id"),
+            nb::arg("cluster_axis"),
+            nb::arg("mesh_device"),
+            nb::kw_only(),
+            nb::arg("num_links") = 1,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId,
         });
 }
 
