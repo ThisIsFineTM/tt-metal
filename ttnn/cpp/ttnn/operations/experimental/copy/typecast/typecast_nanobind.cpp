@@ -13,7 +13,7 @@
 
 #include "typecast.hpp"
 
-namespace ttnn::operations::experimental::conb::detail {
+namespace ttnn::operations::experimental::copy::detail {
 
 namespace nb = nanobind;
 
@@ -53,4 +53,4 @@ void bind_typecast(nb::module_& mod) {
             nb::arg("queue_id") = DefaultQueueId});
 }
 
-}  // namespace ttnn::operations::experimental::conb::detail
+}  // namespace ttnn::operations::experimental::copy::detail
