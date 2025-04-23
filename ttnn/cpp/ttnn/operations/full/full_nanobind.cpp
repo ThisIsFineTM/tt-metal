@@ -2,18 +2,22 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "full_pybind.hpp"
+#include "full_nanobind.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <optional>
+
+#include <fmt/format.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
 
 #include "full.hpp"
-#include "pybind11/cast.h"
-#include "cpp/pybind11/decorators.hpp"
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "ttnn/operations/full/device/full_device_operation.hpp"
 
+namespace nb = nanobind;
+
 namespace ttnn::operations::full {
-void bind_full_operation(py::module& module) {
+void bind_full_operation(nb::module_& mod) {
     auto doc = fmt::format(
         R"doc(
         Creates a tensor of the specified shape and fills it with the specified scalar value.
@@ -41,17 +45,17 @@ void bind_full_operation(py::module& module) {
 
     using FullType = decltype(ttnn::moreh_full);
     bind_registered_operation(
-        module,
+        mod,
         ttnn::moreh_full,
         doc,
-        ttnn::pybind_arguments_t{
-            py::arg("shape"),
-            py::arg("fill_value"),
-            py::arg("any"),
-            py::kw_only(),
-            py::arg("dtype") = std::nullopt,
-            py::arg("layout") = std::nullopt,
-            py::arg("memory_config") = std::nullopt});
+        ttnn::nanobind_arguments_t{
+            nb::arg("shape"),
+            nb::arg("fill_value"),
+            nb::arg("any"),
+            nb::kw_only(),
+            nb::arg("dtype") = std::nullopt,
+            nb::arg("layout") = std::nullopt,
+            nb::arg("memory_config") = std::nullopt});
 }
 
 }  // namespace ttnn::operations::full
