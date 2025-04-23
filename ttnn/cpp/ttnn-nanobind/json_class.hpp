@@ -4,15 +4,20 @@
 
 #pragma once
 
-#include <tt_stl/reflection.hpp>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <string>
 
-namespace py = pybind11;
+#include <fmt/format.h>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/string.h>
+
+#include <nlohmann/json.hpp>
+
+#include <tt_stl/reflection.hpp>
 
 template <typename T>
-auto tt_serializable_class(py::module m, auto name, auto desc) {
-    return py::class_<T>(m, name, desc)
+auto tt_serializable_class(nanobind::module_& mod, auto name, auto desc) {
+    return nanobind::class_<T>(mod, name, desc)
         .def("to_json", [](const T& self) -> std::string { return tt::stl::json::to_json(self).dump(); })
         .def(
             "from_json",

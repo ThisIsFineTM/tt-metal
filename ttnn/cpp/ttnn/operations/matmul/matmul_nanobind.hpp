@@ -4,16 +4,11 @@
 
 #pragma once
 
-#include "pybind11/pybind_fwd.hpp"
+#include "ttnn-nanobind/nanobind_fwd.hpp"
 
-namespace py = pybind11;
+namespace ttnn::operations::matmul {
 
-namespace ttnn {
-namespace operations {
-namespace matmul {
+namespace nb = nanobind;
+void py_module(nb::module_& mod);
 
-void py_module(py::module& module);
-
-}  // namespace matmul
-}  // namespace operations
-}  // namespace ttnn
+}  // namespace ttnn::operations::matmul 

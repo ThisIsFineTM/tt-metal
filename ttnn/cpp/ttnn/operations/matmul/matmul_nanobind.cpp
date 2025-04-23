@@ -2,62 +2,61 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "ttnn/operations/matmul/matmul_pybind.hpp"
+#include "ttnn/operations/matmul/matmul_nanobind.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <cstddef>
+#include <optional>
 
-#include <utility>
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
 
-#include "pybind11/decorators.hpp"
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include <tt-metalium/core_coord.hpp>
-#include "cpp/pybind11/json_class.hpp"
+#include "cpp/ttnn-nanobind/json_class.hpp"
 #include "ttnn/operations/matmul/matmul.hpp"
 #include "ttnn/types.hpp"
 
-namespace ttnn {
-namespace operations {
-namespace matmul {
+namespace ttnn::operations::matmul {
 
 using ttnn::operations::unary::UnaryWithParam;
 
-void py_module(py::module& module) {
-    auto matmul_program_config = tt_serializable_class<MatmulProgramConfig>(module, "MatmulProgramConfig", R"doc(
+void py_module(nb::module_& mod) {
+    auto matmul_program_config = tt_serializable_class<MatmulProgramConfig>(mod, "MatmulProgramConfig", R"doc(
         Class defining matmul program config
     )doc");
 
     auto matmul_multi_core_reuse_program_config =
-        tt_serializable_class<MatmulMultiCoreReuseProgramConfig>(module, "MatmulMultiCoreReuseProgramConfig", R"doc(
+        tt_serializable_class<MatmulMultiCoreReuseProgramConfig>(mod, "MatmulMultiCoreReuseProgramConfig", R"doc(
         Class defining matmul multi core reuse program config
     )doc");
 
     matmul_multi_core_reuse_program_config
         .def(
-            py::init<CoreCoord, std::size_t, std::size_t, std::size_t, std::size_t, std::size_t>(),
-            py::kw_only(),
-            py::arg("compute_with_storage_grid_size"),
-            py::arg("in0_block_w").noconvert(),
-            py::arg("out_subblock_h").noconvert(),
-            py::arg("out_subblock_w").noconvert(),
-            py::arg("per_core_M").noconvert(),
-            py::arg("per_core_N").noconvert())
-        .def_readwrite(
+            nb::init<CoreCoord, std::size_t, std::size_t, std::size_t, std::size_t, std::size_t>(),
+            nb::kw_only(),
+            nb::arg("compute_with_storage_grid_size"),
+            nb::arg("in0_block_w").noconvert(),
+            nb::arg("out_subblock_h").noconvert(),
+            nb::arg("out_subblock_w").noconvert(),
+            nb::arg("per_core_M").noconvert(),
+            nb::arg("per_core_N").noconvert())
+        .def_rw(
             "compute_with_storage_grid_size", &MatmulMultiCoreReuseProgramConfig::compute_with_storage_grid_size)
-        .def_readwrite("in0_block_w", &MatmulMultiCoreReuseProgramConfig::in0_block_w)
-        .def_readwrite("out_subblock_h", &MatmulMultiCoreReuseProgramConfig::out_subblock_h)
-        .def_readwrite("out_subblock_w", &MatmulMultiCoreReuseProgramConfig::out_subblock_w)
-        .def_readwrite("per_core_M", &MatmulMultiCoreReuseProgramConfig::per_core_M)
-        .def_readwrite("per_core_N", &MatmulMultiCoreReuseProgramConfig::per_core_N);
+        .def_rw("in0_block_w", &MatmulMultiCoreReuseProgramConfig::in0_block_w)
+        .def_rw("out_subblock_h", &MatmulMultiCoreReuseProgramConfig::out_subblock_h)
+        .def_rw("out_subblock_w", &MatmulMultiCoreReuseProgramConfig::out_subblock_w)
+        .def_rw("per_core_M", &MatmulMultiCoreReuseProgramConfig::per_core_M)
+        .def_rw("per_core_N", &MatmulMultiCoreReuseProgramConfig::per_core_N);
 
     auto matmul_multi_core_reuse_multicast_program_config =
         tt_serializable_class<MatmulMultiCoreReuseMultiCastProgramConfig>(
-            module, "MatmulMultiCoreReuseMultiCastProgramConfig", R"doc(
+            mod, "MatmulMultiCoreReuseMultiCastProgramConfig", R"doc(
         Class defining matmul multi core reuse multi cast program config
     )doc");
 
     matmul_multi_core_reuse_multicast_program_config
         .def(
-            py::init([](CoreCoord compute_with_storage_grid_size,
+            nb::init([](CoreCoord compute_with_storage_grid_size,
                         std::size_t in0_block_w,
                         std::size_t out_subblock_h,
                         std::size_t out_subblock_w,
@@ -85,41 +84,41 @@ void py_module(py::module& module) {
                     std::move(fused_activation),
                     fuse_batch);
             }),
-            py::kw_only(),
-            py::arg("compute_with_storage_grid_size"),
-            py::arg("in0_block_w").noconvert(),
-            py::arg("out_subblock_h").noconvert(),
-            py::arg("out_subblock_w").noconvert(),
-            py::arg("out_block_h") = py::none(),
-            py::arg("out_block_w") = py::none(),
-            py::arg("per_core_M").noconvert(),
-            py::arg("per_core_N").noconvert(),
-            py::arg("transpose_mcast").noconvert(),
-            py::arg("fused_activation"),
-            py::arg("fuse_batch").noconvert() = true)
-        .def_readwrite(
+            nb::kw_only(),
+            nb::arg("compute_with_storage_grid_size"),
+            nb::arg("in0_block_w").noconvert(),
+            nb::arg("out_subblock_h").noconvert(),
+            nb::arg("out_subblock_w").noconvert(),
+            nb::arg("out_block_h") = nb::none(),
+            nb::arg("out_block_w") = nb::none(),
+            nb::arg("per_core_M").noconvert(),
+            nb::arg("per_core_N").noconvert(),
+            nb::arg("transpose_mcast").noconvert(),
+            nb::arg("fused_activation"),
+            nb::arg("fuse_batch").noconvert() = true)
+        .def_rw(
             "compute_with_storage_grid_size",
             &MatmulMultiCoreReuseMultiCastProgramConfig::compute_with_storage_grid_size)
-        .def_readwrite("in0_block_w", &MatmulMultiCoreReuseMultiCastProgramConfig::in0_block_w)
-        .def_readwrite("out_subblock_h", &MatmulMultiCoreReuseMultiCastProgramConfig::out_subblock_h)
-        .def_readwrite("out_subblock_w", &MatmulMultiCoreReuseMultiCastProgramConfig::out_subblock_w)
-        .def_readwrite("out_block_h", &MatmulMultiCoreReuseMultiCastProgramConfig::out_block_h)
-        .def_readwrite("out_block_w", &MatmulMultiCoreReuseMultiCastProgramConfig::out_block_w)
-        .def_readwrite("per_core_M", &MatmulMultiCoreReuseMultiCastProgramConfig::per_core_M)
-        .def_readwrite("per_core_N", &MatmulMultiCoreReuseMultiCastProgramConfig::per_core_N)
-        .def_readwrite("transpose_mcast", &MatmulMultiCoreReuseMultiCastProgramConfig::transpose_mcast)
-        .def_readwrite("fused_activation", &MatmulMultiCoreReuseMultiCastProgramConfig::fused_activation)
-        .def_readwrite("fuse_batch", &MatmulMultiCoreReuseMultiCastProgramConfig::fuse_batch);
+        .def_rw("in0_block_w", &MatmulMultiCoreReuseMultiCastProgramConfig::in0_block_w)
+        .def_rw("out_subblock_h", &MatmulMultiCoreReuseMultiCastProgramConfig::out_subblock_h)
+        .def_rw("out_subblock_w", &MatmulMultiCoreReuseMultiCastProgramConfig::out_subblock_w)
+        .def_rw("out_block_h", &MatmulMultiCoreReuseMultiCastProgramConfig::out_block_h)
+        .def_rw("out_block_w", &MatmulMultiCoreReuseMultiCastProgramConfig::out_block_w)
+        .def_rw("per_core_M", &MatmulMultiCoreReuseMultiCastProgramConfig::per_core_M)
+        .def_rw("per_core_N", &MatmulMultiCoreReuseMultiCastProgramConfig::per_core_N)
+        .def_rw("transpose_mcast", &MatmulMultiCoreReuseMultiCastProgramConfig::transpose_mcast)
+        .def_rw("fused_activation", &MatmulMultiCoreReuseMultiCastProgramConfig::fused_activation)
+        .def_rw("fuse_batch", &MatmulMultiCoreReuseMultiCastProgramConfig::fuse_batch);
 
     auto matmul_multi_core_reuse_multicast_1d_program_config =
         tt_serializable_class<MatmulMultiCoreReuseMultiCast1DProgramConfig>(
-            module, "MatmulMultiCoreReuseMultiCast1DProgramConfig", R"doc(
+            mod, "MatmulMultiCoreReuseMultiCast1DProgramConfig", R"doc(
         Class defining matmul multi core reuse multi cast 1D program config
     )doc");
 
     matmul_multi_core_reuse_multicast_1d_program_config
         .def(
-            py::init([](CoreCoord compute_with_storage_grid_size,
+            nb::init([](CoreCoord compute_with_storage_grid_size,
                         std::size_t in0_block_w,
                         std::size_t out_subblock_h,
                         std::size_t out_subblock_w,
@@ -153,60 +152,60 @@ void py_module(py::module& module) {
                     std::move(hop_cores),
                     num_global_cb_receivers);
             }),
-            py::kw_only(),
-            py::arg("compute_with_storage_grid_size"),
-            py::arg("in0_block_w").noconvert(),
-            py::arg("out_subblock_h").noconvert(),
-            py::arg("out_subblock_w").noconvert(),
-            py::arg("out_block_h") = py::none(),
-            py::arg("out_block_w") = py::none(),
-            py::arg("per_core_M").noconvert(),
-            py::arg("per_core_N").noconvert(),
-            py::arg("fuse_batch").noconvert(),
-            py::arg("fused_activation"),
-            py::arg("mcast_in0").noconvert(),
-            py::arg("gather_in0").noconvert() = false,
-            py::arg("hop_cores").noconvert() = CoreRangeSet(),
-            py::arg("num_global_cb_receivers").noconvert() = 1)
-        .def_readwrite(
+            nb::kw_only(),
+            nb::arg("compute_with_storage_grid_size"),
+            nb::arg("in0_block_w").noconvert(),
+            nb::arg("out_subblock_h").noconvert(),
+            nb::arg("out_subblock_w").noconvert(),
+            nb::arg("out_block_h") = nb::none(),
+            nb::arg("out_block_w") = nb::none(),
+            nb::arg("per_core_M").noconvert(),
+            nb::arg("per_core_N").noconvert(),
+            nb::arg("fuse_batch").noconvert(),
+            nb::arg("fused_activation"),
+            nb::arg("mcast_in0").noconvert(),
+            nb::arg("gather_in0").noconvert() = false,
+            nb::arg("hop_cores").noconvert() = CoreRangeSet(),
+            nb::arg("num_global_cb_receivers").noconvert() = 1)
+        .def_rw(
             "compute_with_storage_grid_size",
             &MatmulMultiCoreReuseMultiCast1DProgramConfig::compute_with_storage_grid_size)
-        .def_readwrite("in0_block_w", &MatmulMultiCoreReuseMultiCast1DProgramConfig::in0_block_w)
-        .def_readwrite("out_subblock_h", &MatmulMultiCoreReuseMultiCast1DProgramConfig::out_subblock_h)
-        .def_readwrite("out_subblock_w", &MatmulMultiCoreReuseMultiCast1DProgramConfig::out_subblock_w)
-        .def_readwrite("out_block_h", &MatmulMultiCoreReuseMultiCast1DProgramConfig::out_block_h)
-        .def_readwrite("out_block_w", &MatmulMultiCoreReuseMultiCast1DProgramConfig::out_block_w)
-        .def_readwrite("per_core_M", &MatmulMultiCoreReuseMultiCast1DProgramConfig::per_core_M)
-        .def_readwrite("per_core_N", &MatmulMultiCoreReuseMultiCast1DProgramConfig::per_core_N)
-        .def_readwrite("fuse_batch", &MatmulMultiCoreReuseMultiCast1DProgramConfig::fuse_batch)
-        .def_readwrite("fused_activation", &MatmulMultiCoreReuseMultiCast1DProgramConfig::fused_activation)
-        .def_readwrite("mcast_in0", &MatmulMultiCoreReuseMultiCast1DProgramConfig::mcast_in0)
-        .def_readwrite("gather_in0", &MatmulMultiCoreReuseMultiCast1DProgramConfig::gather_in0)
-        .def_readwrite("hop_cores", &MatmulMultiCoreReuseMultiCast1DProgramConfig::hop_cores)
-        .def_readwrite(
+        .def_rw("in0_block_w", &MatmulMultiCoreReuseMultiCast1DProgramConfig::in0_block_w)
+        .def_rw("out_subblock_h", &MatmulMultiCoreReuseMultiCast1DProgramConfig::out_subblock_h)
+        .def_rw("out_subblock_w", &MatmulMultiCoreReuseMultiCast1DProgramConfig::out_subblock_w)
+        .def_rw("out_block_h", &MatmulMultiCoreReuseMultiCast1DProgramConfig::out_block_h)
+        .def_rw("out_block_w", &MatmulMultiCoreReuseMultiCast1DProgramConfig::out_block_w)
+        .def_rw("per_core_M", &MatmulMultiCoreReuseMultiCast1DProgramConfig::per_core_M)
+        .def_rw("per_core_N", &MatmulMultiCoreReuseMultiCast1DProgramConfig::per_core_N)
+        .def_rw("fuse_batch", &MatmulMultiCoreReuseMultiCast1DProgramConfig::fuse_batch)
+        .def_rw("fused_activation", &MatmulMultiCoreReuseMultiCast1DProgramConfig::fused_activation)
+        .def_rw("mcast_in0", &MatmulMultiCoreReuseMultiCast1DProgramConfig::mcast_in0)
+        .def_rw("gather_in0", &MatmulMultiCoreReuseMultiCast1DProgramConfig::gather_in0)
+        .def_rw("hop_cores", &MatmulMultiCoreReuseMultiCast1DProgramConfig::hop_cores)
+        .def_rw(
             "num_global_cb_receivers", &MatmulMultiCoreReuseMultiCast1DProgramConfig::num_global_cb_receivers);
 
     auto matmul_multi_core_reuse_multicast_dram_sharded_program_config =
         tt_serializable_class<MatmulMultiCoreReuseMultiCastDRAMShardedProgramConfig>(
-            module, "MatmulMultiCoreReuseMultiCastDRAMShardedProgramConfig", R"doc(
+            mod, "MatmulMultiCoreReuseMultiCastDRAMShardedProgramConfig", R"doc(
         Class defining matmul multi core reuse multi cast DRAM sharded program config
     )doc");
 
     matmul_multi_core_reuse_multicast_dram_sharded_program_config
         .def(
-            py::init<std::size_t, std::size_t, std::size_t, std::optional<UnaryWithParam>>(),
-            py::kw_only(),
-            py::arg("in0_block_w").noconvert(),
-            py::arg("per_core_M").noconvert(),
-            py::arg("per_core_N").noconvert(),
-            py::arg("fused_activation"))
-        .def_readwrite("in0_block_w", &MatmulMultiCoreReuseMultiCastDRAMShardedProgramConfig::in0_block_w)
-        .def_readwrite("per_core_M", &MatmulMultiCoreReuseMultiCastDRAMShardedProgramConfig::per_core_M)
-        .def_readwrite("per_core_N", &MatmulMultiCoreReuseMultiCastDRAMShardedProgramConfig::per_core_N)
-        .def_readwrite("fused_activation", &MatmulMultiCoreReuseMultiCastDRAMShardedProgramConfig::fused_activation);
+            nb::init<std::size_t, std::size_t, std::size_t, std::optional<UnaryWithParam>>(),
+            nb::kw_only(),
+            nb::arg("in0_block_w").noconvert(),
+            nb::arg("per_core_M").noconvert(),
+            nb::arg("per_core_N").noconvert(),
+            nb::arg("fused_activation"))
+        .def_rw("in0_block_w", &MatmulMultiCoreReuseMultiCastDRAMShardedProgramConfig::in0_block_w)
+        .def_rw("per_core_M", &MatmulMultiCoreReuseMultiCastDRAMShardedProgramConfig::per_core_M)
+        .def_rw("per_core_N", &MatmulMultiCoreReuseMultiCastDRAMShardedProgramConfig::per_core_N)
+        .def_rw("fused_activation", &MatmulMultiCoreReuseMultiCastDRAMShardedProgramConfig::fused_activation);
 
     bind_registered_operation(
-        module,
+        mod,
         ::ttnn::matmul,
         R"doc(
         Returns the matrix product of two tensors.
@@ -332,7 +331,7 @@ void py_module(py::module& module) {
             >>> print(output.shape)
             [1, 10, 64, 128]
         )doc",
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](decltype(::ttnn::matmul)& self,
                const ttnn::Tensor& input_tensor_a,
                const ttnn::Tensor& input_tensor_b,
@@ -364,25 +363,25 @@ void py_module(py::module& module) {
                     global_cb,
                     sub_device_id);
             },
-            py::arg("input_tensor_a"),
-            py::arg("input_tensor_b"),
-            py::kw_only(),
-            py::arg("transpose_a") = false,
-            py::arg("transpose_b") = false,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("dtype") = std::nullopt,
-            py::arg("program_config") = std::nullopt,
-            py::arg("activation") = std::nullopt,
-            py::arg("compute_kernel_config") = std::nullopt,
-            py::arg("core_grid") = std::nullopt,
-            py::arg("output_tile") = std::nullopt,
-            py::arg("optional_output_tensor") = std::nullopt,
-            py::arg("global_cb") = std::nullopt,
-            py::arg("sub_device_id") = std::nullopt,
+            nb::arg("input_tensor_a"),
+            nb::arg("input_tensor_b"),
+            nb::kw_only(),
+            nb::arg("transpose_a") = false,
+            nb::arg("transpose_b") = false,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("dtype") = std::nullopt,
+            nb::arg("program_config") = std::nullopt,
+            nb::arg("activation") = std::nullopt,
+            nb::arg("compute_kernel_config") = std::nullopt,
+            nb::arg("core_grid") = std::nullopt,
+            nb::arg("output_tile") = std::nullopt,
+            nb::arg("optional_output_tensor") = std::nullopt,
+            nb::arg("global_cb") = std::nullopt,
+            nb::arg("sub_device_id") = std::nullopt,
         });
 
     bind_registered_operation(
-        module,
+        mod,
         ::ttnn::linear,
         R"doc(
         Returns the linear transformation of the inputs.
@@ -418,7 +417,7 @@ void py_module(py::module& module) {
             >>> print(output.shape)
             [10, 64, 128]
         )doc",
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](decltype(::ttnn::linear)& self,
                const ttnn::Tensor& input_tensor_a,
                const ttnn::Tensor& input_tensor_b,
@@ -452,25 +451,23 @@ void py_module(py::module& module) {
                     global_cb,
                     sub_device_id);
             },
-            py::arg("input_tensor_a"),
-            py::arg("input_tensor_b"),
-            py::kw_only(),
-            py::arg("bias") = std::nullopt,
-            py::arg("transpose_a") = false,
-            py::arg("transpose_b") = false,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("dtype") = std::nullopt,
-            py::arg("program_config") = std::nullopt,
-            py::arg("activation") = std::nullopt,
-            py::arg("compute_kernel_config") = std::nullopt,
-            py::arg("core_grid") = std::nullopt,
-            py::arg("output_tile") = std::nullopt,
-            py::arg("optional_output_tensor") = std::nullopt,
-            py::arg("global_cb") = std::nullopt,
-            py::arg("sub_device_id") = std::nullopt,
+            nb::arg("input_tensor_a"),
+            nb::arg("input_tensor_b"),
+            nb::kw_only(),
+            nb::arg("bias") = std::nullopt,
+            nb::arg("transpose_a") = false,
+            nb::arg("transpose_b") = false,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("dtype") = std::nullopt,
+            nb::arg("program_config") = std::nullopt,
+            nb::arg("activation") = std::nullopt,
+            nb::arg("compute_kernel_config") = std::nullopt,
+            nb::arg("core_grid") = std::nullopt,
+            nb::arg("output_tile") = std::nullopt,
+            nb::arg("optional_output_tensor") = std::nullopt,
+            nb::arg("global_cb") = std::nullopt,
+            nb::arg("sub_device_id") = std::nullopt,
         });
 }
 
-}  // namespace matmul
-}  // namespace operations
-}  // namespace ttnn
+}  // namespace ttnn::operations::matmul 
