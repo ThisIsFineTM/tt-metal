@@ -4,10 +4,11 @@
 
 #pragma once
 
-#include "pybind11/pybind_fwd.hpp"
+#include "ttnn-nanobind/nanobind_fwd.hpp"
 
 namespace ttnn::operations::kv_cache {
 
-void py_bind_kv_cache(pybind11::module& module);
+namespace nb = nanobind;
+void bind_kv_cache(nb::module_& mod);
 
 }  // namespace ttnn::operations::kv_cache
