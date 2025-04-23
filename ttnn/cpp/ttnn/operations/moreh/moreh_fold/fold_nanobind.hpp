@@ -6,7 +6,6 @@
 
 #include "ttnn-nanobind/nanobind_fwd.hpp"
 
-
 namespace ttnn::operations::moreh::moreh_fold {
 
 namespace nb = nanobind;
