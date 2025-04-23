@@ -2,26 +2,30 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "loss_pybind.hpp"
+#include "loss_nanobind.hpp"
 
-#include <pybind11/operators.h>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <optional>
+
+#include <fmt/format.h>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/operators.h>
+#include <nanobind/stl/optional.h>
 
 #include "loss.hpp"
 #include "loss_types.hpp"
-#include "cpp/pybind11/export_enum.hpp"
-#include "cpp/pybind11/decorators.hpp"
+#include "cpp/ttnn-nanobind/export_enum.hpp"
+#include "cpp/ttnn-nanobind/decorators.hpp"
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
 namespace ttnn::operations::loss {
 
 namespace detail {
 
-void bind_loss_type(py::module& m) { export_enum<LossReductionMode>(m, "LossReductionMode"); }
+void bind_loss_type(nb::module_& mod) { export_enum<LossReductionMode>(mod, "LossReductionMode"); }
 
-void bind_mse_loss_function(py::module& module) {
+void bind_mse_loss_function(nb::module_& mod) {
     auto doc = fmt::format(
         R"doc(
             Returns mean squared error loss function for `input_reference` and `input_prediction`
@@ -50,10 +54,10 @@ void bind_mse_loss_function(py::module& module) {
 
     using OperationType = decltype(ttnn::mse_loss);
     bind_registered_operation(
-        module,
+        mod,
         ttnn::mse_loss,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const OperationType& self,
                const Tensor& ref,
                const Tensor& prediction,
@@ -63,16 +67,16 @@ void bind_mse_loss_function(py::module& module) {
                QueueId queue_id) -> ttnn::Tensor {
                 return self(queue_id, ref, prediction, mode, memory_config, optional_output_tensor);
             },
-            py::arg("input_reference"),
-            py::arg("input_prediction"),
-            py::kw_only(),
-            py::arg("reduction") = LossReductionMode::NONE,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("output_tensor") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId});
+            nb::arg("input_reference"),
+            nb::arg("input_prediction"),
+            nb::kw_only(),
+            nb::arg("reduction") = LossReductionMode::NONE,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("output_tensor") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
-void bind_mae_loss_function(py::module& module) {
+void bind_mae_loss_function(nb::module_& mod) {
     auto doc = fmt::format(
         R"doc(
             Returns mean absolute error loss function for `input_reference` and `input_prediction`
@@ -101,10 +105,10 @@ void bind_mae_loss_function(py::module& module) {
 
     using OperationType = decltype(ttnn::l1_loss);
     bind_registered_operation(
-        module,
+        mod,
         ttnn::l1_loss,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const OperationType& self,
                const Tensor& ref,
                const Tensor& prediction,
@@ -114,21 +118,21 @@ void bind_mae_loss_function(py::module& module) {
                QueueId queue_id) -> ttnn::Tensor {
                 return self(queue_id, ref, prediction, mode, memory_config, optional_output_tensor);
             },
-            py::arg("input_reference"),
-            py::arg("input_prediction"),
-            py::kw_only(),
-            py::arg("reduction") = LossReductionMode::NONE,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("output_tensor") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId});
+            nb::arg("input_reference"),
+            nb::arg("input_prediction"),
+            nb::kw_only(),
+            nb::arg("reduction") = LossReductionMode::NONE,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("output_tensor") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
 }  // namespace detail
 
-void py_bind_loss_functions(py::module& module) {
-    detail::bind_loss_type(module);
-    detail::bind_mse_loss_function(module);
-    detail::bind_mae_loss_function(module);
+void bind_loss_functions(nb::module_& mod) {
+    detail::bind_loss_type(mod);
+    detail::bind_mse_loss_function(mod);
+    detail::bind_mae_loss_function(mod);
 }
 
 }  // namespace ttnn::operations::loss
