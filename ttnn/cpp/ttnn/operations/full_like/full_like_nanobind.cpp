@@ -2,20 +2,22 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "full_like_pybind.hpp"
+#include "full_like_nanobind.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
 
 #include "full_like.hpp"
-#include "cpp/pybind11/decorators.hpp"
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "ttnn/operations/full_like/device/full_like_device_operation.hpp"
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
 namespace ttnn::operations::full_like {
 
-void bind_full_like_operation(py::module& module) {
+void bind_full_like_operation(nb::module_& mod) {
     auto doc =
         R"doc(full_like(tensor: Tensor, fill_value: float or value, dtype: DataType, layout: Layout, memory_config: MemoryConfig) -> Tensor
 
@@ -31,16 +33,16 @@ void bind_full_like_operation(py::module& module) {
     )doc";
 
     bind_registered_operation(
-        module,
+        mod,
         ttnn::moreh_full_like,
         doc,
-        ttnn::pybind_arguments_t{
-            py::arg("input"),
-            py::arg("fill_value"),
-            py::kw_only(),
-            py::arg("dtype") = std::nullopt,
-            py::arg("layout") = std::nullopt,
-            py::arg("memory_config") = std::nullopt});
+        ttnn::nanobind_arguments_t{
+            nb::arg("input"),
+            nb::arg("fill_value"),
+            nb::kw_only(),
+            nb::arg("dtype") = std::nullopt,
+            nb::arg("layout") = std::nullopt,
+            nb::arg("memory_config") = std::nullopt});
 }
 
 }  // namespace ttnn::operations::full_like
