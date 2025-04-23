@@ -2,40 +2,47 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "moreh_adam_pybind.hpp"
+#include "moreh_adam_nanobind.hpp"
 
-#include "pybind11/decorators.hpp"
-#include "pybind11/pytypes.h"
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "ttnn-nanobind/decorators.hpp"
 #include "ttnn/operations/moreh/moreh_adam/moreh_adam.hpp"
 
+namespace nb = nanobind;
+
 namespace ttnn::operations::moreh::moreh_adam {
-void bind_moreh_adam_operation(py::module& module) {
+
+void bind_moreh_adam_operation(nb::module_& mod) {
     bind_registered_operation(
-        module,
+        mod,
         ttnn::moreh_adam,
         "Moreh Adam Operation",
-        ttnn::pybind_arguments_t{
-            py::arg("param_in"),
-            py::arg("grad"),
-            py::arg("exp_avg_in"),
-            py::arg("exp_avg_sq_in"),
+        ttnn::nanobind_arguments_t{
+            nb::arg("param_in"),
+            nb::arg("grad"),
+            nb::arg("exp_avg_in"),
+            nb::arg("exp_avg_sq_in"),
 
-            py::kw_only(),
-            py::arg("lr") = 0.001f,
-            py::arg("beta1") = 0.9f,
-            py::arg("beta2") = 0.999f,
-            py::arg("eps") = 1e-8f,
-            py::arg("weight_decay") = 0.0f,
-            py::arg("step") = 0,
-            py::arg("amsgrad") = false,
+            nb::kw_only(),
+            nb::arg("lr") = 0.001f,
+            nb::arg("beta1") = 0.9f,
+            nb::arg("beta2") = 0.999f,
+            nb::arg("eps") = 1e-8f,
+            nb::arg("weight_decay") = 0.0f,
+            nb::arg("step") = 0,
+            nb::arg("amsgrad") = false,
 
-            py::arg("max_exp_avg_sq_in") = std::nullopt,
-            py::arg("param_out") = std::nullopt,
-            py::arg("exp_avg_out") = std::nullopt,
-            py::arg("exp_avg_sq_out") = std::nullopt,
-            py::arg("max_exp_avg_sq_out") = std::nullopt,
+            nb::arg("max_exp_avg_sq_in") = std::nullopt,
+            nb::arg("param_out") = std::nullopt,
+            nb::arg("exp_avg_out") = std::nullopt,
+            nb::arg("exp_avg_sq_out") = std::nullopt,
+            nb::arg("max_exp_avg_sq_out") = std::nullopt,
 
-            py::arg("memory_config") = std::nullopt,
-            py::arg("compute_kernel_config") = std::nullopt});
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("compute_kernel_config") = std::nullopt});
 }
 }  // namespace ttnn::operations::moreh::moreh_adam
