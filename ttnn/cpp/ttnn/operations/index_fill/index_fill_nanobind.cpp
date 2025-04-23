@@ -2,20 +2,22 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "index_fill_pybind.hpp"
+#include "index_fill_nanobind.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
 
 #include "index_fill.hpp"
-#include "cpp/pybind11/decorators.hpp"
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "ttnn/operations/index_fill/device/index_fill_device_operation.hpp"
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
 namespace ttnn::operations::index_fill {
 
-void bind_index_fill_operation(py::module& module) {
+void bind_index_fill_operation(nb::module_& mod) {
     auto doc =
         R"doc(index_fill(input: Tensor, dim: uint32, index: Tensor, value: int or float, memory_config: MemoryConfig) -> Tensor
     Create or fill a tensor with the given value, with the specified `memory_config`.
@@ -29,16 +31,16 @@ void bind_index_fill_operation(py::module& module) {
     )doc";
 
     bind_registered_operation(
-        module,
+        mod,
         ttnn::index_fill,
         doc,
-        ttnn::pybind_arguments_t{
-            py::arg("input"),
-            py::arg("dim"),
-            py::arg("index"),
-            py::arg("value"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt});
+        ttnn::nanobind_arguments_t{
+            nb::arg("input"),
+            nb::arg("dim"),
+            nb::arg("index"),
+            nb::arg("value"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt});
 }
 
 }  // namespace ttnn::operations::index_fill
