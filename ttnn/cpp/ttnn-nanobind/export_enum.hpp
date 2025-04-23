@@ -12,11 +12,9 @@
 
 #include <magic_enum/magic_enum.hpp>
 
-namespace nb = nanobind;
-
 template <typename E, typename... Extra>
-nb::enum_<E> export_enum(const nb::handle& scope, std::string name = "", Extra&&... extra) {
-    nb::enum_<E> enum_type(
+nanobind::enum_<E> export_enum(const nanobind::handle& scope, std::string name = "", Extra&&... extra) {
+    nanobind::enum_<E> enum_type(
         scope, name.empty() ? magic_enum::enum_type_name<E>().data() : name.c_str(), std::forward<Extra>(extra)...);
     for (const auto& [value, name_] : magic_enum::enum_entries<E>()) {
         enum_type.value(name_.data(), value);
