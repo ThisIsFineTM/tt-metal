@@ -10,7 +10,7 @@
 #include <nanobind/stl/optional.h>
 
 #include "moreh_dot_backward.hpp"
-#include "ttnn-nanobind/cast.h"
+#
 #include "ttnn-nanobind/decorators.hpp"
 #include "ttnn/operations/moreh/moreh_dot_backward/device/moreh_dot_backward_device_operation.hpp"
 
