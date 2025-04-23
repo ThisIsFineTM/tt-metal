@@ -8,6 +8,8 @@
 
 namespace ttnn::operations::moreh::moreh_adamw {
 
+namespace nb = nanobind;
+
 void bind_moreh_adamw_operation(nb::module_& mod);
 
 void py_module(nb::module_& mod);
