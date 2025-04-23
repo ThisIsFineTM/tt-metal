@@ -2,23 +2,30 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "moreh_getitem_pybind.hpp"
+#include "moreh_getitem_nanobind.hpp"
 
-#include "pybind11/decorators.hpp"
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "ttnn-nanobind/decorators.hpp"
 #include "ttnn/operations/moreh/moreh_getitem/moreh_getitem.hpp"
 
+namespace nb = nanobind;
+
 namespace ttnn::operations::moreh::moreh_getitem {
-void bind_moreh_getitem_operation(py::module& module) {
+void bind_moreh_getitem_operation(nb::module_& mod) {
     bind_registered_operation(
-        module,
+        mod,
         ttnn::moreh_getitem,
         "Moreh Getitem operation",
-        ttnn::pybind_arguments_t{
-            py::arg("input"),
-            py::arg("index_tensors"),
-            py::arg("index_dims"),
-            py::kw_only(),
-            py::arg("output") = std::nullopt,
-            py::arg("memory_config") = std::nullopt});
+        ttnn::nanobind_arguments_t{
+            nb::arg("input"),
+            nb::arg("index_tensors"),
+            nb::arg("index_dims"),
+            nb::kw_only(),
+            nb::arg("output") = std::nullopt,
+            nb::arg("memory_config") = std::nullopt});
 }
 }  // namespace ttnn::operations::moreh::moreh_getitem
