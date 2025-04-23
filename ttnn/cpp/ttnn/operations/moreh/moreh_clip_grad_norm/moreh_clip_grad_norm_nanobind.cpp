@@ -2,27 +2,32 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "moreh_clip_grad_norm_pybind.hpp"
+#include "moreh_clip_grad_norm_nanobind.hpp"
+
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
 
 #include "moreh_clip_grad_norm.hpp"
-#include "cpp/pybind11/decorators.hpp"
+#include "cpp/ttnn-nanobind/decorators.hpp"
 
 namespace ttnn::operations::moreh::moreh_clip_grad_norm {
 
-void bind_moreh_clip_grad_norm_operation(py::module& module) {
+void bind_moreh_clip_grad_norm_operation(nb::module_& mod) {
     bind_registered_operation(
-        module,
+        mod,
         ttnn::moreh_clip_grad_norm,
         "moreh_clip_grad_norm",
-        ttnn::pybind_arguments_t{
-            py::arg("inputs"),
-            py::arg("max_norm"),
-            py::arg("norm_type") = 2.0f,
-            py::arg("error_if_nonfinite") = false,
-            py::kw_only(),
-            py::arg("total_norm") = std::nullopt,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("compute_kernel_config") = std::nullopt});
+        ttnn::nanobind_arguments_t{
+            nb::arg("inputs"),
+            nb::arg("max_norm"),
+            nb::arg("norm_type") = 2.0f,
+            nb::arg("error_if_nonfinite") = false,
+            nb::kw_only(),
+            nb::arg("total_norm") = std::nullopt,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("compute_kernel_config") = std::nullopt});
 }
 
 }  // namespace ttnn::operations::moreh::moreh_clip_grad_norm
