@@ -4,10 +4,11 @@
 
 #pragma once
 
-#include "pybind11/pybind_fwd.hpp"
-
-namespace py = pybind11;
+#include "nanobind/nanobind_fwd.hpp"
 
 namespace ttnn::operations::moreh::moreh_bmm {
-void bind_moreh_bmm_operation(py::module& module);
+
+namespace nb = nanobind;
+void bind_moreh_bmm_operation(nb::module_& mod);
+
 }  // namespace ttnn::operations::moreh::moreh_bmm
