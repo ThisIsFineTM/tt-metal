@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "nanobind/nanobind_fwd.hpp"
+#include "ttnn-nanobind/nanobind_fwd.hpp"
 
 namespace ttnn::operations::moreh::moreh_bmm {
 
