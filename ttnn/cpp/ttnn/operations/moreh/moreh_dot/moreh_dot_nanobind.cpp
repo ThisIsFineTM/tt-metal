@@ -2,32 +2,34 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "moreh_dot_pybind.hpp"
+#include "moreh_dot_nanobind.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
 
 #include "device/moreh_dot_device_operation.hpp"
 #include "moreh_dot.hpp"
-#include "cpp/pybind11/decorators.hpp"
+#include "cpp/ttnn-nanobind/decorators.hpp"
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
 namespace ttnn::operations::moreh::moreh_dot {
 
-void bind_moreh_dot_operation(py::module& module) {
+void bind_moreh_dot_operation(nb::module_& mod) {
     bind_registered_operation(
-        module,
+        mod,
         ttnn::moreh_dot,
         "Moreh Moreh Dot Operation",
-        ttnn::pybind_arguments_t{
-            py::arg("input_tensor_a"),
-            py::arg("input_tensor_b"),
-            py::kw_only(),
-            py::arg("output") = std::nullopt,
-            py::arg("dtype") = std::nullopt,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("compute_kernel_config") = std::nullopt});
+        ttnn::nanobind_arguments_t{
+            nb::arg("input_tensor_a"),
+            nb::arg("input_tensor_b"),
+            nb::kw_only(),
+            nb::arg("output") = std::nullopt,
+            nb::arg("dtype") = std::nullopt,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("compute_kernel_config") = std::nullopt});
 }
 
 }  // namespace ttnn::operations::moreh::moreh_dot
