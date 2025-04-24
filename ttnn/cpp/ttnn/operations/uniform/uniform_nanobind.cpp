@@ -2,13 +2,21 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "uniform_pybind.hpp"
+#include "uniform_nanobind.hpp"
 
-#include "pybind11/decorators.hpp"
+#include <optional>
+#include <string>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "ttnn-nanobind/decorators.hpp"
 #include "uniform.hpp"
 
+namespace nb = nanobind;
+
 namespace ttnn::operations::uniform {
-void bind_uniform_operation(py::module& module) {
+void bind_uniform_operation(nb::module_& mod) {
     std::string doc =
         R"doc(
         Update in-place the input tensor with values drawn from the continuous uniform distribution 1 / (`to` - `from`).
@@ -32,16 +40,16 @@ void bind_uniform_operation(py::module& module) {
         )doc";
 
     bind_registered_operation(
-        module,
+        mod,
         ttnn::uniform,
         doc,
-        ttnn::pybind_arguments_t{
-            py::arg("input"),
-            py::arg("from") = 0,
-            py::arg("to") = 1,
-            py::arg("seed") = 0,
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("compute_kernel_config") = std::nullopt});
+        ttnn::nanobind_arguments_t{
+            nb::arg("input"),
+            nb::arg("from") = 0,
+            nb::arg("to") = 1,
+            nb::arg("seed") = 0,
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("compute_kernel_config") = std::nullopt});
 }
 }  // namespace ttnn::operations::uniform
