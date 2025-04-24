@@ -2,17 +2,24 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "sampling_pybind.hpp"
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include "sampling_nanobind.hpp"
 
-#include "cpp/pybind11/decorators.hpp"
+#include <cstdint>
+#include <optional>
+#include <vector>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+#include <nanobind/stl/vector.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 
 #include "ttnn/operations/reduction/sampling/sampling.hpp"
 
+namespace nb = nanobind;
+
 namespace ttnn::operations::reduction::detail {
-namespace py = pybind11;
-void bind_reduction_sampling_operation(py::module& module) {
+void bind_reduction_sampling_operation(nb::module_& mod) {
     auto doc =
         R"doc(
             Samples from the input tensor based on provided top-k and top-p constraints.
@@ -79,10 +86,10 @@ void bind_reduction_sampling_operation(py::module& module) {
 
     using OperationType = decltype(ttnn::sampling);
     bind_registered_operation(
-        module,
+        mod,
         ttnn::sampling,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const OperationType& self,
                const ttnn::Tensor& input_values_tensor,
                const ttnn::Tensor& input_indices_tensor,
@@ -102,15 +109,15 @@ void bind_reduction_sampling_operation(py::module& module) {
                     sub_core_grids,
                     optional_output_tensor);
             },
-            py::arg("input_values_tensor").noconvert(),
-            py::arg("input_indices_tensor").noconvert(),
-            py::kw_only(),
-            py::arg("k").noconvert(),
-            py::arg("p").noconvert(),
-            py::arg("seed").noconvert() = 0,
-            py::arg("sub_core_grids") = std::nullopt,
-            py::arg("output_tensor") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId});
+            nb::arg("input_values_tensor").noconvert(),
+            nb::arg("input_indices_tensor").noconvert(),
+            nb::kw_only(),
+            nb::arg("k").noconvert(),
+            nb::arg("p").noconvert(),
+            nb::arg("seed").noconvert() = 0,
+            nb::arg("sub_core_grids") = std::nullopt,
+            nb::arg("output_tensor") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
 }  // namespace ttnn::operations::reduction::detail
