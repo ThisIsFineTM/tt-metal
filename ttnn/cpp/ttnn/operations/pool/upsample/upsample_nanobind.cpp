@@ -2,20 +2,23 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include "upsample_nanobind.hpp"
 
-#include "cpp/pybind11/decorators.hpp"
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 
 #include "upsample.hpp"
 
-namespace ttnn::operations::upsample {
+namespace nb = nanobind;
 
+namespace ttnn::operations::upsample {
 namespace detail {
 
-namespace py = pybind11;
-
-void bind_upsample(py::module& module) {
+void bind_upsample(nb::module_& mod) {
     const auto doc = R"doc(
         Upsamples a given multi-channel 2D (spatial) data.
         The input data is assumed to be of the form [N, H, W, C].
@@ -40,18 +43,19 @@ void bind_upsample(py::module& module) {
 
     using OperationType = decltype(ttnn::upsample);
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::upsample,
         doc,
-        ttnn::pybind_arguments_t{
-            py::arg("input_tensor"),
-            py::arg("scale_factor"),
-            py::kw_only(),
-            py::arg("mode") = "nearest",
-            py::arg("memory_config") = std::nullopt,
-            py::arg("compute_kernel_config") = std::nullopt});
+        ttnn::nanobind_arguments_t{
+            nb::arg("input_tensor"),
+            nb::arg("scale_factor"),
+            nb::kw_only(),
+            nb::arg("mode") = "nearest",
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("compute_kernel_config") = std::nullopt});
 }
 
 }  // namespace detail
-void py_module(py::module& module) { detail::bind_upsample(module); }
+
+void py_module(nb::module_& mod) { detail::bind_upsample(mod); }
 }  // namespace ttnn::operations::upsample
