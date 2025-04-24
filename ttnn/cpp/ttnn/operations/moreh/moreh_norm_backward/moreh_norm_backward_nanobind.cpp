@@ -2,28 +2,35 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "moreh_norm_backward_pybind.hpp"
+#include "moreh_norm_backward_nanobind.hpp"
+
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
 
 #include "moreh_norm_backward.hpp"
-#include "pybind11/decorators.hpp"
+#include "ttnn-nanobind/decorators.hpp"
+
+namespace nb = nanobind;
 
 namespace ttnn::operations::moreh::moreh_norm_backward {
-void bind_moreh_norm_backward_operation(py::module& module) {
+void bind_moreh_norm_backward_operation(nb::module_& mod) {
     bind_registered_operation(
-        module,
+        mod,
         ttnn::moreh_norm_backward,
         "Moreh Norm Backward Operation",
-        ttnn::pybind_arguments_t{
-            py::arg("input"),
-            py::arg("output"),
-            py::arg("output_grad"),
-            py::arg("p"),
-            py::kw_only(),
-            py::arg("dim") = std::nullopt,
-            py::arg("keepdim") = false,
-            py::arg("input_grad") = std::nullopt,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("compute_kernel_config") = std::nullopt,
+        ttnn::nanobind_arguments_t{
+            nb::arg("input"),
+            nb::arg("output"),
+            nb::arg("output_grad"),
+            nb::arg("p"),
+            nb::kw_only(),
+            nb::arg("dim") = std::nullopt,
+            nb::arg("keepdim") = false,
+            nb::arg("input_grad") = std::nullopt,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("compute_kernel_config") = std::nullopt,
         });
 }
 }  // namespace ttnn::operations::moreh::moreh_norm_backward
