@@ -2,17 +2,20 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "sdpa_pybind.hpp"
+#include "sdpa_nanobind.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <cstdint>
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
 
 #include "sdpa.hpp"
-#include "cpp/pybind11/decorators.hpp"
+#include "cpp/ttnn-nanobind/decorators.hpp"
 
 namespace ttnn::operations::transformer {
 
-void py_bind_sdpa(py::module& module) {
+void bind_sdpa(nb::module_& mod) {
     auto doc =
         R"doc(
         Causal scaled dot product attention. This API mimicks the PyTorch API of the same name.
@@ -42,10 +45,10 @@ void py_bind_sdpa(py::module& module) {
 
     using OperationType = decltype(ttnn::transformer::scaled_dot_product_attention);
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::transformer::scaled_dot_product_attention,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const OperationType& self,
                const ttnn::Tensor& input_tensor_q,
                const ttnn::Tensor& input_tensor_k,
@@ -69,17 +72,17 @@ void py_bind_sdpa(py::module& module) {
                     program_config,
                     compute_kernel_config);
             },
-            py::arg("input_tensor_q").noconvert(),
-            py::arg("input_tensor_k").noconvert(),
-            py::arg("input_tensor_v").noconvert(),
-            py::kw_only(),
-            py::arg("attn_mask").noconvert() = std::nullopt,
-            py::arg("is_causal").noconvert() = true,
-            py::arg("scale").noconvert() = std::nullopt,
-            py::arg("memory_config").noconvert() = std::nullopt,
-            py::arg("program_config").noconvert() = std::nullopt,
-            py::arg("compute_kernel_config").noconvert() = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId,
+            nb::arg("input_tensor_q").noconvert(),
+            nb::arg("input_tensor_k").noconvert(),
+            nb::arg("input_tensor_v").noconvert(),
+            nb::kw_only(),
+            nb::arg("attn_mask").noconvert() = std::nullopt,
+            nb::arg("is_causal").noconvert() = true,
+            nb::arg("scale").noconvert() = std::nullopt,
+            nb::arg("memory_config").noconvert() = std::nullopt,
+            nb::arg("program_config").noconvert() = std::nullopt,
+            nb::arg("compute_kernel_config").noconvert() = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId,
         });
 
     auto chunked_doc =
@@ -110,10 +113,10 @@ void py_bind_sdpa(py::module& module) {
 
     using ChunkedOperationType = decltype(ttnn::transformer::chunked_scaled_dot_product_attention);
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::transformer::chunked_scaled_dot_product_attention,
         chunked_doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const ChunkedOperationType& self,
                const ttnn::Tensor& input_tensor_q,
                const ttnn::Tensor& input_tensor_k,
@@ -137,17 +140,17 @@ void py_bind_sdpa(py::module& module) {
                     program_config,
                     compute_kernel_config);
             },
-            py::arg("input_tensor_q").noconvert(),
-            py::arg("input_tensor_k").noconvert(),
-            py::arg("input_tensor_v").noconvert(),
-            py::arg("page_table_tensor").noconvert(),
-            py::arg("chunk_start_idx"),
-            py::kw_only(),
-            py::arg("scale").noconvert() = std::nullopt,
-            py::arg("memory_config").noconvert() = std::nullopt,
-            py::arg("program_config").noconvert() = std::nullopt,
-            py::arg("compute_kernel_config").noconvert() = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId,
+            nb::arg("input_tensor_q").noconvert(),
+            nb::arg("input_tensor_k").noconvert(),
+            nb::arg("input_tensor_v").noconvert(),
+            nb::arg("page_table_tensor").noconvert(),
+            nb::arg("chunk_start_idx"),
+            nb::kw_only(),
+            nb::arg("scale").noconvert() = std::nullopt,
+            nb::arg("memory_config").noconvert() = std::nullopt,
+            nb::arg("program_config").noconvert() = std::nullopt,
+            nb::arg("compute_kernel_config").noconvert() = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId,
         });
 
     auto joint_doc = R"doc(
@@ -185,10 +188,10 @@ void py_bind_sdpa(py::module& module) {
     using JointOperationType = decltype(ttnn::transformer::joint_scaled_dot_product_attention);
 
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::transformer::joint_scaled_dot_product_attention,
         joint_doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const JointOperationType& self,
                const ttnn::Tensor& input_tensor_q,
                const ttnn::Tensor& input_tensor_k,
@@ -215,17 +218,17 @@ void py_bind_sdpa(py::module& module) {
                     compute_kernel_config);
                 return outputs;
             },
-            py::arg("input_tensor_q").noconvert(),
-            py::arg("input_tensor_k").noconvert(),
-            py::arg("input_tensor_v").noconvert(),
-            py::arg("joint_tensor_q").noconvert(),
-            py::arg("joint_tensor_k").noconvert(),
-            py::arg("joint_tensor_v").noconvert(),
-            py::kw_only(),
-            py::arg("joint_strategy"),
-            py::arg("program_config").noconvert(),
-            py::arg("scale").noconvert() = std::nullopt,
-            py::arg("compute_kernel_config").noconvert() = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId});
+            nb::arg("input_tensor_q").noconvert(),
+            nb::arg("input_tensor_k").noconvert(),
+            nb::arg("input_tensor_v").noconvert(),
+            nb::arg("joint_tensor_q").noconvert(),
+            nb::arg("joint_tensor_k").noconvert(),
+            nb::arg("joint_tensor_v").noconvert(),
+            nb::kw_only(),
+            nb::arg("joint_strategy"),
+            nb::arg("program_config").noconvert(),
+            nb::arg("scale").noconvert() = std::nullopt,
+            nb::arg("compute_kernel_config").noconvert() = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 }  // namespace ttnn::operations::transformer
