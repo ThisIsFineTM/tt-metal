@@ -2,20 +2,23 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "attention_softmax_pybind.hpp"
+#include "attention_softmax_nanobind.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <optional>
 
-#include "cpp/pybind11/decorators.hpp"
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "attention_softmax.hpp"
+
+namespace nb = nanobind;
 
 namespace ttnn::operations::transformer {
 
-void py_bind_attention_softmax(pybind11::module& module) {
-    namespace py = pybind11;
+void bind_attention_softmax(nb::module_& mod) {
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::transformer::attention_softmax,
         R"doc(
         Divides :attr:`tensor` by the square root of :attr:`head_size`, adds :attr:`attention_mask` (optionally) and computes softmax.
@@ -37,17 +40,17 @@ void py_bind_attention_softmax(pybind11::module& module) {
             ttnn.Tensor: the output tensor.
 
         )doc",
-        ttnn::pybind_arguments_t{
-            py::arg("tensor"),
-            py::kw_only(),
-            py::arg("head_size") = std::nullopt,
-            py::arg("attention_mask") = std::nullopt,
-            py::arg("program_config").noconvert() = ttnn::operations::normalization::SoftmaxDefaultProgramConfig{},
-            py::arg("causal_mask") = false,
-            py::arg("memory_config") = std::nullopt});
+        ttnn::nanobind_arguments_t{
+            nb::arg("tensor"),
+            nb::kw_only(),
+            nb::arg("head_size") = std::nullopt,
+            nb::arg("attention_mask") = std::nullopt,
+            nb::arg("program_config").noconvert() = ttnn::operations::normalization::SoftmaxDefaultProgramConfig{},
+            nb::arg("causal_mask") = false,
+            nb::arg("memory_config") = std::nullopt});
 
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::transformer::attention_softmax_,
         R"doc(
         In-Place divides :attr:`tensor` by the square root of :attr:`head_size`, adds :attr:`attention_mask` (optionally) and computes softmax.
@@ -69,14 +72,14 @@ void py_bind_attention_softmax(pybind11::module& module) {
             ttnn.Tensor: the output tensor.
 
         )doc",
-        ttnn::pybind_arguments_t{
-            py::arg("tensor"),
-            py::kw_only(),
-            py::arg("head_size") = std::nullopt,
-            py::arg("attention_mask") = std::nullopt,
-            py::arg("program_config").noconvert() = ttnn::operations::normalization::SoftmaxDefaultProgramConfig{},
-            py::arg("causal_mask") = false,
-            py::arg("memory_config") = std::nullopt});
+        ttnn::nanobind_arguments_t{
+            nb::arg("tensor"),
+            nb::kw_only(),
+            nb::arg("head_size") = std::nullopt,
+            nb::arg("attention_mask") = std::nullopt,
+            nb::arg("program_config").noconvert() = ttnn::operations::normalization::SoftmaxDefaultProgramConfig{},
+            nb::arg("causal_mask") = false,
+            nb::arg("memory_config") = std::nullopt});
 }
 
 }  // namespace ttnn::operations::transformer
