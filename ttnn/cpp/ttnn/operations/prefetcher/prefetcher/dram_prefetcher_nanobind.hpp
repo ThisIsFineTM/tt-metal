@@ -4,10 +4,11 @@
 
 #pragma once
 
-#include "pybind11/pybind_fwd.hpp"
+#include "ttnn-nanobind/nanobind_fwd.hpp"
 
 namespace ttnn::operations::dram_prefetcher::detail {
 
-void bind_dram_prefetcher(pybind11::module& module);
+namespace nb = nanobind;
+void bind_dram_prefetcher(nb::module_& mod);
 
 }  // namespace ttnn::operations::dram_prefetcher::detail

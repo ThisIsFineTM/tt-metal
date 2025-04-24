@@ -2,17 +2,20 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "dram_prefetcher_pybind.hpp"
-#include "cpp/pybind11/decorators.hpp"
+#include "dram_prefetcher_nanobind.hpp"
+
+#include <nanobind/nanobind.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "dram_prefetcher.hpp"
+
+namespace nb = nanobind;
 
 namespace ttnn::operations::dram_prefetcher::detail {
 
-namespace py = pybind11;
-
-void bind_dram_prefetcher_operation(py::module& module) {
+void bind_dram_prefetcher_operation(nb::module_& mod) {
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::dram_prefetcher,
         R"doc(
             Asynchronously pre-fetch tensors from DRAM into the neighbouring L1 cores.
@@ -32,13 +35,13 @@ void bind_dram_prefetcher_operation(py::module& module) {
                 ttnn.Tensor: empty tensor (TODO: Should return None)
         )doc",
 
-        ttnn::pybind_arguments_t{
-            py::arg("tensors"),
-            py::arg("num_layers"),
-            py::arg("global_cb"),
+        ttnn::nanobind_arguments_t{
+            nb::arg("tensors"),
+            nb::arg("num_layers"),
+            nb::arg("global_cb"),
         });
 }
 
-void bind_dram_prefetcher(py::module& module) { bind_dram_prefetcher_operation(module); }
+void bind_dram_prefetcher(nb::module_& mod) { bind_dram_prefetcher_operation(mod); }
 
 }  // namespace ttnn::operations::dram_prefetcher::detail
