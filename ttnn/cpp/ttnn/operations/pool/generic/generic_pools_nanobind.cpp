@@ -2,20 +2,27 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "ttnn/operations/pool/generic/generic_pools_pybind.hpp"
+#include "ttnn/operations/pool/generic/generic_pools_nanobind.hpp"
 #include "ttnn/operations/pool/generic/generic_pools.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <array>
+#include <cstdint>
+#include <optional>
 
-#include "cpp/pybind11/decorators.hpp"
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/array.h>
+#include <nanobind/stl/optional.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "ttnn/types.hpp"
+
+namespace nb = nanobind;
 
 namespace ttnn::operations::pool {
 
-void bind_max_pool2d_operation(py::module& module) {
+void bind_max_pool2d_operation(nb::module_& mod) {
     bind_registered_operation(
-        module,
+        mod,
         ttnn::max_pool2d,
         R"doc(
         Applies a max pool convolution to the input tensor. The resulting output Tensor will contain the maximum
@@ -76,7 +83,7 @@ void bind_max_pool2d_operation(py::module& module) {
                             )
 
         )doc",
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const decltype(ttnn::max_pool2d)& self,
                const ttnn::Tensor& input_tensor,
                uint32_t batch_size,
@@ -108,26 +115,26 @@ void bind_max_pool2d_operation(py::module& module) {
                     ceil_mode,
                     in_place_halo);
             },
-            py::arg("input_tensor"),
-            py::arg("batch_size"),
-            py::arg("input_h"),
-            py::arg("input_w"),
-            py::arg("channels"),
-            py::arg("kernel_size"),
-            py::arg("stride"),
-            py::arg("padding"),
-            py::arg("dilation"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("applied_shard_scheme") = std::nullopt,
-            py::arg("ceil_mode") = false,
-            py::arg("in_place_halo") = false,
-            py::arg("queue_id") = DefaultQueueId});
+            nb::arg("input_tensor"),
+            nb::arg("batch_size"),
+            nb::arg("input_h"),
+            nb::arg("input_w"),
+            nb::arg("channels"),
+            nb::arg("kernel_size"),
+            nb::arg("stride"),
+            nb::arg("padding"),
+            nb::arg("dilation"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("applied_shard_scheme") = std::nullopt,
+            nb::arg("ceil_mode") = false,
+            nb::arg("in_place_halo") = false,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
-void bind_avg_pool2d_operation(py::module& module) {
+void bind_avg_pool2d_operation(nb::module_& mod) {
     bind_registered_operation(
-        module,
+        mod,
         ttnn::avg_pool2d,
         R"doc(
         Applies an average pool convolution to the input tensor. The resulting output Tensor will contain the average
@@ -187,7 +194,7 @@ void bind_avg_pool2d_operation(py::module& module) {
                             in_place_halo=False,
                         )
         )doc",
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const decltype(ttnn::avg_pool2d)& self,
                const ttnn::Tensor& input_tensor,
                uint32_t batch_size,
@@ -219,26 +226,26 @@ void bind_avg_pool2d_operation(py::module& module) {
                     ceil_mode,
                     in_place_halo);
             },
-            py::arg("input_tensor"),
-            py::arg("batch_size"),
-            py::arg("input_h"),
-            py::arg("input_w"),
-            py::arg("channels"),
-            py::arg("kernel_size"),
-            py::arg("stride"),
-            py::arg("padding"),
-            py::arg("dilation"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("applied_shard_scheme") = std::nullopt,
-            py::arg("ceil_mode") = false,
-            py::arg("in_place_halo") = false,
-            py::arg("queue_id") = 0});
+            nb::arg("input_tensor"),
+            nb::arg("batch_size"),
+            nb::arg("input_h"),
+            nb::arg("input_w"),
+            nb::arg("channels"),
+            nb::arg("kernel_size"),
+            nb::arg("stride"),
+            nb::arg("padding"),
+            nb::arg("dilation"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("applied_shard_scheme") = std::nullopt,
+            nb::arg("ceil_mode") = false,
+            nb::arg("in_place_halo") = false,
+            nb::arg("queue_id") = 0});
 }
 
-void py_module(py::module& module) {
-    bind_max_pool2d_operation(module);
-    bind_avg_pool2d_operation(module);
+void py_module(nb::module_& mod) {
+    bind_max_pool2d_operation(mod);
+    bind_avg_pool2d_operation(mod);
 }
 
 }  // namespace ttnn::operations::pool

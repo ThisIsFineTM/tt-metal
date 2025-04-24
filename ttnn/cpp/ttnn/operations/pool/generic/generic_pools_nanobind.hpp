@@ -4,14 +4,14 @@
 
 #pragma once
 
-#include "pybind11/pybind_fwd.hpp"
-
-namespace py = pybind11;
+#include "ttnn-nanobind/nanobind_fwd.hpp"
 
 namespace ttnn::operations::pool {
 
-void bind_max_pool2d_operation(py::module& module);
-void bind_avg_pool2d_operation(py::module& module);
-void py_module(py::module& module);
+namespace nb = nanobind;
+
+void bind_max_pool2d_operation(nb::module_& mod);
+void bind_avg_pool2d_operation(nb::module_& mod);
+void py_module(nb::module_& mod);
 
 }  // namespace ttnn::operations::pool
