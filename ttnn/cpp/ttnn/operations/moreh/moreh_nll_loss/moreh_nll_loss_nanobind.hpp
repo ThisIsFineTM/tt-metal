@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <pybind11/pybind11.h>
-
-namespace py = pybind11;
+#include "ttnn-nanobind/nanobind_fwd.hpp"
 
 namespace ttnn::operations::moreh::moreh_nll_loss {
-void bind_moreh_nll_loss_operation(py::module& module);
+
+namespace nb = nanobind;
+void bind_moreh_nll_loss_operation(nb::module_& mod);
 }  // namespace ttnn::operations::moreh::moreh_nll_loss
