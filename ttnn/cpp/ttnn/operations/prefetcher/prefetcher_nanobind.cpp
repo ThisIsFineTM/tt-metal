@@ -2,17 +2,16 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "prefetcher_pybind.hpp"
+#include "prefetcher_nanobind.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <nanobind/nanobind.h>
 
-#include "prefetcher/dram_prefetcher_pybind.hpp"
+#include "prefetcher/dram_prefetcher_nanobind.hpp"
+
+namespace nb = nanobind;
 
 namespace ttnn::operations::prefetcher {
 
-namespace py = pybind11;
-
-void py_module(py::module& module) { dram_prefetcher::detail::bind_dram_prefetcher(module); }
+void py_module(nb::module_& mod) { dram_prefetcher::detail::bind_dram_prefetcher(mod); }
 
 }  // namespace ttnn::operations::prefetcher
