@@ -4,14 +4,13 @@
 
 #pragma once
 
-#include "pybind11/pybind_fwd.hpp"
+#include "ttnn-nanobind/nanobind_fwd.hpp"
 #include "ttnn/global_semaphore.hpp"
-
-namespace py = pybind11;
 
 namespace ttnn::global_semaphore {
 
-void py_module_types(py::module& module);
-void py_module(py::module& module);
+namespace nb = nanobind;
+void py_module_types(nb::module_& mod);
+void py_module(nb::module_& mod);
 
 }  // namespace ttnn::global_semaphore
