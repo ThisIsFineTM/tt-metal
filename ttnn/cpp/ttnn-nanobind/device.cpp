@@ -4,11 +4,28 @@
 
 #include "device.hpp"
 
-#include <pybind11/operators.h>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <cstddef>
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <tuple>
+#include <utility>
+#include <vector>
 
-#include "small_vector_caster.hpp"  // NOLINT - for pybind11 SmallVector binding support.
+#include <nanobind/nanobind.h>
+#include <nanobind/operators.h>
+#include <nanobind/stl/array.h>
+#include <nanobind/stl/optional.h>
+#include <nanobind/stl/string.h>
+#include <nanobind/stl/string_view.h>
+#include <nanobind/stl/tuple.h>
+#include <nanobind/stl/vector.h>
+
+#include "ttnn/device.hpp"
+#include "ttnn/operations/experimental/auto_format/auto_format.hpp"
+
+#include "small_vector_caster.hpp"  // NOLINT - for nanobind SmallVector binding support.
 #include <tt-metalium/persistent_kernel_cache.hpp>
 #include <tt-metalium/memory_reporter.hpp>
 #include <tt-metalium/device_impl.hpp>
@@ -23,7 +40,7 @@
 
 using namespace tt::tt_metal;
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
 namespace {
 void DumpDeviceProfiler(IDevice* device) {
@@ -32,21 +49,20 @@ void DumpDeviceProfiler(IDevice* device) {
 }
 }  // namespace
 
-namespace ttnn {
-namespace device {
+namespace ttnn::device {
 namespace detail {
 
-void ttnn_device(py::module& module) {
-    module.def(
+void ttnn_device(nb::module_& mod) {
+    mod.def(
         "open_device",
         &ttnn::open_device,
-        py::kw_only(),
-        py::arg("device_id"),
-        py::arg("l1_small_size") = DEFAULT_L1_SMALL_SIZE,
-        py::arg("trace_region_size") = DEFAULT_TRACE_REGION_SIZE,
-        py::arg("dispatch_core_config") = tt::tt_metal::DispatchCoreConfig{},
-        py::arg("worker_l1_size") = DEFAULT_WORKER_L1_SIZE,
-        py::return_value_policy::reference,
+        nb::kw_only(),
+        nb::arg("device_id"),
+        nb::arg("l1_small_size") = DEFAULT_L1_SMALL_SIZE,
+        nb::arg("trace_region_size") = DEFAULT_TRACE_REGION_SIZE,
+        nb::arg("dispatch_core_config") = tt::tt_metal::DispatchCoreConfig{},
+        nb::arg("worker_l1_size") = DEFAULT_WORKER_L1_SIZE,
+        nb::return_value_policy::reference,
         R"doc(
             Open a device with the given device_id. If the device is already open, return the existing device.
 
@@ -67,101 +83,101 @@ void ttnn_device(py::module& module) {
                 <ttnn._ttnn.device.Device object at 0x7fbac5bfc1b0>
         )doc");
 
-    module.def("close_device", &ttnn::close_device, py::arg("device"));
+    mod.def("close_device", &ttnn::close_device, nb::arg("device"));
 
-    module.def("enable_program_cache", &ttnn::enable_program_cache, py::arg("device"));
+    mod.def("enable_program_cache", &ttnn::enable_program_cache, nb::arg("device"));
 
-    module.def("disable_and_clear_program_cache", &ttnn::disable_and_clear_program_cache, py::arg("device"));
+    mod.def("disable_and_clear_program_cache", &ttnn::disable_and_clear_program_cache, nb::arg("device"));
 
-    module.def("deallocate_buffers", &ttnn::deallocate_buffers, py::arg("device"), R"doc(
+    mod.def("deallocate_buffers", &ttnn::deallocate_buffers, nb::arg("device"), R"doc(
         Deallocate all buffers associated with Device handle
     )doc");
 }
 
 }  // namespace detail
 
-void py_device_module_types(py::module& m_device) {
-    py::enum_<tt::ARCH>(m_device, "Arch", "Enum of types of Tenstorrent accelerator devices.")
+void py_device_module_types(nb::module_& m_device) {
+    nb::enum_<tt::ARCH>(m_device, "Arch", "Enum of types of Tenstorrent accelerator devices.")
         .value("GRAYSKULL", tt::ARCH::GRAYSKULL)
         .value("WORMHOLE_B0", tt::ARCH::WORMHOLE_B0)
         .value("BLACKHOLE", tt::ARCH::BLACKHOLE);
 
-    py::enum_<tt::tt_metal::DispatchCoreType>(m_device, "DispatchCoreType", "Enum of types of dispatch cores.")
+    nb::enum_<tt::tt_metal::DispatchCoreType>(m_device, "DispatchCoreType", "Enum of types of dispatch cores.")
         .value("WORKER", tt::tt_metal::DispatchCoreType::WORKER)
         .value("ETH", tt::tt_metal::DispatchCoreType::ETH);
 
-    py::enum_<tt::tt_metal::DispatchCoreAxis>(
+    nb::enum_<tt::tt_metal::DispatchCoreAxis>(
         m_device, "DispatchCoreAxis", "Enum of axis (row or col) of dispatch cores.")
         .value("ROW", tt::tt_metal::DispatchCoreAxis::ROW)
         .value("COL", tt::tt_metal::DispatchCoreAxis::COL);
 
-    py::class_<tt::tt_metal::DispatchCoreConfig>(
+    nb::class_<tt::tt_metal::DispatchCoreConfig>(
         m_device, "DispatchCoreConfig", "Class representing dispatch core configuration.")
         .def(
-            py::init<>(),
+            nb::init<>(),
             "Default constructor initializing type to WORKER and axis to default value on platform architecture.")
         .def(
-            py::init<tt::tt_metal::DispatchCoreType>(),
+            nb::init<tt::tt_metal::DispatchCoreType>(),
             "Constructor with specified dispatch core type and default axis on platform architecture.",
-            py::arg("type"))
+            nb::arg("type"))
         .def(
-            py::init<tt::tt_metal::DispatchCoreType, tt::tt_metal::DispatchCoreAxis>(),
+            nb::init<tt::tt_metal::DispatchCoreType, tt::tt_metal::DispatchCoreAxis>(),
             "Constructor with specified dispatch core type and axis.",
-            py::arg("type"),
-            py::arg("axis"));
+            nb::arg("type"),
+            nb::arg("axis"));
 
-    py::class_<IDevice, std::unique_ptr<IDevice, py::nodelete>>(
+    nb::class_<IDevice>(
         m_device, "IDevice", "Base class describing a Tenstorrent accelerator device.");
 
-    py::class_<tt::tt_metal::Device, IDevice, std::unique_ptr<Device, py::nodelete>>(
+    nb::class_<tt::tt_metal::Device, IDevice>(
         m_device, "Device", "Class describing a Tenstorrent accelerator device.");
 
-    py::class_<SubDevice>(m_device, "SubDevice", "Class describing a sub-device of a Tenstorrent accelerator device.");
+    nb::class_<SubDevice>(m_device, "SubDevice", "Class describing a sub-device of a Tenstorrent accelerator device.");
 
-    py::class_<SubDeviceId>(m_device, "SubDeviceId", "ID of a sub-device.");
+    nb::class_<SubDeviceId>(m_device, "SubDeviceId", "ID of a sub-device.");
 
-    py::class_<SubDeviceManagerId>(m_device, "SubDeviceManagerId", "ID of a sub-device manager.");
+    nb::class_<SubDeviceManagerId>(m_device, "SubDeviceManagerId", "ID of a sub-device manager.");
 
-    py::class_<tt::tt_metal::detail::MemoryView>(
+    nb::class_<tt::tt_metal::detail::MemoryView>(
         m_device, "MemoryView", "Class representing view of the memory (dram, l1, l1_small, trace) of a device.")
-        .def_readonly("num_banks", &tt::tt_metal::detail::MemoryView::num_banks)
-        .def_readonly("total_bytes_per_bank", &tt::tt_metal::detail::MemoryView::total_bytes_per_bank)
-        .def_readonly(
+        .def_ro("num_banks", &tt::tt_metal::detail::MemoryView::num_banks)
+        .def_ro("total_bytes_per_bank", &tt::tt_metal::detail::MemoryView::total_bytes_per_bank)
+        .def_ro(
             "total_bytes_allocated_per_bank", &tt::tt_metal::detail::MemoryView::total_bytes_allocated_per_bank)
-        .def_readonly("total_bytes_free_per_bank", &tt::tt_metal::detail::MemoryView::total_bytes_free_per_bank)
-        .def_readonly(
+        .def_ro("total_bytes_free_per_bank", &tt::tt_metal::detail::MemoryView::total_bytes_free_per_bank)
+        .def_ro(
             "largest_contiguous_bytes_free_per_bank",
             &tt::tt_metal::detail::MemoryView::largest_contiguous_bytes_free_per_bank)
-        .def_readonly("block_table", &tt::tt_metal::detail::MemoryView::block_table);
+        .def_ro("block_table", &tt::tt_metal::detail::MemoryView::block_table);
 }
 
-void device_module(py::module& m_device) {
-    auto pySubDevice = static_cast<py::class_<SubDevice>>(m_device.attr("SubDevice"));
+void device_module(nb::module_& m_device) {
+    auto pySubDevice = static_cast<nb::class_<SubDevice>>(m_device.attr("SubDevice"));
     pySubDevice.def(
-        py::init<>([](std::vector<CoreRangeSet> cores) { return SubDevice(cores); }),
-        py::arg("cores"),
+        nb::init<>([](std::vector<CoreRangeSet> cores) { return SubDevice(cores); }), // TODO
+        nb::arg("cores"),
         R"doc(
             Creates a SubDevice object from a list of CoreRangeSet objects, where each CoreRangeSet object
             represents the cores from a specific CoreType.
             The order of cores is Tensix, then Ethernet.
         )doc");
 
-    auto pySubDeviceId = static_cast<py::class_<SubDeviceId>>(m_device.attr("SubDeviceId"));
+    auto pySubDeviceId = static_cast<nb::class_<SubDeviceId>>(m_device.attr("SubDeviceId"));
     pySubDeviceId
         .def(
-            py::init<uint8_t>(),
-            py::arg("id"),
+            nb::init<uint8_t>(),
+            nb::arg("id"),
             R"doc(
             Creates a SubDeviceId object with the given ID.
         )doc")
         .def(
             "__repr__",
             [](const SubDeviceId& self) { return "SubDeviceId(" + std::to_string(static_cast<int>(*self)) + ")"; })
-        .def(py::self == py::self)
-        .def(py::self != py::self);
+        .def(nb::self == nb::self)
+        .def(nb::self != nb::self);
 
     auto pyIDevice =
-        static_cast<py::class_<IDevice, std::unique_ptr<IDevice, py::nodelete>>>(m_device.attr("IDevice"))
+        static_cast<nb::class_<IDevice>>(m_device.attr("IDevice"))
             .def("id", &IDevice::id, "Device's ID")
             .def("arch", &IDevice::arch, "Device's arch")
             .def(
@@ -201,8 +217,8 @@ void device_module(py::module& m_device) {
                     TT_FATAL(sub_device_manager_id.has_value(), "Failed to create sub-device manager");
                     return *sub_device_manager_id;
                 },
-                py::arg("sub_devices"),
-                py::arg("local_l1_size"),
+                nb::arg("sub_devices"),
+                nb::arg("local_l1_size"),
                 R"doc(
                 Creates a sub-device manager for the given device.
 
@@ -226,8 +242,8 @@ void device_module(py::module& m_device) {
                     TT_FATAL(manager_and_sub_device_ids.has_value(), "Failed to create sub-device manager with fabric");
                     return *manager_and_sub_device_ids;
                 },
-                py::arg("sub_devices"),
-                py::arg("local_l1_size"),
+                nb::arg("sub_devices"),
+                nb::arg("local_l1_size"),
                 R"doc(
                 Creates a sub-device manager for the given device. This will automatically create a sub-device of ethernet cores for use with fabric.
                 Note that this is a temporary API until migration to actual fabric is complete.
@@ -246,7 +262,7 @@ void device_module(py::module& m_device) {
                     device->push_work(
                         [device, sub_device_manager_id] { device->load_sub_device_manager(sub_device_manager_id); });
                 },
-                py::arg("sub_device_manager_id"),
+                nb::arg("sub_device_manager_id"),
                 R"doc(
                 Loads the sub-device manager with the given ID.
 
@@ -265,7 +281,7 @@ void device_module(py::module& m_device) {
                     device->push_work(
                         [device, sub_device_manager_id] { device->remove_sub_device_manager(sub_device_manager_id); });
                 },
-                py::arg("sub_device_manager_id"),
+                nb::arg("sub_device_manager_id"),
                 R"doc(
                 Removes the sub-device manager with the given ID.
 
@@ -277,7 +293,7 @@ void device_module(py::module& m_device) {
                 [](IDevice* device, const std::vector<SubDeviceId>& sub_device_ids) {
                     device->push_work([device, sub_device_ids] { device->set_sub_device_stall_group(sub_device_ids); });
                 },
-                py::arg("sub_device_ids"),
+                nb::arg("sub_device_ids"),
                 R"doc(
                 Set the SubDevice IDs that will be stalled on by default for Fast Dispatch commands such as reading, writing, synchronizing.
                 Stalling here refers to the Fast Dispatch cores waiting for programs to complete execution on the specified SubDevices before proceeding with the specified instruction.
@@ -306,17 +322,17 @@ void device_module(py::module& m_device) {
                 [](IDevice* device) { return tt::tt_metal::hal::get_inf(); },
                 R"doc(Returns Infinity value for current architecture.)doc");
 
-    auto pyDevice = static_cast<py::class_<tt::tt_metal::Device, IDevice, std::unique_ptr<tt::tt_metal::Device, py::nodelete>>>(m_device.attr("Device"));
+    auto pyDevice = static_cast<nb::class_<tt::tt_metal::Device, IDevice>>(m_device.attr("Device"));
     pyDevice.def(
-        py::init<>([](int device_id, size_t l1_small_size, size_t trace_region_size, size_t worker_l1_size) {
+        nb::init<>([](int device_id, size_t l1_small_size, size_t trace_region_size, size_t worker_l1_size) { // TODO
             return tt::tt_metal::Device(device_id, 1, l1_small_size, trace_region_size, {}, {}, worker_l1_size);
         }),
         "Create device.",
-        py::arg("device_id"),
-        py::arg("l1_small_size") = DEFAULT_L1_SMALL_SIZE,
-        py::arg("trace_region_size") = DEFAULT_TRACE_REGION_SIZE,
-        py::kw_only(),
-        py::arg("worker_l1_size") = DEFAULT_WORKER_L1_SIZE);
+        nb::arg("device_id"),
+        nb::arg("l1_small_size") = DEFAULT_L1_SMALL_SIZE,
+        nb::arg("trace_region_size") = DEFAULT_TRACE_REGION_SIZE,
+        nb::kw_only(),
+        nb::arg("worker_l1_size") = DEFAULT_WORKER_L1_SIZE);
 
     m_device.def(
         "CreateDevice",
@@ -344,13 +360,13 @@ void device_module(py::module& m_device) {
         | device_id        | Device index           | int                 |                              | Yes      |
         +------------------+------------------------+---------------------+------------------------------+----------+
     )doc",
-        py::arg("device_id"),
-        py::arg("num_command_queues") = 1,
-        py::arg("l1_small_size") = DEFAULT_L1_SMALL_SIZE,
-        py::arg("trace_region_size") = DEFAULT_TRACE_REGION_SIZE,
-        py::arg("DispatchCoreConfig") = tt::tt_metal::DispatchCoreConfig{},
-        py::kw_only(),
-        py::arg("worker_l1_size") = DEFAULT_WORKER_L1_SIZE);
+        nb::arg("device_id"),
+        nb::arg("num_command_queues") = 1,
+        nb::arg("l1_small_size") = DEFAULT_L1_SMALL_SIZE,
+        nb::arg("trace_region_size") = DEFAULT_TRACE_REGION_SIZE,
+        nb::arg("DispatchCoreConfig") = tt::tt_metal::DispatchCoreConfig{},
+        nb::kw_only(),
+        nb::arg("worker_l1_size") = DEFAULT_WORKER_L1_SIZE);
     m_device.def(
         "CreateDevices",
         [](const std::vector<int>& device_ids,
@@ -377,13 +393,13 @@ void device_module(py::module& m_device) {
         | device_id        | Device index           | int                 |                              | Yes      |
         +------------------+------------------------+---------------------+------------------------------+----------+
     )doc",
-        py::arg("device_ids"),
-        py::arg("num_command_queues") = 1,
-        py::arg("l1_small_size") = DEFAULT_L1_SMALL_SIZE,
-        py::arg("trace_region_size") = DEFAULT_TRACE_REGION_SIZE,
-        py::arg("DispatchCoreConfig") = tt::tt_metal::DispatchCoreConfig{},
-        py::kw_only(),
-        py::arg("worker_l1_size") = DEFAULT_WORKER_L1_SIZE);
+        nb::arg("device_ids"),
+        nb::arg("num_command_queues") = 1,
+        nb::arg("l1_small_size") = DEFAULT_L1_SMALL_SIZE,
+        nb::arg("trace_region_size") = DEFAULT_TRACE_REGION_SIZE,
+        nb::arg("DispatchCoreConfig") = tt::tt_metal::DispatchCoreConfig{},
+        nb::kw_only(),
+        nb::arg("worker_l1_size") = DEFAULT_WORKER_L1_SIZE);
     m_device.def("CloseDevice", &tt::tt_metal::CloseDevice, R"doc(
         Reset an instance of TT accelerator device to default state and relinquish connection to device.
 
@@ -452,12 +468,12 @@ void device_module(py::module& m_device) {
     m_device.def(
         "format_input_tensor",
         &ttnn::operations::experimental::auto_format::AutoFormat::format_input_tensor,
-        py::arg("input").noconvert(),
-        py::arg("device").noconvert(),
-        py::arg("padded_shape"),
-        py::arg("pad_value"),
-        py::arg("target_layout").noconvert(),
-        py::arg("target_mem_config").noconvert() = std::nullopt,
+        nb::arg("input").noconvert(),
+        nb::arg("device").noconvert(),
+        nb::arg("padded_shape"),
+        nb::arg("pad_value"),
+        nb::arg("target_layout").noconvert(),
+        nb::arg("target_mem_config").noconvert() = std::nullopt,
         R"doc(
         Formats tensor to target layout and pads to padded shape.
 
@@ -490,11 +506,11 @@ void device_module(py::module& m_device) {
             return operations::experimental::auto_format::AutoFormat::format_output_tensor(
                 output, ttnn::Shape(shape), device, target_layout, std::move(target_mem_config));
         },
-        py::arg("output").noconvert(),
-        py::arg("shape"),
-        py::arg("device").noconvert(),
-        py::arg("target_layout").noconvert(),
-        py::arg("target_mem_config").noconvert() = std::nullopt,
+        nb::arg("output").noconvert(),
+        nb::arg("shape"),
+        nb::arg("device").noconvert(),
+        nb::arg("target_layout").noconvert(),
+        nb::arg("target_mem_config").noconvert() = std::nullopt,
         R"doc(
         Formats tensor to target layout and unpads to shape.
 
@@ -523,7 +539,7 @@ void device_module(py::module& m_device) {
                 ttnn::operations::experimental::auto_format::AutoFormat::pad_to_tile_shape(ttnn::Shape(unpadded_shape));
             return std::vector<uint32_t>(result.cbegin(), result.cend());
         },
-        py::arg("unpadded_shape"),
+        nb::arg("unpadded_shape"),
         R"doc(
         Pads the given shape to tile shape based on specified padding options.
 
@@ -557,8 +573,8 @@ void device_module(py::module& m_device) {
     m_device.def(
         "DumpDeviceMemoryState",
         &tt::tt_metal::detail::DumpDeviceMemoryState,
-        py::arg().noconvert(),
-        py::arg("prefix").noconvert() = std::string(""),
+        nb::arg().noconvert(),
+        nb::arg("prefix").noconvert() = std::string(""),
         R"doc(
         Generates reports to dump device memory state. Three reports are generated:
         - `<prefix>l1_usage_summary.csv` has a table with an entry for each program indicating the minimum largest free L1 block and size of largest L1 buffer that can be interleaved across available free L1 blocks
@@ -576,8 +592,8 @@ void device_module(py::module& m_device) {
     m_device.def(
         "GetMemoryView",
         &tt::tt_metal::detail::GetMemoryView,
-        py::arg().noconvert(),
-        py::arg().noconvert(),
+        nb::arg().noconvert(),
+        nb::arg().noconvert(),
         R"doc(
         Populates MemoryView for BufferType [dram, l1, l1 small, trace]. Used when storing to disk is not an option.
 
@@ -622,9 +638,9 @@ void device_module(py::module& m_device) {
             device->synchronize();
         },
         synchronize_device_doc.data(),
-        py::arg("device"),
-        py::arg("cq_id") = std::nullopt,
-        py::arg("sub_device_ids") = std::vector<SubDeviceId>());
+        nb::arg("device"),
+        nb::arg("cq_id") = std::nullopt,
+        nb::arg("sub_device_ids") = std::vector<SubDeviceId>());
     // TODO: #18572 - Replace the implementation of this overload with the TT-distributed implementation.
     m_device.def(
         "synchronize_device",
@@ -637,9 +653,9 @@ void device_module(py::module& m_device) {
             }
         },
         synchronize_device_doc.data(),
-        py::arg("device"),
-        py::arg("cq_id") = std::nullopt,
-        py::arg("sub_device_ids") = std::vector<SubDeviceId>());
+        nb::arg("device"),
+        nb::arg("cq_id") = std::nullopt,
+        nb::arg("sub_device_ids") = std::vector<SubDeviceId>());
     m_device.def(
         "synchronize_mesh_device",
         [](MeshDevice* device, std::optional<QueueId> cq_id, const std::vector<SubDeviceId>& sub_device_ids) {
@@ -647,10 +663,10 @@ void device_module(py::module& m_device) {
                 device, cq_id.has_value() ? std::make_optional(**cq_id) : std::nullopt, sub_device_ids);
         },
         synchronize_device_doc.data(),
-        py::arg("device"),
-        py::arg("cq_id") = std::nullopt,
-        py::arg("sub_device_ids") = std::vector<SubDeviceId>());
-    m_device.def("DumpDeviceProfiler", DumpDeviceProfiler, py::arg("device"), R"doc(
+        nb::arg("device"),
+        nb::arg("cq_id") = std::nullopt,
+        nb::arg("sub_device_ids") = std::vector<SubDeviceId>());
+    m_device.def("DumpDeviceProfiler", DumpDeviceProfiler, nb::arg("device"), R"doc(
         Dump device side profiling data.
 
         +------------------+----------------------------------+-----------------------+-------------+----------+
@@ -662,9 +678,9 @@ void device_module(py::module& m_device) {
 
     m_device.def("get_arch_name", &tt::tt_metal::hal::get_arch_name, "Return the name of the architecture present.");
 
-    m_device.attr("DEFAULT_L1_SMALL_SIZE") = py::int_(DEFAULT_L1_SMALL_SIZE);
-    m_device.attr("DEFAULT_TRACE_REGION_SIZE") = py::int_(DEFAULT_TRACE_REGION_SIZE);
-    m_device.attr("DEFAULT_WORKER_L1_SIZE") = py::int_(DEFAULT_WORKER_L1_SIZE);
+    m_device.attr("DEFAULT_L1_SMALL_SIZE") = nb::int_(DEFAULT_L1_SMALL_SIZE);
+    m_device.attr("DEFAULT_TRACE_REGION_SIZE") = nb::int_(DEFAULT_TRACE_REGION_SIZE);
+    m_device.attr("DEFAULT_WORKER_L1_SIZE") = nb::int_(DEFAULT_WORKER_L1_SIZE);
 
     m_device.def(
         "get_max_worker_l1_unreserved_size",
@@ -674,10 +690,9 @@ void device_module(py::module& m_device) {
     m_device.attr("DefaultQueueId") = ttnn::DefaultQueueId;
 }
 
-void py_device_module(py::module& module) {
-    detail::ttnn_device(module);
-    device_module(module);
+void py_device_module(nb::module_& mod) {
+    detail::ttnn_device(mod);
+    device_module(mod);
 }
 
-}  // namespace device
-}  // namespace ttnn
+}  // namespace ttnn::device

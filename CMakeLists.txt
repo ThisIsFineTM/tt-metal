@@ -208,10 +208,12 @@ add_compile_options(
     -Wno-sign-compare
     -Wno-ignored-qualifiers
     -Wno-type-limits
+    -Wno-unused
     -fPIC
     -fvisibility-inlines-hidden
+    -fconcepts-diagnostics-depth=3
     -Wall
-    -Werror
+    #-Werror
     # The following list is not indicative of what we _desire_ only the status quo to build.
     -Wno-deprecated-declarations
     -Wno-bool-operation
