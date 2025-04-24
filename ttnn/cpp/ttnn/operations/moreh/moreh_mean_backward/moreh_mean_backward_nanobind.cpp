@@ -2,25 +2,32 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "moreh_mean_backward_pybind.hpp"
+#include "moreh_mean_backward_nanobind.hpp"
 
-#include "pybind11/decorators.hpp"
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "ttnn-nanobind/decorators.hpp"
 #include "ttnn/operations/moreh/moreh_mean_backward/moreh_mean_backward.hpp"
 
+namespace nb = nanobind;
+
 namespace ttnn::operations::moreh::moreh_mean_backward {
-void bind_moreh_mean_backward_operation(py::module& module) {
+void bind_moreh_mean_backward_operation(nb::module_& mod) {
     bind_registered_operation(
-        module,
+        mod,
         ttnn::moreh_mean_backward,
         "Moreh Mean Backward Operation",
-        ttnn::pybind_arguments_t{
-            py::arg("output_grad"),
-            py::kw_only(),
-            py::arg("dim"),
-            py::arg("keepdim"),
-            py::arg("input_grad_shape") = std::nullopt,
-            py::arg("input_grad") = std::nullopt,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("compute_kernel_config") = std::nullopt});
+        ttnn::nanobind_arguments_t{
+            nb::arg("output_grad"),
+            nb::kw_only(),
+            nb::arg("dim"),
+            nb::arg("keepdim"),
+            nb::arg("input_grad_shape") = std::nullopt,
+            nb::arg("input_grad") = std::nullopt,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("compute_kernel_config") = std::nullopt});
 }
 }  // namespace ttnn::operations::moreh::moreh_mean_backward
