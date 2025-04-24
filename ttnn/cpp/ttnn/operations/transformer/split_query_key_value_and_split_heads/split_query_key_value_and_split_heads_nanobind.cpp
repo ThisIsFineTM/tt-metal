@@ -2,21 +2,27 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "split_query_key_value_and_split_heads_pybind.hpp"
+#include "split_query_key_value_and_split_heads_nanobind.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <cstdint>
+#include <optional>
+#include <tuple>
 
-#include "cpp/pybind11/decorators.hpp"
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+#include <nanobind/stl/tuple.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 
 #include "split_query_key_value_and_split_heads.hpp"
 
+namespace nb = nanobind;
+
 namespace ttnn::operations::transformer {
 
-void py_bind_split_query_key_value_and_split_heads(pybind11::module& module) {
-    namespace py = pybind11;
+void bind_split_query_key_value_and_split_heads(nb::module_& mod) {
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::transformer::split_query_key_value_and_split_heads,
         R"doc(
 
@@ -74,7 +80,7 @@ void py_bind_split_query_key_value_and_split_heads(pybind11::module& module) {
                Tuple[ttnn.Tensor, ttnn.Tensor, ttnn.Tensor]: the output tensor.
 
         )doc",
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const decltype(ttnn::transformer::split_query_key_value_and_split_heads)& self,
                const Tensor& input_tensor,
                const std::optional<Tensor>& kv_input_tensor,
@@ -85,13 +91,13 @@ void py_bind_split_query_key_value_and_split_heads(pybind11::module& module) {
                 -> std::tuple<ttnn::Tensor, ttnn::Tensor, ttnn::Tensor> {
                 return self(input_tensor, kv_input_tensor, num_heads, num_kv_heads, transpose_key, memory_config);
             },
-            py::arg("input_tensor").noconvert(),
-            py::arg("kv_input_tensor") = std::nullopt,
-            py::kw_only(),
-            py::arg("num_heads"),
-            py::arg("num_kv_heads") = std::nullopt,
-            py::arg("transpose_key") = true,
-            py::arg("memory_config") = std::nullopt});
+            nb::arg("input_tensor").noconvert(),
+            nb::arg("kv_input_tensor") = std::nullopt,
+            nb::kw_only(),
+            nb::arg("num_heads"),
+            nb::arg("num_kv_heads") = std::nullopt,
+            nb::arg("transpose_key") = true,
+            nb::arg("memory_config") = std::nullopt});
 }
 
 }  // namespace ttnn::operations::transformer
