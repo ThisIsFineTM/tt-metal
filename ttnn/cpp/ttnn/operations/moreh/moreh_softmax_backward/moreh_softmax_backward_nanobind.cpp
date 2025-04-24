@@ -2,33 +2,40 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "moreh_softmax_backward_pybind.hpp"
+#include "moreh_softmax_backward_nanobind.hpp"
+
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
 
 #include "moreh_softmax_backward.hpp"
-#include "pybind11/decorators.hpp"
-#include "cpp/pybind11/export_enum.hpp"
+#include "ttnn-nanobind/decorators.hpp"
+#include "cpp/ttnn-nanobind/export_enum.hpp"
+
+namespace nb = nanobind;
 
 namespace ttnn::operations::moreh::moreh_softmax_backward {
 
-void bind_moreh_softmax_backward_operation(py::module& module) {
-    export_enum<MorehSoftmaxBackwardOp>(module, "MorehSoftmaxBackwardOp");
-    export_enum<MorehSoftmaxBackwardOpParallelizationStrategy>(module, "MorehSoftmaxBackwardOpParallelizationStrategy");
+void bind_moreh_softmax_backward_operation(nb::module_& mod) {
+    export_enum<MorehSoftmaxBackwardOp>(mod, "MorehSoftmaxBackwardOp");
+    export_enum<MorehSoftmaxBackwardOpParallelizationStrategy>(mod, "MorehSoftmaxBackwardOpParallelizationStrategy");
 
 #define BIND_MOREH_SOFT_BACKWARD_OP(op_name, op_enum, op_desc)                         \
     bind_registered_operation(                                                         \
-        module,                                                                        \
+        mod,                                                                           \
         ttnn::op_name,                                                                 \
         op_desc,                                                                       \
-        ttnn::pybind_arguments_t{                                                      \
-            py::arg("output_tensor"),                                                  \
-            py::arg("output_grad_tensor"),                                             \
-            py::arg("dim"),                                                            \
-            py::kw_only(),                                                             \
-            py::arg("input_grad_tensor") = std::nullopt,                               \
-            py::arg("op") = op_enum,                                                   \
-            py::arg("strategy") = MorehSoftmaxBackwardOpParallelizationStrategy::NONE, \
-            py::arg("memory_config") = std::nullopt,                                   \
-            py::arg("compute_kernel_config") = std::nullopt});
+        ttnn::nanobind_arguments_t{                                                    \
+            nb::arg("output_tensor"),                                                  \
+            nb::arg("output_grad_tensor"),                                             \
+            nb::arg("dim"),                                                            \
+            nb::kw_only(),                                                             \
+            nb::arg("input_grad_tensor") = std::nullopt,                               \
+            nb::arg("op") = op_enum,                                                   \
+            nb::arg("strategy") = MorehSoftmaxBackwardOpParallelizationStrategy::NONE, \
+            nb::arg("memory_config") = std::nullopt,                                   \
+            nb::arg("compute_kernel_config") = std::nullopt});
 
     BIND_MOREH_SOFT_BACKWARD_OP(
         moreh_softmax_backward, MorehSoftmaxBackwardOp::SOFTMAX, "Moreh Softmax Backward Operation")
