@@ -2,17 +2,24 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "sdpa_decode_pybind.hpp"
+#include "sdpa_decode_nanobind.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <cstdint>
+#include <optional>
+#include <vector>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+#include <nanobind/stl/vector.h>
 
 #include "sdpa_decode.hpp"
-#include "cpp/pybind11/decorators.hpp"
+#include "cpp/ttnn-nanobind/decorators.hpp"
+
+namespace nb = nanobind;
 
 namespace ttnn::operations::transformer {
 
-void py_bind_sdpa_decode(py::module& module) {
+void bind_sdpa_decode(nb::module_& mod) {
     auto doc =
         R"doc(
         A version of scaled dot product attention specifically for decode.
@@ -50,10 +57,10 @@ void py_bind_sdpa_decode(py::module& module) {
 
     using OperationType = decltype(ttnn::transformer::scaled_dot_product_attention_decode);
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::transformer::scaled_dot_product_attention_decode,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const OperationType& self,
                const ttnn::Tensor& input_tensor_q,
                const ttnn::Tensor& input_tensor_k,
@@ -81,27 +88,27 @@ void py_bind_sdpa_decode(py::module& module) {
                     program_config,
                     compute_kernel_config);
             },
-            py::arg("input_tensor_q").noconvert(),
-            py::arg("input_tensor_k").noconvert(),
-            py::arg("input_tensor_v").noconvert(),
-            py::kw_only(),
-            py::arg("is_causal").noconvert() = true,
-            py::arg("attn_mask").noconvert() = std::nullopt,
-            py::arg("cur_pos").noconvert() = std::vector<uint32_t>(),
-            py::arg("cur_pos_tensor").noconvert() = std::nullopt,
-            py::arg("scale").noconvert() = std::nullopt,
-            py::arg("memory_config").noconvert() = std::nullopt,
-            py::arg("program_config").noconvert() = std::nullopt,
-            py::arg("compute_kernel_config").noconvert() = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId,
+            nb::arg("input_tensor_q").noconvert(),
+            nb::arg("input_tensor_k").noconvert(),
+            nb::arg("input_tensor_v").noconvert(),
+            nb::kw_only(),
+            nb::arg("is_causal").noconvert() = true,
+            nb::arg("attn_mask").noconvert() = std::nullopt,
+            nb::arg("cur_pos").noconvert() = std::vector<uint32_t>(),
+            nb::arg("cur_pos_tensor").noconvert() = std::nullopt,
+            nb::arg("scale").noconvert() = std::nullopt,
+            nb::arg("memory_config").noconvert() = std::nullopt,
+            nb::arg("program_config").noconvert() = std::nullopt,
+            nb::arg("compute_kernel_config").noconvert() = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId,
         });
 
     using PagedOperationType = decltype(ttnn::transformer::paged_scaled_dot_product_attention_decode);
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::transformer::paged_scaled_dot_product_attention_decode,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const PagedOperationType& self,
                const ttnn::Tensor& input_tensor_q,
                const ttnn::Tensor& input_tensor_k,
@@ -129,19 +136,19 @@ void py_bind_sdpa_decode(py::module& module) {
                     program_config,
                     compute_kernel_config);
             },
-            py::arg("input_tensor_q").noconvert(),
-            py::arg("input_tensor_k").noconvert(),
-            py::arg("input_tensor_v").noconvert(),
-            py::arg("page_table_tensor").noconvert(),
-            py::kw_only(),
-            py::arg("is_causal").noconvert() = true,
-            py::arg("attn_mask").noconvert() = std::nullopt,
-            py::arg("cur_pos_tensor").noconvert() = std::nullopt,
-            py::arg("scale").noconvert() = std::nullopt,
-            py::arg("memory_config").noconvert() = std::nullopt,
-            py::arg("program_config").noconvert() = std::nullopt,
-            py::arg("compute_kernel_config").noconvert() = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId,
+            nb::arg("input_tensor_q").noconvert(),
+            nb::arg("input_tensor_k").noconvert(),
+            nb::arg("input_tensor_v").noconvert(),
+            nb::arg("page_table_tensor").noconvert(),
+            nb::kw_only(),
+            nb::arg("is_causal").noconvert() = true,
+            nb::arg("attn_mask").noconvert() = std::nullopt,
+            nb::arg("cur_pos_tensor").noconvert() = std::nullopt,
+            nb::arg("scale").noconvert() = std::nullopt,
+            nb::arg("memory_config").noconvert() = std::nullopt,
+            nb::arg("program_config").noconvert() = std::nullopt,
+            nb::arg("compute_kernel_config").noconvert() = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId,
         });
 }
 }  // namespace ttnn::operations::transformer
