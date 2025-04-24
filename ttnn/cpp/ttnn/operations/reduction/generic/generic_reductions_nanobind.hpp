@@ -4,16 +4,20 @@
 
 #pragma once
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <optional>
 
-#include "cpp/pybind11/decorators.hpp"
+#include <fmt/format.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 
 namespace ttnn::operations::reduction::detail {
 
+namespace nb = nanobind;
+
 template <typename reduction_operation_t>
-void bind_reduction_operation(py::module& module, const reduction_operation_t& operation) {
-    namespace py = pybind11;
+void bind_reduction_operation(nb::module_& mod, const reduction_operation_t& operation) {
     auto doc = fmt::format(
         R"doc(
 
@@ -35,17 +39,17 @@ void bind_reduction_operation(py::module& module, const reduction_operation_t& o
         operation.base_name());
 
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        ttnn::pybind_arguments_t{
-            py::arg("input_tensor"),
-            py::arg("dim") = std::nullopt,
-            py::arg("keepdim") = true,
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("compute_kernel_config") = std::nullopt,
-            py::arg("scalar") = 1.0f});
+        ttnn::nanobind_arguments_t{
+            nb::arg("input_tensor"),
+            nb::arg("dim") = std::nullopt,
+            nb::arg("keepdim") = true,
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("compute_kernel_config") = std::nullopt,
+            nb::arg("scalar") = 1.0f});
 }
 
 }  // namespace ttnn::operations::reduction::detail
