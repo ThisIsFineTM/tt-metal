@@ -2,60 +2,62 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "rmsnorm_distributed_pybind.hpp"
+#include "rmsnorm_distributed_nanobind.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <optional>
 
-#include "cpp/pybind11/decorators.hpp"
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 
 #include "rmsnorm_pre_all_gather.hpp"
 #include "rmsnorm_post_all_gather.hpp"
 
+namespace nb = nanobind;
+
 namespace ttnn::operations::normalization::detail {
 
-namespace py = pybind11;
-
-void bind_normalization_rmsnorm_pre_all_gather_operation(py::module& module) {
+void bind_normalization_rmsnorm_pre_all_gather_operation(nb::module_& mod) {
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::rms_norm_pre_all_gather,
         R"doc(rms_norm_pre_all_gather(input_tensor: ttnn.Tensor, dtype: Optional[ttnn.DataType] = None) -> ttnn.Tensor
             Compute sum(:attr:`input_tensor`ˆ2) and sum(:attr:`input_tensor`) over the last dimension.
         )doc",
-        ttnn::pybind_arguments_t{
-            py::arg("input_tensor"),
-            py::kw_only(),
-            py::arg("dtype") = DataType::BFLOAT16,
-            py::arg("residual_input_tensor") = std::nullopt,
-            py::arg("compute_kernel_config") = std::nullopt,
-            py::arg("program_config") = std::nullopt,
-            py::arg("memory_config") = std::nullopt});
+        ttnn::nanobind_arguments_t{
+            nb::arg("input_tensor"),
+            nb::kw_only(),
+            nb::arg("dtype") = DataType::BFLOAT16,
+            nb::arg("residual_input_tensor") = std::nullopt,
+            nb::arg("compute_kernel_config") = std::nullopt,
+            nb::arg("program_config") = std::nullopt,
+            nb::arg("memory_config") = std::nullopt});
 }
 
-void bind_normalization_rmsnorm_post_all_gather_operation(py::module& module) {
+void bind_normalization_rmsnorm_post_all_gather_operation(nb::module_& mod) {
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::rms_norm_post_all_gather,
         R"doc(rms_norm_post_all_gather(input_tensor: ttnn.Tensor, stats: ttnn.Tensor, epsilon: float = 1e-12, weight: Optional[ttnn.Tensor] = None, bias: Optional[ttnn.Tensor] = None, memory_config: Optional[ttnn.MemoryConfig] = None) -> ttnn.Tensor
             Performs the second part of a distributed layernorm operation normalizing the input based on the gathered statistics input.
         )doc",
-        ttnn::pybind_arguments_t{
-            py::arg("input_tensor"),
-            py::arg("stats"),
-            py::kw_only(),
-            py::arg("epsilon") = 1e-12,
-            py::arg("weight") = std::nullopt,
-            py::arg("bias") = std::nullopt,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("compute_kernel_config") = std::nullopt,
-            py::arg("program_config") = std::nullopt,
-            py::arg("dtype") = std::nullopt});
+        ttnn::nanobind_arguments_t{
+            nb::arg("input_tensor"),
+            nb::arg("stats"),
+            nb::kw_only(),
+            nb::arg("epsilon") = 1e-12,
+            nb::arg("weight") = std::nullopt,
+            nb::arg("bias") = std::nullopt,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("compute_kernel_config") = std::nullopt,
+            nb::arg("program_config") = std::nullopt,
+            nb::arg("dtype") = std::nullopt});
 }
 
-void bind_normalization_rms_norm_distributed(py::module& module) {
-    bind_normalization_rmsnorm_pre_all_gather_operation(module);
-    bind_normalization_rmsnorm_post_all_gather_operation(module);
+void bind_normalization_rms_norm_distributed(nb::module_& mod) {
+    bind_normalization_rmsnorm_pre_all_gather_operation(mod);
+    bind_normalization_rmsnorm_post_all_gather_operation(mod);
 }
 
 }  // namespace ttnn::operations::normalization::detail
