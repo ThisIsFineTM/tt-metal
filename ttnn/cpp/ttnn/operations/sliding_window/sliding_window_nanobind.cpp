@@ -2,25 +2,26 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "cpp/pybind11/decorators.hpp"
+#include "sliding_window_nanobind.hpp"
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "sliding_window.hpp"
 
 using namespace tt::tt_metal;
 
-namespace py = pybind11;
 namespace ttnn::operations::sliding_window {
 
-void py_bind_sliding_window(py::module& module) {
-    py::class_<ParallelConfig>(module, "ParallelConfig")
+void bind_sliding_window(nb::module_& mod) {
+    nb::class_<ParallelConfig>(mod, "ParallelConfig")
         .def(
-            py::init<CoreRangeSet, TensorMemoryLayout, ShardOrientation>(),
-            py::kw_only(),
-            py::arg("grid"),
-            py::arg("shard_scheme"),
-            py::arg("shard_orientation"))
-        .def_readwrite("grid", &ParallelConfig::grid)
-        .def_readwrite("shard_scheme", &ParallelConfig::shard_scheme)
-        .def_readwrite("shard_orientation", &ParallelConfig::shard_orientation);
+            nb::init<CoreRangeSet, TensorMemoryLayout, ShardOrientation>(),
+            nb::kw_only(),
+            nb::arg("grid"),
+            nb::arg("shard_scheme"),
+            nb::arg("shard_orientation"))
+        .def_rw("grid", &ParallelConfig::grid)
+        .def_rw("shard_scheme", &ParallelConfig::shard_scheme)
+        .def_rw("shard_orientation", &ParallelConfig::shard_orientation);
 }
 
 }  // namespace ttnn::operations::sliding_window
