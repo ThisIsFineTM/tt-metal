@@ -2,20 +2,23 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "concatenate_heads_pybind.hpp"
+#include "concatenate_heads_nanobind.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <optional>
 
-#include "cpp/pybind11/decorators.hpp"
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "concatenate_heads.hpp"
+
+namespace nb = nanobind;
 
 namespace ttnn::operations::transformer {
 
-void py_bind_concatenate_heads(pybind11::module& module) {
-    namespace py = pybind11;
+void bind_concatenate_heads(nb::module_& mod) {
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::transformer::concatenate_heads,
         R"doc(
 
@@ -31,7 +34,10 @@ void py_bind_concatenate_heads(pybind11::module& module) {
                 ttnn.Tensor: the output tensor.
 
         )doc",
-        ttnn::pybind_arguments_t{py::arg("input_tensor"), py::kw_only(), py::arg("memory_config") = std::nullopt});
+        ttnn::nanobind_arguments_t{
+            nb::arg("input_tensor"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt});
 }
 
 }  // namespace ttnn::operations::transformer
