@@ -19,13 +19,13 @@ namespace ttnn::operations::experimental::ccl {
 
 void py_module(nb::module_& mod) {
     ccl::bind_fused_rms_1_1_32_8192(mod);
-    ccl::py_bind_all_gather_matmul(mod);
-    ccl::py_bind_all_reduce(mod);
-    ccl::py_bind_all_gather_async(mod);
-    ccl::py_bind_all_gather_concat(mod);
-    ccl::py_bind_reduce_scatter_async(mod);
-    ccl::py_bind_all_reduce_async(mod);
-    ccl::py_bind_llama_reduce_scatter(mod);
+    ccl::bind_all_gather_matmul(mod);
+    ccl::bind_all_reduce(mod);
+    ccl::bind_all_gather_async(mod);
+    ccl::bind_all_gather_concat(mod);
+    ccl::bind_reduce_scatter_async(mod);
+    ccl::bind_all_reduce_async(mod);
+    ccl::bind_llama_reduce_scatter(mod);
 }
 
 }  // namespace ttnn::operations::experimental::ccl
