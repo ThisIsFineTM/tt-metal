@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "pybind11/pybind_fwd.hpp"
-
-namespace py = pybind11;
+#include "ttnn-nanobind/nanobind_fwd.hpp"
 
 namespace ttnn::operations::normalization::detail {
-void bind_batch_norm_operation(pybind11::module& module);
+
+namespace nb = nanobind;
+void bind_batch_norm_operation(nb::module_& mod);
 }

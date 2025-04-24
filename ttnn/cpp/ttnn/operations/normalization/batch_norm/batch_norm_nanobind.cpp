@@ -2,16 +2,23 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "batch_norm_pybind.hpp"
+#include "batch_norm_nanobind.hpp"
+
+#include <optional>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
 
 #include "batch_norm.hpp"
 
-#include "pybind11/decorators.hpp"
-namespace py = pybind11;
+#include "ttnn-nanobind/decorators.hpp"
+
+namespace nb = nanobind;
+
 namespace ttnn::operations::normalization::detail {
-void bind_batch_norm_operation(pybind11::module& module) {
+void bind_batch_norm_operation(nb::module_& mod) {
     ttnn::bind_registered_operation(
-        module,
+        mod,
         ttnn::batch_norm,
         R"doc(
             Applies Spatial Batch Normalization over each channel on :attr:`input_tensor`. Inputs must be must be tilized and interleaved.
@@ -65,18 +72,18 @@ void bind_batch_norm_operation(pybind11::module& module) {
 
 
         )doc",
-        ttnn::pybind_arguments_t{
-            py::arg("input"),
-            py::kw_only(),
-            py::arg("running_mean") = std::nullopt,
-            py::arg("running_var") = std::nullopt,
-            py::arg("training") = false,
-            py::arg("eps") = 1e-05,
-            py::arg("momentum") = 0.1,
-            py::arg("weight") = std::nullopt,
-            py::arg("bias") = std::nullopt,
-            py::arg("output") = std::nullopt,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId});
+        ttnn::nanobind_arguments_t{
+            nb::arg("input"),
+            nb::kw_only(),
+            nb::arg("running_mean") = std::nullopt,
+            nb::arg("running_var") = std::nullopt,
+            nb::arg("training") = false,
+            nb::arg("eps") = 1e-05,
+            nb::arg("momentum") = 0.1,
+            nb::arg("weight") = std::nullopt,
+            nb::arg("bias") = std::nullopt,
+            nb::arg("output") = std::nullopt,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 }  // namespace ttnn::operations::normalization::detail
