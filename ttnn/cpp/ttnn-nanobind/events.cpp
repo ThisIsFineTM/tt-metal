@@ -4,34 +4,47 @@
 
 #include "events.hpp"
 
+#include <memory>
+#include <optional>
+#include <ostream>
+#include <string>
+#include <vector>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+#include <nanobind/stl/shared_ptr.h>
+#include <nanobind/stl/string.h>
+#include <nanobind/stl/vector.h>
+
 #include <tt-metalium/event.hpp>
-#include "pybind11/pybind11.h"
-#include <pybind11/stl.h>
+#include "ttnn/events.hpp"
 
 #include "ttnn/common/queue_id.hpp"
 
 using namespace tt::tt_metal;
+namespace nb = nanobind;
 
 namespace ttnn::events {
 
-void py_module_types(py::module& module) {
-    py::class_<Event, std::shared_ptr<Event>>(module, "event");
-    py::class_<MultiDeviceEvent>(module, "multi_device_event");
-    py::class_<MeshEvent>(module, "MeshEvent").def("__repr__", [](const MeshEvent& self) {
-        std::ostringstream str;
-        str << self;
-        return str.str();
+void py_module_types(nb::module_& mod) {
+    nb::class_<Event>(mod, "event");
+    nb::class_<MultiDeviceEvent>(mod, "multi_device_event");
+    nb::class_<MeshEvent>(mod, "MeshEvent")
+        .def("__repr__", [](const MeshEvent& self) {
+            std::ostringstream str;
+            str << self;
+            return str.str();
     });
 }
 
-void py_module(py::module& module) {
+void py_module(nb::module_& mod) {
     // Single Device APIs
-    module.def(
+    mod.def(
         "record_event",
-        py::overload_cast<IDevice*, QueueId, const std::vector<SubDeviceId>&>(&record_event),
-        py::arg("cq_id"),
-        py::arg("event"),
-        py::arg("sub_device_ids") = std::vector<SubDeviceId>(),
+        nb::overload_cast<IDevice*, QueueId, const std::vector<SubDeviceId>&>(&record_event),
+        nb::arg("cq_id"),
+        nb::arg("event"),
+        nb::arg("sub_device_ids") = std::vector<SubDeviceId>(),
         R"doc(
             Records the completion of commands on this CQ, preceeding this call.
 
@@ -44,11 +57,11 @@ void py_module(py::module& module) {
                 event: The event used to record completion of preceeding commands.
         )doc");
 
-    module.def(
+    mod.def(
         "wait_for_event",
-        py::overload_cast<QueueId, const std::shared_ptr<Event>&>(&wait_for_event),
-        py::arg("cq_id"),
-        py::arg("event"),
+        nb::overload_cast<QueueId, const std::shared_ptr<Event>&>(&wait_for_event),
+        nb::arg("cq_id"),
+        nb::arg("event"),
         R"doc(
             Inserts a barrier - makes a CQ wait until an event is recorded.
 
@@ -58,12 +71,12 @@ void py_module(py::module& module) {
             )doc");
 
     // Multi Device APIs
-    module.def(
+    mod.def(
         "record_event",
-        py::overload_cast<MeshDevice*, QueueId, const std::vector<SubDeviceId>&>(&record_event),
-        py::arg("cq_id"),
-        py::arg("multi_device_event"),
-        py::arg("sub_device_ids") = std::vector<SubDeviceId>(),
+        nb::overload_cast<MeshDevice*, QueueId, const std::vector<SubDeviceId>&>(&record_event),
+        nb::arg("cq_id"),
+        nb::arg("multi_device_event"),
+        nb::arg("sub_device_ids") = std::vector<SubDeviceId>(),
         R"doc(
             Records the completion of commands on this CQ, preceeding this call.
 
@@ -76,11 +89,11 @@ void py_module(py::module& module) {
                 multi_device_event: The event used to record completion of preceeding commands.
         )doc");
 
-    module.def(
+    mod.def(
         "wait_for_event",
-        py::overload_cast<QueueId, const MultiDeviceEvent&>(&wait_for_event),
-        py::arg("cq_id"),
-        py::arg("multi_device_event"),
+        nb::overload_cast<QueueId, const MultiDeviceEvent&>(&wait_for_event),
+        nb::arg("cq_id"),
+        nb::arg("multi_device_event"),
         R"doc(
             Inserts a barrier - makes a CQ wait until an event is recorded.
 
@@ -89,17 +102,17 @@ void py_module(py::module& module) {
                 multi_device_event (multi_device_event): The Command Queue will stall until this event is completed.
             )doc");
 
-    module.def(
+    mod.def(
         "record_mesh_event",
-        py::overload_cast<
+        nb::overload_cast<
             MeshDevice*,
             QueueId,
             const std::vector<SubDeviceId>&,
             const std::optional<MeshCoordinateRange>&>(&record_mesh_event),
-        py::arg("mesh_device"),
-        py::arg("cq_id"),
-        py::arg("sub_device_ids") = std::vector<SubDeviceId>(),
-        py::arg("device_range") = std::nullopt,
+        nb::arg("mesh_device"),
+        nb::arg("cq_id"),
+        nb::arg("sub_device_ids") = std::vector<SubDeviceId>(),
+        nb::arg("device_range") = std::nullopt,
         R"doc(
             Records the completion of commands on this CQ, preceeding this call.
 
@@ -113,11 +126,11 @@ void py_module(py::module& module) {
                 MeshEvent: The event used to record completion of preceeding commands.
         )doc");
 
-    module.def(
+    mod.def(
         "wait_for_mesh_event",
-        py::overload_cast<QueueId, const MeshEvent&>(&wait_for_mesh_event),
-        py::arg("cq_id"),
-        py::arg("mesh_event"),
+        nb::overload_cast<QueueId, const MeshEvent&>(&wait_for_mesh_event),
+        nb::arg("cq_id"),
+        nb::arg("mesh_event"),
         R"doc(
             Inserts a barrier - makes a CQ wait until an event is recorded.
 

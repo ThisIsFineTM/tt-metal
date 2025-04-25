@@ -4,14 +4,12 @@
 
 #pragma once
 
-#include "pybind11/pybind_fwd.hpp"
-#include "ttnn/events.hpp"
-
-namespace py = pybind11;
+#include "ttnn-nanobind/nanobind_fwd.hpp"
 
 namespace ttnn::events {
 
-void py_module_types(py::module& module);
-void py_module(py::module& module);
+namespace nb = nanobind;
+void py_module_types(nb::module_& mod);
+void py_module(nb::module_& mod);
 
 }  // namespace ttnn::events
