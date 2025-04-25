@@ -4,6 +4,7 @@
 
 #include "ttnn/operations/data_movement/fold/fold_nanobind.hpp"
 
+#include <cstdint>
 #include <optional>
 
 #include <nanobind/nanobind.h>
