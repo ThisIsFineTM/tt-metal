@@ -1281,6 +1281,7 @@ if(USE_NANOBIND)
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn-nanobind/__init__.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn-nanobind/types.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn-nanobind/reports.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn-nanobind/operations/copy.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn-nanobind/events.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn-nanobind/global_circular_buffer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn-nanobind/global_semaphore.cpp
