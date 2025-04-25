@@ -5,7 +5,6 @@
 #pragma once
 
 #include "ttnn-nanobind/nanobind_fwd.hpp"
-#include "ttnn/global_semaphore.hpp"
 
 namespace ttnn::global_semaphore {
 

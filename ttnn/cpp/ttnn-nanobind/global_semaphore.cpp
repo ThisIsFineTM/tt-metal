@@ -14,7 +14,7 @@
 namespace ttnn::global_semaphore {
 
 void py_module_types(nb::module_& mod) {
-    nb::class_<GlobalSemaphore, std::shared_ptr<GlobalSemaphore>>(mod, "global_sempahore");
+    nb::class_<GlobalSemaphore>(mod, "global_sempahore");
     nb::class_<MultiDeviceGlobalSemaphore>(mod, "multi_device_global_semaphore");
 }
 
