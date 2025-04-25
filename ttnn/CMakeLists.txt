@@ -1074,6 +1074,7 @@ if(USE_NANOBIND)
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn/operations/eltwise/complex/complex_nanobind.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn/operations/eltwise/unary_backward/unary_backward_nanobind.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn/operations/eltwise/quantization/quantization_nanobind.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn/operations/embedding/embedding_nanobind.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn/operations/embedding_backward/embedding_backward_nanobind.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn/operations/examples/example_multiple_return/example_multiple_return_nanobind.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn/operations/examples/examples_nanobind.cpp
