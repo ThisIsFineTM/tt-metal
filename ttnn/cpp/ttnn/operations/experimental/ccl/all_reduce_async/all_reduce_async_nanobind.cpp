@@ -2,29 +2,33 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "all_reduce_async_pybind.hpp"
+#include "all_reduce_async_nanobind.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <optional>
 
-#include "cpp/pybind11/decorators.hpp"
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "ttnn/operations/experimental/ccl/all_reduce_async/all_reduce_async.hpp"
 #include "ttnn/types.hpp"
 #include "cpp/ttnn/global_semaphore.hpp"
 
 #include "ttnn/operations/reduction/generic/generic_reductions.hpp"
 
+namespace nb = nanobind;
+
 namespace ttnn::operations::experimental::ccl {
 
-namespace detail {
+namespace {
 
 template <typename ccl_operation_t>
-void bind_all_reduce_async(pybind11::module& module, const ccl_operation_t& operation, const char* doc) {
+void bind_operation_all_reduce_async(nb::module_& mod, const ccl_operation_t& operation, const char* doc) {
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const ccl_operation_t& self,
                const ttnn::Tensor& input_tensor,
                const global_semaphore::MultiDeviceGlobalSemaphore& from_remote_multi_device_global_semaphore,
@@ -46,18 +50,18 @@ void bind_all_reduce_async(pybind11::module& module, const ccl_operation_t& oper
                     num_links,
                     worker_subdevice_id_opt);
             },
-            py::arg("input_tensor"),
-            py::arg("from_remote_multi_device_global_semaphore"),
-            py::arg("to_remote_multi_device_global_semaphore"),
-            py::arg("gather_multi_device_global_semaphore"),
-            py::arg("math_op"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("topology") = ttnn::ccl::Topology::Linear,
-            py::arg("num_links") = std::nullopt,
-            py::arg("subdevice_id") = std::nullopt},
+            nb::arg("input_tensor"),
+            nb::arg("from_remote_multi_device_global_semaphore"),
+            nb::arg("to_remote_multi_device_global_semaphore"),
+            nb::arg("gather_multi_device_global_semaphore"),
+            nb::arg("math_op"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("topology") = ttnn::ccl::Topology::Linear,
+            nb::arg("num_links") = std::nullopt,
+            nb::arg("subdevice_id") = std::nullopt},
 
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const ccl_operation_t& self,
                const ttnn::Tensor& input_tensor,
                const uint32_t cluster_axis,
@@ -83,20 +87,20 @@ void bind_all_reduce_async(pybind11::module& module, const ccl_operation_t& oper
                     num_links,
                     worker_subdevice_id_opt);
             },
-            py::arg("input_tensor"),
-            py::arg("cluster_axis"),
-            py::arg("mesh_device"),
-            py::arg("from_remote_multi_device_global_semaphore"),
-            py::arg("to_remote_multi_device_global_semaphore"),
-            py::arg("gather_multi_device_global_semaphore"),
-            py::arg("math_op"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("topology") = ttnn::ccl::Topology::Linear,
-            py::arg("num_links") = std::nullopt,
-            py::arg("subdevice_id") = std::nullopt},
+            nb::arg("input_tensor"),
+            nb::arg("cluster_axis"),
+            nb::arg("mesh_device"),
+            nb::arg("from_remote_multi_device_global_semaphore"),
+            nb::arg("to_remote_multi_device_global_semaphore"),
+            nb::arg("gather_multi_device_global_semaphore"),
+            nb::arg("math_op"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("topology") = ttnn::ccl::Topology::Linear,
+            nb::arg("num_links") = std::nullopt,
+            nb::arg("subdevice_id") = std::nullopt},
 
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const ccl_operation_t& self,
                const ttnn::Tensor& input_tensor,
                ttnn::Tensor& buffer_tensor,
@@ -120,24 +124,24 @@ void bind_all_reduce_async(pybind11::module& module, const ccl_operation_t& oper
                     num_links,
                     worker_subdevice_id_opt);
             },
-            py::arg("input_tensor"),
-            py::arg("buffer_tensor"),
-            py::arg("cluster_axis"),
-            py::arg("mesh_device"),
-            py::arg("multi_device_global_semaphore"),
-            py::kw_only(),
-            py::arg("dtype") = std::nullopt,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("topology") = ttnn::ccl::Topology::Linear,
-            py::arg("num_links") = std::nullopt,
-            py::arg("subdevice_id") = std::nullopt});
+            nb::arg("input_tensor"),
+            nb::arg("buffer_tensor"),
+            nb::arg("cluster_axis"),
+            nb::arg("mesh_device"),
+            nb::arg("multi_device_global_semaphore"),
+            nb::kw_only(),
+            nb::arg("dtype") = std::nullopt,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("topology") = ttnn::ccl::Topology::Linear,
+            nb::arg("num_links") = std::nullopt,
+            nb::arg("subdevice_id") = std::nullopt});
 }
 
-}  // namespace detail
+}  // namespace
 
-void py_bind_all_reduce_async(pybind11::module& module) {
-    detail::bind_all_reduce_async(
-        module,
+void bind_all_reduce_async(nb::module_& mod) {
+    bind_operation_all_reduce_async(
+        mod,
         ttnn::experimental::all_reduce_async,
         R"doc(
 
