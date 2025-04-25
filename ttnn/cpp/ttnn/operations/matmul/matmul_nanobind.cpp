@@ -72,7 +72,7 @@ void py_module(nb::module_& mod) {
                 std::size_t actual_out_block_h = out_block_h.value_or(per_core_M);
                 std::size_t actual_out_block_w = out_block_w.value_or(per_core_N);
 
-                return new (t) MatmulMultiCoreReuseMultiCastProgramConfig(
+                new (t) MatmulMultiCoreReuseMultiCastProgramConfig(
                     compute_with_storage_grid_size,
                     in0_block_w,
                     out_subblock_h,
@@ -139,7 +139,7 @@ void py_module(nb::module_& mod) {
                 std::size_t actual_out_block_h = out_block_h.value_or(per_core_M);
                 std::size_t actual_out_block_w = out_block_w.value_or(per_core_N);
 
-                return new (t) MatmulMultiCoreReuseMultiCast1DProgramConfig(
+                new (t) MatmulMultiCoreReuseMultiCast1DProgramConfig(
                     compute_with_storage_grid_size,
                     in0_block_w,
                     out_subblock_h,
