@@ -2,43 +2,44 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "barrier_pybind.hpp"
+#include "barrier_nanobind.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <nanobind/nanobind.h>
 
-#include "cpp/pybind11/decorators.hpp"
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "ttnn/operations/ccl/ccl_host_datastructures.hpp"
 #include "ttnn/operations/ccl/barrier/barrier.hpp"
 #include "ttnn/types.hpp"
 
 #include "ttnn/operations/reduction/generic/generic_reductions.hpp"
 
+namespace nb = nanobind;
+
 namespace ttnn::operations::ccl {
 
-namespace detail {
+namespace {
 
 template <typename ccl_operation_t>
-void bind_barrier(pybind11::module& module, const ccl_operation_t& operation, const char* doc) {
+void bind_operation_barrier(nb::module_& mod, const ccl_operation_t& operation, const char* doc) {
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const ccl_operation_t& self,
                const ttnn::Tensor& input_tensor,
                const ttnn::MemoryConfig& memory_config,
                ttnn::ccl::Topology topology) -> ttnn::Tensor { return self(input_tensor, memory_config, topology); },
-            py::arg("input_tensor"),
-            py::kw_only(),  // The following are optional by key word only
-            py::arg("memory_config") = std::nullopt,
-            py::arg("topology") = ttnn::ccl::Topology::Ring});
+            nb::arg("input_tensor"),
+            nb::kw_only(),  // The following are optional by key word only
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("topology") = ttnn::ccl::Topology::Ring});
 }
-}  // namespace detail
+}  // namespace
 
-void py_bind_barrier(pybind11::module& module) {
-    detail::bind_barrier(
-        module,
+void bind_barrier(nb::module_& mod) {
+    bind_operation_barrier(
+        mod,
         ttnn::barrier,
         R"doc(
 
