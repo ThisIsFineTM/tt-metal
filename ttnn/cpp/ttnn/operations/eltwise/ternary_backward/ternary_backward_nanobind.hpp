@@ -4,24 +4,27 @@
 
 #pragma once
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <vector>
 
-#include "cpp/pybind11/decorators.hpp"
+#include <fmt/format.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+#include <nanobind/stl/vector.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "ttnn/operations/eltwise/ternary_backward/ternary_backward.hpp"
 #include "ttnn/types.hpp"
 
-namespace py = pybind11;
-
-namespace ttnn {
-namespace operations {
-namespace ternary_backward {
+namespace ttnn::operations::ternary_backward {
 
 namespace detail {
 
 template <typename ternary_backward_operation_t>
 void bind_ternary_backward(
-    py::module& module,
+    nb::module_& mod,
     const ternary_backward_operation_t& operation,
     const std::string_view description,
     const std::string& supported_dtype = "BFLOAT16",
@@ -74,10 +77,10 @@ void bind_ternary_backward(
         note);
 
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const ternary_backward_operation_t& self,
                const ttnn::Tensor& grad_tensor,
                const ttnn::Tensor& input_tensor_a,
@@ -88,18 +91,18 @@ void bind_ternary_backward(
                 auto output_memory_config = memory_config.value_or(input_tensor_a.memory_config());
                 return self(grad_tensor, input_tensor_a, input_tensor_b, input_tensor_c, alpha, output_memory_config);
             },
-            py::arg("grad_tensor"),
-            py::arg("input_tensor_a"),
-            py::arg("input_tensor_b"),
-            py::arg("input_tensor_c"),
-            py::arg("alpha"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt});
+            nb::arg("grad_tensor"),
+            nb::arg("input_tensor_a"),
+            nb::arg("input_tensor_b"),
+            nb::arg("input_tensor_c"),
+            nb::arg("alpha"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt});
 }
 
 template <typename ternary_backward_operation_t>
 void bind_ternary_backward_op(
-    py::module& module,
+    nb::module_& mod,
     const ternary_backward_operation_t& operation,
     const std::string_view description,
     const std::string& supported_dtype = "BFLOAT16") {
@@ -168,10 +171,10 @@ void bind_ternary_backward_op(
         supported_dtype);
 
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const ternary_backward_operation_t& self,
                const ttnn::Tensor& grad_tensor,
                const ttnn::Tensor& input_tensor_a,
@@ -180,14 +183,14 @@ void bind_ternary_backward_op(
                const std::optional<ttnn::MemoryConfig>& memory_config) {
                 return self(grad_tensor, input_tensor_a, input_tensor_b, input_tensor_c, memory_config);
             },
-            py::arg("grad_tensor"),
-            py::arg("input_tensor_a"),
-            py::arg("input_tensor_b"),
-            py::arg("input_tensor_c"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt},
+            nb::arg("grad_tensor"),
+            nb::arg("input_tensor_a"),
+            nb::arg("input_tensor_b"),
+            nb::arg("input_tensor_c"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt},
 
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const ternary_backward_operation_t& self,
                const ttnn::Tensor& grad_tensor,
                const ttnn::Tensor& input_tensor_a,
@@ -196,17 +199,17 @@ void bind_ternary_backward_op(
                const std::optional<ttnn::MemoryConfig>& memory_config) {
                 return self(grad_tensor, input_tensor_a, input_tensor_b, scalar, memory_config);
             },
-            py::arg("grad_tensor"),
-            py::arg("input_tensor_a"),
-            py::arg("input_tensor_b"),
-            py::arg("scalar"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt});
+            nb::arg("grad_tensor"),
+            nb::arg("input_tensor_a"),
+            nb::arg("input_tensor_b"),
+            nb::arg("scalar"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt});
 }
 
 template <typename ternary_backward_operation_t>
 void bind_ternary_backward_optional_output(
-    py::module& module,
+    nb::module_& mod,
     const ternary_backward_operation_t& operation,
     const std::string_view description,
     const std::string& supported_dtype = "BFLOAT16") {
@@ -258,10 +261,10 @@ void bind_ternary_backward_optional_output(
         supported_dtype);
 
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const ternary_backward_operation_t& self,
                const ttnn::Tensor& grad_tensor,
                const ttnn::Tensor& input_tensor_a,
@@ -283,46 +286,44 @@ void bind_ternary_backward_optional_output(
                     input_a_grad,
                     input_b_grad);
             },
-            py::arg("grad_tensor"),
-            py::arg("input_tensor_a"),
-            py::arg("input_tensor_b"),
-            py::arg("input_tensor_c"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("are_required_outputs") = std::vector<bool>{true, true},
-            py::arg("input_a_grad") = std::nullopt,
-            py::arg("input_b_grad") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId});
+            nb::arg("grad_tensor"),
+            nb::arg("input_tensor_a"),
+            nb::arg("input_tensor_b"),
+            nb::arg("input_tensor_c"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("are_required_outputs") = std::vector<bool>{true, true},
+            nb::arg("input_a_grad") = std::nullopt,
+            nb::arg("input_b_grad") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 }  // namespace detail
 
-void py_module(py::module& module) {
+void py_module(nb::module_& mod) {
     detail::bind_ternary_backward(
-        module,
+        mod,
         ttnn::addcmul_bw,
         R"doc(Performs backward operations for addcmul of :attr:`input_tensor_a`, :attr:`input_tensor_b` and :attr:`input_tensor_c` with given :attr:`grad_tensor`.)doc",
         R"doc(BFLOAT16, BFLOAT8_B)doc");
 
     detail::bind_ternary_backward(
-        module,
+        mod,
         ttnn::addcdiv_bw,
         R"doc(Performs backward operations for addcdiv of :attr:`input_tensor_a`, :attr:`input_tensor_b` and :attr:`input_tensor_c` with given :attr:`grad_tensor`.)doc",
         "",
         R"doc(For more details about BFLOAT8_B, refer to the `BFLOAT8_B limitations <../tensor.html#limitation-of-bfloat8-b>`_.)doc");
 
     detail::bind_ternary_backward_optional_output(
-        module,
+        mod,
         ttnn::where_bw,
         R"doc(Performs backward operations for where of :attr:`input_tensor_a`, :attr:`input_tensor_b` and :attr:`input_tensor_c` with given :attr:`grad_tensor`.)doc",
         R"doc(BFLOAT16, BFLOAT8_B)doc");
 
     detail::bind_ternary_backward_op(
-        module,
+        mod,
         ttnn::lerp_bw,
         R"doc(Performs backward operations for lerp of :attr:`input_tensor_a`, :attr:`input_tensor_b` and :attr:`input_tensor_c` or :attr:`scalar` with given :attr:`grad_tensor`.)doc",
         R"doc(BFLOAT16, BFLOAT8_B)doc");
 }
 
-}  // namespace ternary_backward
-}  // namespace operations
-}  // namespace ttnn
+}  // namespace ttnn::operations::ternary_backward 
