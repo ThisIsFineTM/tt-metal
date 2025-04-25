@@ -17,7 +17,7 @@
 
 namespace nb = nanobind;
 
-namespace ttnn::operations:copy {
+namespace ttnn::operations::copy {
 
 namespace {
 
