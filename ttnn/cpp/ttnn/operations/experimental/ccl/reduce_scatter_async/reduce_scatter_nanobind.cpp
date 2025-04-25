@@ -2,12 +2,16 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "reduce_scatter_pybind.hpp"
+#include "reduce_scatter_nanobind.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <cstddef>
+#include <cstdint>
+#include <optional>
 
-#include "cpp/pybind11/decorators.hpp"
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "ttnn/operations/experimental/ccl/reduce_scatter_async/reduce_scatter.hpp"
 #include "ttnn/types.hpp"
 #include "cpp/ttnn/global_semaphore.hpp"
@@ -16,15 +20,15 @@
 
 namespace ttnn::operations::experimental::ccl {
 
-namespace detail {
+namespace {
 
 template <typename ccl_operation_t>
-void bind_reduce_scatter(pybind11::module& module, const ccl_operation_t& operation, const char* doc) {
+void bind_operation_reduce_scatter(nb::module_& mod, const ccl_operation_t& operation, const char* doc) {
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const ccl_operation_t& self,
                const ttnn::Tensor& input_tensor,
                const int32_t dim,
@@ -46,18 +50,18 @@ void bind_reduce_scatter(pybind11::module& module, const ccl_operation_t& operat
                     num_links,
                     worker_subdevice_id_opt);
             },
-            py::arg("input_tensor"),
-            py::arg("dim"),
-            py::arg("from_remote_multi_device_global_semaphore"),
-            py::arg("to_remote_multi_device_global_semaphore"),
-            py::arg("math_op"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("topology") = ttnn::ccl::Topology::Linear,
-            py::arg("num_links") = std::nullopt,
-            py::arg("subdevice_id") = std::nullopt},
+            nb::arg("input_tensor"),
+            nb::arg("dim"),
+            nb::arg("from_remote_multi_device_global_semaphore"),
+            nb::arg("to_remote_multi_device_global_semaphore"),
+            nb::arg("math_op"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("topology") = ttnn::ccl::Topology::Linear,
+            nb::arg("num_links") = std::nullopt,
+            nb::arg("subdevice_id") = std::nullopt},
 
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const ccl_operation_t& self,
                const ttnn::Tensor& input_tensor,
                const int32_t dim,
@@ -85,26 +89,26 @@ void bind_reduce_scatter(pybind11::module& module, const ccl_operation_t& operat
                     num_links,
                     worker_subdevice_id_opt);
             },
-            py::arg("input_tensor"),
-            py::arg("dim"),
-            py::arg("cluster_axis"),
-            py::arg("mesh_device"),
-            py::arg("from_remote_multi_device_global_semaphore"),
-            py::arg("to_remote_multi_device_global_semaphore"),
-            py::kw_only(),
-            py::arg("persistent_output_tensors") = std::nullopt,
-            py::arg("math_op") = ttnn::operations::reduction::ReduceType::Sum,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("topology") = ttnn::ccl::Topology::Linear,
-            py::arg("num_links") = std::nullopt,
-            py::arg("subdevice_id") = std::nullopt});
+            nb::arg("input_tensor"),
+            nb::arg("dim"),
+            nb::arg("cluster_axis"),
+            nb::arg("mesh_device"),
+            nb::arg("from_remote_multi_device_global_semaphore"),
+            nb::arg("to_remote_multi_device_global_semaphore"),
+            nb::kw_only(),
+            nb::arg("persistent_output_tensors") = std::nullopt,
+            nb::arg("math_op") = ttnn::operations::reduction::ReduceType::Sum,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("topology") = ttnn::ccl::Topology::Linear,
+            nb::arg("num_links") = std::nullopt,
+            nb::arg("subdevice_id") = std::nullopt});
 }
 
-}  // namespace detail
+}  // namespace
 
-void py_bind_reduce_scatter_async(pybind11::module& module) {
-    detail::bind_reduce_scatter(
-        module,
+void bind_reduce_scatter_async(nb::module_& mod) {
+    bind_operation_reduce_scatter(
+        mod,
         ttnn::experimental::reduce_scatter_async,
         R"doc(
 
