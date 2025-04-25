@@ -4,27 +4,34 @@
 
 #include "global_circular_buffer.hpp"
 
+#include <cstdint>
+#include <utility>
+#include <vector>
+
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/pair.h>
+#include <nanobind/stl/vector.h>
+
 #include <tt-metalium/global_circular_buffer_impl.hpp>
 #include "cpp/ttnn/global_circular_buffer.hpp"
-#include "pybind11/pybind11.h"
 
 namespace ttnn::global_circular_buffer {
 
-void py_module_types(py::module& module) {
-    py::class_<GlobalCircularBuffer, std::shared_ptr<GlobalCircularBuffer>>(module, "global_circular_buffer");
-    py::class_<MultiDeviceGlobalCircularBuffer>(module, "multi_device_global_circular_buffer");
+void py_module_types(nb::module_& mod) {
+    nb::class_<GlobalCircularBuffer>(mod, "global_circular_buffer");
+    nb::class_<MultiDeviceGlobalCircularBuffer>(mod, "multi_device_global_circular_buffer");
 }
 
-void py_module(py::module& module) {
+void py_module(nb::module_& mod) {
     // Single Device APIs
-    module.def(
+    mod.def(
         "create_global_circular_buffer",
-        py::overload_cast<IDevice*, const std::vector<std::pair<CoreCoord, CoreRangeSet>>&, uint32_t, BufferType>(
+        nb::overload_cast<IDevice*, const std::vector<std::pair<CoreCoord, CoreRangeSet>>&, uint32_t, BufferType>(
             &ttnn::global_circular_buffer::create_global_circular_buffer),
-        py::arg("device"),
-        py::arg("sender_receiver_core_mapping"),
-        py::arg("size"),
-        py::arg("buffer_type") = tt::tt_metal::BufferType::L1,
+        nb::arg("device"),
+        nb::arg("sender_receiver_core_mapping"),
+        nb::arg("size"),
+        nb::arg("buffer_type") = tt::tt_metal::BufferType::L1,
         R"doc(
             Create a GlobalCircularBuffer Object on a single device.
 
@@ -36,14 +43,14 @@ void py_module(py::module& module) {
             )doc");
 
     // Multi Device APIs
-    module.def(
+    mod.def(
         "create_global_circular_buffer",
-        py::overload_cast<MeshDevice*, const std::vector<std::pair<CoreCoord, CoreRangeSet>>&, uint32_t, BufferType>(
+        nb::overload_cast<MeshDevice*, const std::vector<std::pair<CoreCoord, CoreRangeSet>>&, uint32_t, BufferType>(
             &ttnn::global_circular_buffer::create_global_circular_buffer),
-        py::arg("mesh_device"),
-        py::arg("sender_receiver_core_mapping"),
-        py::arg("size"),
-        py::arg("buffer_type") = tt::tt_metal::BufferType::L1,
+        nb::arg("mesh_device"),
+        nb::arg("sender_receiver_core_mapping"),
+        nb::arg("size"),
+        nb::arg("buffer_type") = tt::tt_metal::BufferType::L1,
         R"doc(
             Create a GlobalCircularBuffer Object on a single device.
 
