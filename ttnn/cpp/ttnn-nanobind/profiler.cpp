@@ -2,25 +2,24 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <nanobind/nanobind.h>
 
 #include "profiler.hpp"
 #include "tools/profiler/op_profiler.hpp"
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
-namespace ttnn {
-namespace profiler {
-namespace detail {
-void ProfilerModule(py::module& m_profiler) {
-    m_profiler.def(
+namespace ttnn::profiler {
+
+namespace {
+void ProfilerModule(nb::module_& mod) {
+    mod.def(
         "start_tracy_zone",
         &tt::tt_metal::op_profiler::start_tracy_zone,
-        py::arg("source"),
-        py::arg("functName"),
-        py::arg("lineNum"),
-        py::arg("color") = 0,
+        nb::arg("source"),
+        nb::arg("functName"),
+        nb::arg("lineNum"),
+        nb::arg("color") = 0,
         R"doc(
         Stop profiling op with tracy.
         +------------------+------------------------------------------------+-----------------------+-------------+----------+
@@ -33,11 +32,11 @@ void ProfilerModule(py::module& m_profiler) {
         +------------------+------------------------------------------------+-----------------------+-------------+----------+
     )doc");
 
-    m_profiler.def(
+    mod.def(
         "stop_tracy_zone",
         &tt::tt_metal::op_profiler::stop_tracy_zone,
-        py::arg("name") = "",
-        py::arg("color") = 0,
+        nb::arg("name") = "",
+        nb::arg("color") = 0,
         R"doc(
         Stop profiling op with tracy.
         +------------------+------------------------------------------------+-----------------------+-------------+----------+
@@ -48,11 +47,11 @@ void ProfilerModule(py::module& m_profiler) {
         +------------------+------------------------------------------------+-----------------------+-------------+----------+
     )doc");
 
-    m_profiler.def(
+    mod.def(
         "tracy_message",
         &tt::tt_metal::op_profiler::tracy_message,
-        py::arg("message"),
-        py::arg("color") = 0xf0f8ff,
+        nb::arg("message"),
+        nb::arg("color") = 0xf0f8ff,
         R"doc(
         Emit a message signpost into the tracy profile.
         +------------------+------------------------------------------------+-----------------------+-------------+----------+
@@ -63,7 +62,7 @@ void ProfilerModule(py::module& m_profiler) {
         +------------------+------------------------------------------------+-----------------------+-------------+----------+
     )doc");
 
-    m_profiler.def(
+    mod.def(
         "tracy_frame",
         &tt::tt_metal::op_profiler::tracy_frame,
         R"doc(
@@ -71,8 +70,7 @@ void ProfilerModule(py::module& m_profiler) {
     )doc");
 }
 
-}  // namespace detail
+}  // namespace
 
-void py_module(py::module& module) { detail::ProfilerModule(module); }
-}  // namespace profiler
-}  // namespace ttnn
+void py_module(nb::module_& mod) { ProfilerModule(mod); }
+}  // namespace ttnn::profiler
