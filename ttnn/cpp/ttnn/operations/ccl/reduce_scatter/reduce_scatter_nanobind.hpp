@@ -4,10 +4,11 @@
 
 #pragma once
 
-#include "pybind11/pybind_fwd.hpp"
+#include "ttnn-nanobind/nanobind_fwd.hpp"
 
 namespace ttnn::operations::ccl {
 
-void py_bind_reduce_scatter(pybind11::module& module);
+namespace nb = nanobind;
+void bind_reduce_scatter(nb::module_& mod);
 
 }  // namespace ttnn::operations::ccl

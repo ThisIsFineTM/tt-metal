@@ -2,28 +2,34 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "reduce_scatter_pybind.hpp"
+#include "reduce_scatter_nanobind.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <cstddef>
+#include <cstdint>
+#include <optional>
 
-#include "cpp/pybind11/decorators.hpp"
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "ttnn/operations/ccl/reduce_scatter/reduce_scatter.hpp"
 #include "ttnn/types.hpp"
 
 #include "ttnn/operations/reduction/generic/generic_reductions.hpp"
 
+namespace nb = nanobind;
+
 namespace ttnn::operations::ccl {
 
-namespace detail {
+namespace {
 
 template <typename ccl_operation_t>
-void bind_reduce_scatter(pybind11::module& module, const ccl_operation_t& operation, const char* doc) {
+void bind_operation_reduce_scatter(nb::module_& mod, const ccl_operation_t& operation, const char* doc) {
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const ccl_operation_t& self,
                const ttnn::Tensor& input_tensor,
                const int32_t dim,
@@ -43,17 +49,17 @@ void bind_reduce_scatter(pybind11::module& module, const ccl_operation_t& operat
                     num_workers,
                     num_buffers_per_channel);
             },
-            py::arg("input_tensor"),
-            py::arg("dim"),
-            py::arg("math_op"),
-            py::kw_only(),
-            py::arg("num_links") = 1,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("topology") = ttnn::ccl::Topology::Ring,
-            py::arg("num_workers") = std::nullopt,
-            py::arg("num_buffers_per_channel") = std::nullopt},
+            nb::arg("input_tensor"),
+            nb::arg("dim"),
+            nb::arg("math_op"),
+            nb::kw_only(),
+            nb::arg("num_links") = 1,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("topology") = ttnn::ccl::Topology::Ring,
+            nb::arg("num_workers") = std::nullopt,
+            nb::arg("num_buffers_per_channel") = std::nullopt},
 
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const ccl_operation_t& self,
                const ttnn::Tensor& input_tensor,
                const int32_t dim,
@@ -77,24 +83,24 @@ void bind_reduce_scatter(pybind11::module& module, const ccl_operation_t& operat
                     num_workers,
                     num_buffers_per_channel);
             },
-            py::arg("input_tensor"),
-            py::arg("dim"),
-            py::arg("cluster_axis"),
-            py::arg("mesh_device"),
-            py::arg("math_op"),
-            py::kw_only(),
-            py::arg("num_links") = 1,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("num_workers") = std::nullopt,
-            py::arg("num_buffers_per_channel") = std::nullopt,
-            py::arg("topology") = ttnn::ccl::Topology::Ring});
+            nb::arg("input_tensor"),
+            nb::arg("dim"),
+            nb::arg("cluster_axis"),
+            nb::arg("mesh_device"),
+            nb::arg("math_op"),
+            nb::kw_only(),
+            nb::arg("num_links") = 1,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("num_workers") = std::nullopt,
+            nb::arg("num_buffers_per_channel") = std::nullopt,
+            nb::arg("topology") = ttnn::ccl::Topology::Ring});
 }
 
-}  // namespace detail
+}  // namespace
 
-void py_bind_reduce_scatter(pybind11::module& module) {
-    detail::bind_reduce_scatter(
-        module,
+void bind_reduce_scatter(nb::module_& mod) {
+    bind_operation_reduce_scatter(
+        mod,
         ttnn::reduce_scatter,
         R"doc(
 
