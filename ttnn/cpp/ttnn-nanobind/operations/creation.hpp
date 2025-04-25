@@ -4,23 +4,31 @@
 
 #pragma once
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <cstdint>
+#include <functional>
+#include <optional>
+#include <string>
+#include <vector>
 
-#include "cpp/pybind11/decorators.hpp"
-#include "cpp/pybind11/types.hpp"
+#include <fmt/format.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/vector.h>
+#include <nanobind/stl/optional.h>
+#include <nanobind/stl/string.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
+#include "cpp/ttnn-nanobind/types.hpp"
 #include "ttnn/operations/creation.hpp"
 
-namespace py = pybind11;
+namespace ttnn::operations::creation {
 
-namespace ttnn {
-namespace operations {
-namespace creation {
+namespace nb = nanobind;
+
 namespace detail {
 
 template <typename creation_operation_t, typename device_t, typename fill_value_t>
-auto create_pybind_full_overload() {
-    return ttnn::pybind_overload_t{
+auto create_nanobind_full_overload() {
+    return ttnn::nanobind_overload_t{
         [](const creation_operation_t& self,
            const std::vector<uint32_t>& shape,
            const fill_value_t fill_value,
@@ -33,19 +41,19 @@ auto create_pybind_full_overload() {
             return self(
                 queue_id, ttnn::Shape(shape), fill_value, dtype, layout, device, memory_config, optional_output_tensor);
         },
-        py::arg("shape"),
-        py::arg("fill_value"),
-        py::arg("dtype") = std::nullopt,
-        py::arg("layout") = std::nullopt,
-        py::arg("device") = std::nullopt,
-        py::arg("memory_config") = std::nullopt,
-        py::arg("optional_tensor") = std::nullopt,
-        py::arg("queue_id") = ttnn::DefaultQueueId};
+        nb::arg("shape"),
+        nb::arg("fill_value"),
+        nb::arg("dtype") = std::nullopt,
+        nb::arg("layout") = std::nullopt,
+        nb::arg("device") = std::nullopt,
+        nb::arg("memory_config") = std::nullopt,
+        nb::arg("optional_tensor") = std::nullopt,
+        nb::arg("queue_id") = ttnn::DefaultQueueId};
 }
 
 template <typename creation_operation_t, typename device_t>
-auto create_pybind_full_with_hard_coded_value_overload() {
-    return ttnn::pybind_overload_t{
+auto create_nanobind_full_with_hard_coded_value_overload() {
+    return ttnn::nanobind_overload_t{
         [](const creation_operation_t& self,
            const std::vector<uint32_t>& shape,
            const std::optional<DataType>& dtype,
@@ -54,16 +62,16 @@ auto create_pybind_full_with_hard_coded_value_overload() {
            const std::optional<MemoryConfig>& memory_config) -> ttnn::Tensor {
             return self(ttnn::Shape{shape}, dtype, layout, device, memory_config);
         },
-        py::arg("shape"),
-        py::arg("dtype") = std::nullopt,
-        py::arg("layout") = std::nullopt,
-        py::arg("device") = std::nullopt,
-        py::arg("memory_config") = std::nullopt};
+        nb::arg("shape"),
+        nb::arg("dtype") = std::nullopt,
+        nb::arg("layout") = std::nullopt,
+        nb::arg("device") = std::nullopt,
+        nb::arg("memory_config") = std::nullopt};
 }
 
 template <typename creation_operation_t, typename device_t, typename fill_value_t>
-auto create_pybind_full_like_overload() {
-    return ttnn::pybind_overload_t{
+auto create_nanobind_full_like_overload() {
+    return ttnn::nanobind_overload_t{
         [](const creation_operation_t& self,
            const ttnn::Tensor& tensor,
            const fill_value_t fill_value,
@@ -75,19 +83,19 @@ auto create_pybind_full_like_overload() {
            QueueId queue_id) -> ttnn::Tensor {
             return self(queue_id, tensor, fill_value, dtype, layout, device, memory_config, optional_output_tensor);
         },
-        py::arg("tensor"),
-        py::arg("fill_value"),
-        py::arg("dtype") = std::nullopt,
-        py::arg("layout") = std::nullopt,
-        py::arg("device") = std::nullopt,
-        py::arg("memory_config") = std::nullopt,
-        py::arg("optional_tensor") = std::nullopt,
-        py::arg("queue_id") = ttnn::DefaultQueueId};
+        nb::arg("tensor"),
+        nb::arg("fill_value"),
+        nb::arg("dtype") = std::nullopt,
+        nb::arg("layout") = std::nullopt,
+        nb::arg("device") = std::nullopt,
+        nb::arg("memory_config") = std::nullopt,
+        nb::arg("optional_tensor") = std::nullopt,
+        nb::arg("queue_id") = ttnn::DefaultQueueId};
 }
 
 template <typename creation_operation_t, typename device_t>
-auto create_pybind_full_like_with_hard_coded_value_overload() {
-    return ttnn::pybind_overload_t{
+auto create_nanobind_full_like_with_hard_coded_value_overload() {
+    return ttnn::nanobind_overload_t{
         [](const creation_operation_t& self,
            const ttnn::Tensor& tensor,
            const std::optional<DataType>& dtype,
@@ -98,18 +106,18 @@ auto create_pybind_full_like_with_hard_coded_value_overload() {
            QueueId queue_id) -> ttnn::Tensor {
             return self(queue_id, tensor, dtype, layout, device, memory_config, optional_output_tensor);
         },
-        py::arg("tensor"),
-        py::arg("dtype") = std::nullopt,
-        py::arg("layout") = std::nullopt,
-        py::arg("device") = std::nullopt,
-        py::arg("memory_config") = std::nullopt,
-        py::arg("optional_tensor") = std::nullopt,
-        py::arg("queue_id") = ttnn::DefaultQueueId};
+        nb::arg("tensor"),
+        nb::arg("dtype") = std::nullopt,
+        nb::arg("layout") = std::nullopt,
+        nb::arg("device") = std::nullopt,
+        nb::arg("memory_config") = std::nullopt,
+        nb::arg("optional_tensor") = std::nullopt,
+        nb::arg("queue_id") = ttnn::DefaultQueueId};
 }
 
 template <typename creation_operation_t, typename device_t>
-auto create_pybind_empty_overload() {
-    return ttnn::pybind_overload_t{
+auto create_nanobind_empty_overload() {
+    return ttnn::nanobind_overload_t{
         [](const creation_operation_t& self,
            const std::vector<uint32_t>& shape,
            const DataType& dtype,
@@ -118,16 +126,16 @@ auto create_pybind_empty_overload() {
            const MemoryConfig& memory_config) -> ttnn::Tensor {
             return self(ttnn::Shape{shape}, dtype, layout, device, memory_config);
         },
-        py::arg("shape"),
-        py::arg("dtype") = DataType::BFLOAT16,
-        py::arg("layout") = Layout::ROW_MAJOR,
-        py::arg("device"),
-        py::arg("memory_config") = ttnn::DRAM_MEMORY_CONFIG};
+        nb::arg("shape"),
+        nb::arg("dtype") = DataType::BFLOAT16,
+        nb::arg("layout") = Layout::ROW_MAJOR,
+        nb::arg("device"),
+        nb::arg("memory_config") = ttnn::DRAM_MEMORY_CONFIG};
 }
 
 template <typename creation_operation_t, typename device_t>
-auto create_pybind_empty_like_overload() {
-    return ttnn::pybind_overload_t{
+auto create_nanobind_empty_like_overload() {
+    return ttnn::nanobind_overload_t{
         [](const creation_operation_t& self,
            const ttnn::Tensor& reference,
            const std::optional<DataType>& dtype,
@@ -136,17 +144,17 @@ auto create_pybind_empty_like_overload() {
            const std::optional<MemoryConfig>& memory_config) -> ttnn::Tensor {
             return self(reference, dtype, layout, device, memory_config);
         },
-        py::arg("tensor"),
-        py::kw_only(),
-        py::arg("dtype") = DataType::BFLOAT16,
-        py::arg("layout") = Layout::ROW_MAJOR,
-        py::arg("device") = std::nullopt,
-        py::arg("memory_config") = ttnn::DRAM_MEMORY_CONFIG};
+        nb::arg("tensor"),
+        nb::kw_only(),
+        nb::arg("dtype") = DataType::BFLOAT16,
+        nb::arg("layout") = Layout::ROW_MAJOR,
+        nb::arg("device") = std::nullopt,
+        nb::arg("memory_config") = ttnn::DRAM_MEMORY_CONFIG};
 }
 
 template <typename creation_operation_t, typename device_t>
-auto create_pybind_arange_overload() {
-    return ttnn::pybind_overload_t{
+auto create_nanobind_arange_overload() {
+    return ttnn::nanobind_overload_t{
         [](const creation_operation_t& self,
            const int64_t start,
            const int64_t end,
@@ -156,16 +164,16 @@ auto create_pybind_arange_overload() {
            const MemoryConfig& memory_config) -> ttnn::Tensor {
             return self(start, end, step, dtype, device, memory_config);
         },
-        py::arg("start") = 0,
-        py::arg("end"),
-        py::arg("step") = 1,
-        py::arg("dtype") = DataType::BFLOAT16,
-        py::arg("device") = std::nullopt,
-        py::arg("memory_config") = ttnn::DRAM_MEMORY_CONFIG};
+        nb::arg("start") = 0,
+        nb::arg("end"),
+        nb::arg("step") = 1,
+        nb::arg("dtype") = DataType::BFLOAT16,
+        nb::arg("device") = std::nullopt,
+        nb::arg("memory_config") = ttnn::DRAM_MEMORY_CONFIG};
 }
 
 template <typename creation_operation_t>
-void bind_full_operation(py::module& module, const creation_operation_t& operation) {
+void bind_full_operation(nb::module_& mod, const creation_operation_t& operation) {
     auto doc = fmt::format(
         R"doc(
         Creates a tensor of the specified shape and fills it with the specified scalar value.
@@ -196,18 +204,18 @@ void bind_full_operation(py::module& module, const creation_operation_t& operati
         operation.base_name());
 
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        create_pybind_full_overload<creation_operation_t, IDevice, float>(),
-        create_pybind_full_overload<creation_operation_t, MeshDevice, float>(),
-        create_pybind_full_overload<creation_operation_t, IDevice, int>(),
-        create_pybind_full_overload<creation_operation_t, MeshDevice, int>());
+        create_nanobind_full_overload<creation_operation_t, IDevice, float>(),
+        create_nanobind_full_overload<creation_operation_t, MeshDevice, float>(),
+        create_nanobind_full_overload<creation_operation_t, IDevice, int>(),
+        create_nanobind_full_overload<creation_operation_t, MeshDevice, int>());
 }
 
 template <typename creation_operation_t>
 void bind_full_operation_with_hard_coded_value(
-    py::module& module,
+    nb::module_& mod,
     const creation_operation_t& operation,
     const std::string& value_string,
     const std::string& info_doc = "") {
@@ -245,15 +253,15 @@ void bind_full_operation_with_hard_coded_value(
         info_doc);
 
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        create_pybind_full_with_hard_coded_value_overload<creation_operation_t, IDevice>(),
-        create_pybind_full_with_hard_coded_value_overload<creation_operation_t, MeshDevice>());
+        create_nanobind_full_with_hard_coded_value_overload<creation_operation_t, IDevice>(),
+        create_nanobind_full_with_hard_coded_value_overload<creation_operation_t, MeshDevice>());
 }
 
 template <typename creation_operation_t>
-void bind_full_like_operation(py::module& module, const creation_operation_t& operation) {
+void bind_full_like_operation(nb::module_& mod, const creation_operation_t& operation) {
     auto doc = fmt::format(
         R"doc(
         Creates a tensor of the same shape as the input tensor and fills it with the specified scalar value. The data type, layout, device, and memory configuration of the resulting tensor can be specified.
@@ -281,18 +289,18 @@ void bind_full_like_operation(py::module& module, const creation_operation_t& op
         operation.base_name());
 
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        create_pybind_full_like_overload<creation_operation_t, IDevice, float>(),
-        create_pybind_full_like_overload<creation_operation_t, MeshDevice, float>(),
-        create_pybind_full_like_overload<creation_operation_t, IDevice, int>(),
-        create_pybind_full_like_overload<creation_operation_t, MeshDevice, int>());
+        create_nanobind_full_like_overload<creation_operation_t, IDevice, float>(),
+        create_nanobind_full_like_overload<creation_operation_t, MeshDevice, float>(),
+        create_nanobind_full_like_overload<creation_operation_t, IDevice, int>(),
+        create_nanobind_full_like_overload<creation_operation_t, MeshDevice, int>());
 }
 
 template <typename creation_operation_t>
 void bind_full_like_operation_with_hard_coded_value(
-    py::module& module,
+    nb::module_& mod,
     const creation_operation_t& operation,
     const std::string& value_string,
     const std::string& info_doc = "") {
@@ -329,15 +337,15 @@ void bind_full_like_operation_with_hard_coded_value(
         info_doc);
 
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        create_pybind_full_like_with_hard_coded_value_overload<creation_operation_t, IDevice>(),
-        create_pybind_full_like_with_hard_coded_value_overload<creation_operation_t, MeshDevice>());
+        create_nanobind_full_like_with_hard_coded_value_overload<creation_operation_t, IDevice>(),
+        create_nanobind_full_like_with_hard_coded_value_overload<creation_operation_t, MeshDevice>());
 }
 
 template <typename creation_operation_t>
-void bind_arange_operation(py::module& module, const creation_operation_t& operation) {
+void bind_arange_operation(nb::module_& mod, const creation_operation_t& operation) {
     auto doc = fmt::format(
         R"doc(
         Creates a tensor with values ranging from `start` (inclusive) to `end` (exclusive) with a specified `step` size. The data type, device, and memory configuration of the resulting tensor can be specified.
@@ -361,15 +369,15 @@ void bind_arange_operation(py::module& module, const creation_operation_t& opera
         operation.base_name());
 
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        create_pybind_arange_overload<creation_operation_t, IDevice>(),
-        create_pybind_arange_overload<creation_operation_t, MeshDevice>());
+        create_nanobind_arange_overload<creation_operation_t, IDevice>(),
+        create_nanobind_arange_overload<creation_operation_t, MeshDevice>());
 }
 
 template <typename creation_operation_t>
-void bind_empty_operation(py::module& module, const creation_operation_t& operation, const std::string& info_doc = "") {
+void bind_empty_operation(nb::module_& mod, const creation_operation_t& operation, const std::string& info_doc = "") {
     auto doc = fmt::format(
         R"doc(
         Creates a device tensor with uninitialized values of the specified shape, data type, layout, and memory configuration.
@@ -396,15 +404,15 @@ void bind_empty_operation(py::module& module, const creation_operation_t& operat
         info_doc);
 
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        create_pybind_empty_overload<creation_operation_t, IDevice>(),
-        create_pybind_empty_overload<creation_operation_t, MeshDevice>());
+        create_nanobind_empty_overload<creation_operation_t, IDevice>(),
+        create_nanobind_empty_overload<creation_operation_t, MeshDevice>());
 }
 
 template <typename creation_operation_t>
-void bind_empty_like_operation(py::module& module, const creation_operation_t& operation) {
+void bind_empty_like_operation(nb::module_& mod, const creation_operation_t& operation) {
     auto doc = fmt::format(
         R"doc(
         Creates a new tensor with the same shape as the given `reference`, but without initializing its values. The data type, layout, device, and memory configuration of the new tensor can be specified.
@@ -430,19 +438,19 @@ void bind_empty_like_operation(py::module& module, const creation_operation_t& o
         operation.base_name());
 
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        create_pybind_empty_like_overload<creation_operation_t, IDevice>(),
-        create_pybind_empty_like_overload<creation_operation_t, MeshDevice>());
+        create_nanobind_empty_like_overload<creation_operation_t, IDevice>(),
+        create_nanobind_empty_like_overload<creation_operation_t, MeshDevice>());
 }
 
 }  // namespace detail
 
-void py_module(py::module& module) {
-    detail::bind_full_operation(module, ttnn::full);
+void py_module(nb::module_& mod) {
+    detail::bind_full_operation(mod, ttnn::full);
     detail::bind_full_operation_with_hard_coded_value(
-        module,
+        mod,
         ttnn::zeros,
         "0.0",
         R"doc(Supported dtypes, layouts, and ranks:
@@ -453,11 +461,11 @@ void py_module(py::module& module) {
         |    BFLOAT16, FLOAT32       |       ROW_MAJOR, TILE           |      2, 3, 4      |
         +----------------------------+---------------------------------+-------------------+)doc");
 
-    detail::bind_full_operation_with_hard_coded_value(module, ttnn::ones, "1.0");
+    detail::bind_full_operation_with_hard_coded_value(mod, ttnn::ones, "1.0");
 
-    detail::bind_full_like_operation(module, ttnn::full_like);
+    detail::bind_full_like_operation(mod, ttnn::full_like);
     detail::bind_full_like_operation_with_hard_coded_value(
-        module,
+        mod,
         ttnn::zeros_like,
         "0.0",
         R"doc(Supported dtypes, layouts, and ranks:
@@ -467,12 +475,12 @@ void py_module(py::module& module) {
         +----------------------------+---------------------------------+-------------------+
         |    BFLOAT16, FLOAT32       |       ROW_MAJOR, TILE           |      2, 3, 4      |
         +----------------------------+---------------------------------+-------------------+)doc");
-    detail::bind_full_like_operation_with_hard_coded_value(module, ttnn::ones_like, "1.0");
+    detail::bind_full_like_operation_with_hard_coded_value(mod, ttnn::ones_like, "1.0");
 
-    detail::bind_arange_operation(module, ttnn::arange);
+    detail::bind_arange_operation(mod, ttnn::arange);
 
     detail::bind_empty_operation(
-        module,
+        mod,
         ttnn::empty,
         R"doc(Supported dtypes, layouts, and ranks:
 
@@ -483,9 +491,7 @@ void py_module(py::module& module) {
         +----------------------------+---------------------------------+-------------------+
         |    BFLOAT_8                |          TILE                   |      2, 3, 4      |
         +----------------------------+---------------------------------+-------------------+)doc");
-    detail::bind_empty_like_operation(module, ttnn::empty_like);
+    detail::bind_empty_like_operation(mod, ttnn::empty_like);
 }
 
-}  // namespace creation
-}  // namespace operations
-}  // namespace ttnn
+}  // namespace ttnn::operations::creation 
