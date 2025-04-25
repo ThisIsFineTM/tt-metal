@@ -11,6 +11,8 @@
 #include <nanobind/operators.h>
 #include <nanobind/stl/tuple.h>
 
+#include "ttnn-nanobind/decorators.hpp"
+
 #include "complex.hpp"
 
 namespace nb = nanobind;
