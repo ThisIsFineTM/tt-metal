@@ -20,7 +20,7 @@
 #include "tensor.hpp"
 #include "reports.hpp"
 #include "ttnn/distributed/distributed_nanobind.hpp"
-#include "ttnn/deprecated/tt_lib/csrc/operations/primary/module.hpp"
+#include "ttnn/deprecated/tt_lib/csrc/operations/primary/module_nanobind.hpp"
 #include "ttnn/graph/graph_nanobind.hpp"
 #include "types.hpp"
 
