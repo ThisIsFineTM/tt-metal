@@ -4,12 +4,11 @@
 
 #pragma once
 
-#include "pybind11/pybind_fwd.hpp"
-
-namespace py = pybind11;
+#include "ttnn-nanobind/nanobind_fwd.hpp"
 
 namespace ttnn::fabric {
 
-void py_bind_fabric_api(py::module& module);
+namespace nb = nanobind;
+void bind_fabric_api(nb::module_& mod);
 
 }  // namespace ttnn::fabric
