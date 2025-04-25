@@ -44,7 +44,7 @@ void py_module(nb::module_& mod) {
             return fmt::format("{}", config);
         });
     reflect::for_each<ttnn::Config::attributes_t>([&py_config](auto I) {
-        py_config.def_property(
+        py_config.def_prop_rw(
             std::string{reflect::member_name<I, ttnn::Config::attributes_t>()}.c_str(),
             &ttnn::Config::get<I>,
             &ttnn::Config::set<I>);
