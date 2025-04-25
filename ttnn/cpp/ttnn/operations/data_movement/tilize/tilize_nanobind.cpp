@@ -7,7 +7,7 @@
 #include <optional>
 
 #include <nanobind/nanobind.h>
-#include <nanobind/stl/optional.h
+#include <nanobind/stl/optional.h>
 
 #include "tilize.hpp"
 #include "cpp/ttnn-nanobind/decorators.hpp"

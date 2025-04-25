@@ -21,7 +21,7 @@ namespace nb = nanobind;
 
 namespace ttnn::operations::data_movement::detail {
 
-void bind_pad(nb::module_& module) {
+void bind_pad(nb::module_& mod) {
     auto doc =
         R"doc(
 
