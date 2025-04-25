@@ -2,12 +2,15 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "all_reduce_pybind.hpp"
+#include "all_reduce_nanobind.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <cstddef>
+#include <cstdint>
 
-#include "cpp/pybind11/decorators.hpp"
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "ttnn/operations/ccl/ccl_host_datastructures.hpp"
 #include "ttnn/operations/experimental/ccl/all_reduce/all_reduce.hpp"
 #include "ttnn/types.hpp"
@@ -16,15 +19,15 @@
 
 namespace ttnn::operations::experimental::ccl {
 
-namespace detail {
+namespace {
 
 template <typename ccl_operation_t>
-void bind_all_reduce(pybind11::module& module, const ccl_operation_t& operation, const char* doc) {
+void bind_operation_all_reduce(nb::module_& mod, const ccl_operation_t& operation, const char* doc) {
     bind_registered_operation(
         module,
         operation,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const ccl_operation_t& self,
                const ttnn::Tensor& input_tensor,
                ttnn::operations::reduction::ReduceType math_op,
@@ -36,21 +39,21 @@ void bind_all_reduce(pybind11::module& module, const ccl_operation_t& operation,
                 return self(
                     input_tensor, math_op, num_links, memory_config, topology, num_workers, num_buffers_per_channel);
             },
-            py::arg("input_tensor"),
-            py::arg("math_op"),
-            py::kw_only(),
-            py::arg("num_links") = 1,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("topology") = ttnn::ccl::Topology::Ring,
-            py::arg("num_workers") = std::nullopt,
-            py::arg("num_buffers_per_channel") = std::nullopt});
+            nb::arg("input_tensor"),
+            nb::arg("math_op"),
+            nb::kw_only(),
+            nb::arg("num_links") = 1,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("topology") = ttnn::ccl::Topology::Ring,
+            nb::arg("num_workers") = std::nullopt,
+            nb::arg("num_buffers_per_channel") = std::nullopt});
 }
 
-}  // namespace detail
+}  // namespace
 
-void py_bind_all_reduce(pybind11::module& module) {
-    detail::bind_all_reduce(
-        module,
+void bind_all_reduce(nb::module_& mod) {
+    bind_operation_all_reduce(
+        mod,
         ttnn::experimental::all_reduce,
         R"doc(
 
