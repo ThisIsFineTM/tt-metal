@@ -40,8 +40,7 @@ void py_module(nb::module_& mod) {
             nb::arg("out_subblock_w").noconvert(),
             nb::arg("per_core_M").noconvert(),
             nb::arg("per_core_N").noconvert())
-        .def_rw(
-            "compute_with_storage_grid_size", &MatmulMultiCoreReuseProgramConfig::compute_with_storage_grid_size)
+        .def_rw("compute_with_storage_grid_size", &MatmulMultiCoreReuseProgramConfig::compute_with_storage_grid_size)
         .def_rw("in0_block_w", &MatmulMultiCoreReuseProgramConfig::in0_block_w)
         .def_rw("out_subblock_h", &MatmulMultiCoreReuseProgramConfig::out_subblock_h)
         .def_rw("out_subblock_w", &MatmulMultiCoreReuseProgramConfig::out_subblock_w)
@@ -56,22 +55,24 @@ void py_module(nb::module_& mod) {
 
     matmul_multi_core_reuse_multicast_program_config
         .def(
-            nb::init([](CoreCoord compute_with_storage_grid_size,
-                        std::size_t in0_block_w,
-                        std::size_t out_subblock_h,
-                        std::size_t out_subblock_w,
-                        std::optional<std::size_t> out_block_h,
-                        std::optional<std::size_t> out_block_w,
-                        std::size_t per_core_M,
-                        std::size_t per_core_N,
-                        bool transpose_mcast,
-                        std::optional<UnaryWithParam> fused_activation,
-                        bool fuse_batch) {
+            "__init__",
+            [](MatmulMultiCoreReuseMultiCastProgramConfig* t,
+               CoreCoord compute_with_storage_grid_size,
+               std::size_t in0_block_w,
+               std::size_t out_subblock_h,
+               std::size_t out_subblock_w,
+               std::optional<std::size_t> out_block_h,
+               std::optional<std::size_t> out_block_w,
+               std::size_t per_core_M,
+               std::size_t per_core_N,
+               bool transpose_mcast,
+               std::optional<UnaryWithParam> fused_activation,
+               bool fuse_batch) {
                 // Set out_block_h and out_block_w to defaults if they are not provided
                 std::size_t actual_out_block_h = out_block_h.value_or(per_core_M);
                 std::size_t actual_out_block_w = out_block_w.value_or(per_core_N);
 
-                return MatmulMultiCoreReuseMultiCastProgramConfig(
+                return new (t) MatmulMultiCoreReuseMultiCastProgramConfig(
                     compute_with_storage_grid_size,
                     in0_block_w,
                     out_subblock_h,
@@ -83,7 +84,7 @@ void py_module(nb::module_& mod) {
                     transpose_mcast,
                     std::move(fused_activation),
                     fuse_batch);
-            }),
+            },
             nb::kw_only(),
             nb::arg("compute_with_storage_grid_size"),
             nb::arg("in0_block_w").noconvert(),
@@ -118,25 +119,27 @@ void py_module(nb::module_& mod) {
 
     matmul_multi_core_reuse_multicast_1d_program_config
         .def(
-            nb::init([](CoreCoord compute_with_storage_grid_size,
-                        std::size_t in0_block_w,
-                        std::size_t out_subblock_h,
-                        std::size_t out_subblock_w,
-                        std::optional<std::size_t> out_block_h,
-                        std::optional<std::size_t> out_block_w,
-                        std::size_t per_core_M,
-                        std::size_t per_core_N,
-                        bool fuse_batch,
-                        std::optional<UnaryWithParam> fused_activation,
-                        bool mcast_in0,
-                        bool gather_in0,
-                        CoreRangeSet hop_cores,
-                        std::size_t num_global_cb_receivers) {
+            "__init__",
+            [](MatmulMultiCoreReuseMultiCast1DProgramConfig* t,
+               CoreCoord compute_with_storage_grid_size,
+               std::size_t in0_block_w,
+               std::size_t out_subblock_h,
+               std::size_t out_subblock_w,
+               std::optional<std::size_t> out_block_h,
+               std::optional<std::size_t> out_block_w,
+               std::size_t per_core_M,
+               std::size_t per_core_N,
+               bool fuse_batch,
+               std::optional<UnaryWithParam> fused_activation,
+               bool mcast_in0,
+               bool gather_in0,
+               CoreRangeSet hop_cores,
+               std::size_t num_global_cb_receivers) {
                 // Set out_block_h and out_block_w to defaults if they are not provided
                 std::size_t actual_out_block_h = out_block_h.value_or(per_core_M);
                 std::size_t actual_out_block_w = out_block_w.value_or(per_core_N);
 
-                return MatmulMultiCoreReuseMultiCast1DProgramConfig(
+                return new (t) MatmulMultiCoreReuseMultiCast1DProgramConfig(
                     compute_with_storage_grid_size,
                     in0_block_w,
                     out_subblock_h,
@@ -151,7 +154,7 @@ void py_module(nb::module_& mod) {
                     gather_in0,
                     std::move(hop_cores),
                     num_global_cb_receivers);
-            }),
+            },
             nb::kw_only(),
             nb::arg("compute_with_storage_grid_size"),
             nb::arg("in0_block_w").noconvert(),
@@ -182,8 +185,7 @@ void py_module(nb::module_& mod) {
         .def_rw("mcast_in0", &MatmulMultiCoreReuseMultiCast1DProgramConfig::mcast_in0)
         .def_rw("gather_in0", &MatmulMultiCoreReuseMultiCast1DProgramConfig::gather_in0)
         .def_rw("hop_cores", &MatmulMultiCoreReuseMultiCast1DProgramConfig::hop_cores)
-        .def_rw(
-            "num_global_cb_receivers", &MatmulMultiCoreReuseMultiCast1DProgramConfig::num_global_cb_receivers);
+        .def_rw("num_global_cb_receivers", &MatmulMultiCoreReuseMultiCast1DProgramConfig::num_global_cb_receivers);
 
     auto matmul_multi_core_reuse_multicast_dram_sharded_program_config =
         tt_serializable_class<MatmulMultiCoreReuseMultiCastDRAMShardedProgramConfig>(
@@ -470,4 +472,4 @@ void py_module(nb::module_& mod) {
         });
 }
 
-}  // namespace ttnn::operations::matmul 
+}  // namespace ttnn::operations::matmul
