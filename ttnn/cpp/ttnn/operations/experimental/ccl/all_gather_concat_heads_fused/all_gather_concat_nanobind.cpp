@@ -2,30 +2,34 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "all_gather_concat_pybind.hpp"
+#include "all_gather_concat_nanobind.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <cstdint>
+#include <optional>
 
-#include "cpp/pybind11/decorators.hpp"
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "ttnn/operations/experimental/ccl/all_gather_concat_heads_fused/all_gather_concat.hpp"
 #include "ttnn/operations/ccl/ccl_host_datastructures.hpp"
 #include "ttnn/distributed/types.hpp"
 #include "cpp/ttnn/global_semaphore.hpp"
 
+namespace nb = nanobind;
+
 namespace ttnn::operations::experimental::ccl {
 
-namespace detail {
+namespace {
 
 template <typename ccl_operation_t>
-void bind_all_gather_concat(pybind11::module& module, const ccl_operation_t& operation, const char* doc) {
-    // namespace py = pybind11;
+void bind_all_gather_concat(nb::module_& mod, const ccl_operation_t& operation, const char* doc) {
 
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const ccl_operation_t& self,
                const ttnn::Tensor& input_tensor,
                ttnn::Tensor& buffer_tensor,
@@ -55,27 +59,27 @@ void bind_all_gather_concat(pybind11::module& module, const ccl_operation_t& ope
                     subdevice_id,
                     enable_persistent_fabric_mode);
             },
-            py::arg("input_tensor"),
-            py::arg("buffer_tensor"),
-            py::arg("dim"),
-            py::arg("cluster_axis"),
-            py::arg("mesh_device"),
-            py::arg("multi_device_global_semaphore"),
-            py::arg("num_heads").noconvert(),
-            py::kw_only(),
-            py::arg("num_links") = 1,
-            py::arg("memory_config") = std::nullopt,
-            py::arg("topology") = ttnn::ccl::Topology::Linear,
-            py::arg("subdevice_id") = std::nullopt,
-            py::arg("enable_persistent_fabric_mode") = false,
-            py::arg("queue_id") = DefaultQueueId});
+            nb::arg("input_tensor"),
+            nb::arg("buffer_tensor"),
+            nb::arg("dim"),
+            nb::arg("cluster_axis"),
+            nb::arg("mesh_device"),
+            nb::arg("multi_device_global_semaphore"),
+            nb::arg("num_heads").noconvert(),
+            nb::kw_only(),
+            nb::arg("num_links") = 1,
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("topology") = ttnn::ccl::Topology::Linear,
+            nb::arg("subdevice_id") = std::nullopt,
+            nb::arg("enable_persistent_fabric_mode") = false,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
-}  // namespace detail
+}  // namespace
 
-void py_bind_all_gather_concat(pybind11::module& module) {
-    detail::bind_all_gather_concat(
-        module,
+void bind_all_gather_concat(nb::module_& mod) {
+    bind_operation_all_gather_concat(
+        mod,
         ttnn::experimental::all_gather_concat,
         R"doc(
         Performs a fused all-gather/concat operation on multi-device (specific to llama model):attr:`input_tensor` across all devices.
