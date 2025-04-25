@@ -4,25 +4,26 @@
 
 #pragma once
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <string>
+#include <optional>
 
-#include "cpp/pybind11/decorators.hpp"
+#include <fmt/format.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "ttnn/operations/eltwise/ternary/ternary_composite.hpp"
 #include "ttnn/operations/eltwise/ternary/where.hpp"
 #include "ttnn/types.hpp"
 
-namespace py = pybind11;
 
-namespace ttnn {
-namespace operations {
-namespace ternary {
+namespace ttnn::operations::ternary {
 
 namespace detail {
 
 template <typename ternary_operation_t>
 void bind_ternary_composite_float(
-    py::module& module,
+    nb::module_& mod,
     const ternary_operation_t& operation,
     const std::string& description,
     const std::string& supported_dtype = "BFLOAT16") {
@@ -71,10 +72,10 @@ void bind_ternary_composite_float(
         supported_dtype);
 
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const ternary_operation_t& self,
                const Tensor& input_tensor_a,
                const Tensor& input_tensor_b,
@@ -83,16 +84,16 @@ void bind_ternary_composite_float(
                const std::optional<MemoryConfig>& memory_config) {
                 return self(input_tensor_a, input_tensor_b, input_tensor_c, value, memory_config);
             },
-            py::arg("input_tensor_a"),
-            py::arg("input_tensor_b"),
-            py::arg("input_tensor_c"),
-            py::kw_only(),
-            py::arg("value"),
-            py::arg("memory_config") = std::nullopt});
+            nb::arg("input_tensor_a"),
+            nb::arg("input_tensor_b"),
+            nb::arg("input_tensor_c"),
+            nb::kw_only(),
+            nb::arg("value"),
+            nb::arg("memory_config") = std::nullopt});
 }
 
 template <typename ternary_operation_t>
-void bind_ternary_where(py::module& module, const ternary_operation_t& operation, const std::string& description) {
+void bind_ternary_where(nb::module_& mod, const ternary_operation_t& operation, const std::string& description) {
     auto doc = fmt::format(
         R"doc(
             {2}
@@ -135,10 +136,10 @@ void bind_ternary_where(py::module& module, const ternary_operation_t& operation
         description);
 
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const ternary_operation_t& self,
                const Tensor& predicate,
                const Tensor& true_value,
@@ -148,14 +149,14 @@ void bind_ternary_where(py::module& module, const ternary_operation_t& operation
                QueueId queue_id) {
                 return self(queue_id, predicate, true_value, false_value, memory_config, output_tensor);
             },
-            py::arg("predicate"),
-            py::arg("true_value"),
-            py::arg("false_value"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("output_tensor") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId},
-        ttnn::pybind_overload_t{
+            nb::arg("predicate"),
+            nb::arg("true_value"),
+            nb::arg("false_value"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("output_tensor") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId},
+        ttnn::nanobind_overload_t{
             [](const ternary_operation_t& self,
                const Tensor& predicate,
                const float true_value,
@@ -165,14 +166,14 @@ void bind_ternary_where(py::module& module, const ternary_operation_t& operation
                QueueId queue_id) {
                 return self(queue_id, predicate, true_value, false_value, memory_config, output_tensor);
             },
-            py::arg("predicate"),
-            py::arg("true_value"),
-            py::arg("false_value"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("output_tensor") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId},
-        ttnn::pybind_overload_t{
+            nb::arg("predicate"),
+            nb::arg("true_value"),
+            nb::arg("false_value"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("output_tensor") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId},
+        ttnn::nanobind_overload_t{
             [](const ternary_operation_t& self,
                const Tensor& predicate,
                const Tensor& true_value,
@@ -182,14 +183,14 @@ void bind_ternary_where(py::module& module, const ternary_operation_t& operation
                QueueId queue_id) {
                 return self(queue_id, predicate, true_value, false_value, memory_config, output_tensor);
             },
-            py::arg("predicate"),
-            py::arg("true_value"),
-            py::arg("false_value"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("output_tensor") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId},
-        ttnn::pybind_overload_t{
+            nb::arg("predicate"),
+            nb::arg("true_value"),
+            nb::arg("false_value"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("output_tensor") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId},
+        ttnn::nanobind_overload_t{
             [](const ternary_operation_t& self,
                const Tensor& predicate,
                const float true_value,
@@ -199,17 +200,17 @@ void bind_ternary_where(py::module& module, const ternary_operation_t& operation
                QueueId queue_id) {
                 return self(queue_id, predicate, true_value, false_value, memory_config, output_tensor);
             },
-            py::arg("predicate"),
-            py::arg("true_value"),
-            py::arg("false_value"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt,
-            py::arg("output_tensor") = std::nullopt,
-            py::arg("queue_id") = DefaultQueueId});
+            nb::arg("predicate"),
+            nb::arg("true_value"),
+            nb::arg("false_value"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt,
+            nb::arg("output_tensor") = std::nullopt,
+            nb::arg("queue_id") = DefaultQueueId});
 }
 
 template <typename ternary_operation_t>
-void bind_ternary_lerp(py::module& module, const ternary_operation_t& operation, const std::string& description) {
+void bind_ternary_lerp(nb::module_& mod, const ternary_operation_t& operation, const std::string& description) {
     auto doc = fmt::format(
         R"doc(
 
@@ -256,36 +257,36 @@ void bind_ternary_lerp(py::module& module, const ternary_operation_t& operation,
         description);
 
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const ternary_operation_t& self,
                const Tensor& input,
                const Tensor& end,
                const Tensor& weight,
                const std::optional<MemoryConfig>& memory_config) { return self(input, end, weight, memory_config); },
-            py::arg("input"),
-            py::arg("end"),
-            py::arg("weight"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt},
+            nb::arg("input"),
+            nb::arg("end"),
+            nb::arg("weight"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt},
 
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const ternary_operation_t& self,
                const Tensor& input,
                const Tensor& end,
                float weight,
                const std::optional<MemoryConfig>& memory_config) { return self(input, end, weight, memory_config); },
-            py::arg("input"),
-            py::arg("end"),
-            py::arg("weight"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt});
+            nb::arg("input"),
+            nb::arg("end"),
+            nb::arg("weight"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt});
 }
 
 template <typename ternary_operation_t>
-void bind_ternary_mac(py::module& module, const ternary_operation_t& operation, const std::string& description) {
+void bind_ternary_mac(nb::module_& mod, const ternary_operation_t& operation, const std::string& description) {
     auto doc = fmt::format(
         R"doc(
             {2}
@@ -327,10 +328,10 @@ void bind_ternary_mac(py::module& module, const ternary_operation_t& operation, 
         description);
 
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const ternary_operation_t& self,
                const Tensor& input_tensor_a,
                const Tensor& input_tensor_b,
@@ -338,13 +339,13 @@ void bind_ternary_mac(py::module& module, const ternary_operation_t& operation, 
                const std::optional<MemoryConfig>& memory_config) {
                 return self(input_tensor_a, input_tensor_b, input_tensor_c, memory_config);
             },
-            py::arg("input_tensor_a"),
-            py::arg("input_tensor_b"),
-            py::arg("input_tensor_c"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt},
+            nb::arg("input_tensor_a"),
+            nb::arg("input_tensor_b"),
+            nb::arg("input_tensor_c"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt},
 
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const ternary_operation_t& self,
                const Tensor& input_tensor_a,
                float value1,
@@ -352,44 +353,42 @@ void bind_ternary_mac(py::module& module, const ternary_operation_t& operation, 
                const std::optional<MemoryConfig>& memory_config) {
                 return self(input_tensor_a, value1, value2, memory_config);
             },
-            py::arg("input_tensor_a"),
-            py::arg("value1"),
-            py::arg("value2"),
-            py::kw_only(),
-            py::arg("memory_config") = std::nullopt});
+            nb::arg("input_tensor_a"),
+            nb::arg("value1"),
+            nb::arg("value2"),
+            nb::kw_only(),
+            nb::arg("memory_config") = std::nullopt});
 }
 
 }  // namespace detail
 
-void py_module(py::module& module) {
+void py_module(nb::module_& mod) {
     // new imported
     detail::bind_ternary_composite_float(
-        module,
+        mod,
         ttnn::addcmul,
         R"doc(Computes Addcmul on :attr:`input_tensor_a`, :attr:`input_tensor_b` and :attr:`input_tensor_c` and returns the tensor with the same layout as :attr:`input_tensor_a`)doc",
         R"doc(BFLOAT16, BFLOAT8_B)doc");
 
     detail::bind_ternary_composite_float(
-        module,
+        mod,
         ttnn::addcdiv,
         R"doc(Computes Addcdiv on :attr:`input_tensor_a`, :attr:`input_tensor_b` and :attr:`input_tensor_c` and returns the tensor with the same layout as :attr:`input_tensor_a`)doc");
 
     detail::bind_ternary_where(
-        module,
+        mod,
         ttnn::where,
         R"doc(Computes Where on :attr:`input_tensor_a`, :attr:`input_tensor_b` and :attr:`input_tensor_c` and returns the tensor with the same layout as :attr:`input_tensor_a`)doc");
 
     detail::bind_ternary_lerp(
-        module,
+        mod,
         ttnn::lerp,
         R"doc(Computes Lerp on :attr:`input`, :attr:`end` and :attr:`weight` and returns the tensor with the same layout as :attr:`input`)doc");
 
     detail::bind_ternary_mac(
-        module,
+        mod,
         ttnn::mac,
         R"doc(Computes Mac on :attr:`input_tensor_a`, :attr:`input_tensor_b` and :attr:`input_tensor_c` and returns the tensor with the same layout as :attr:`input_tensor_a`)doc");
 }
 
-}  // namespace ternary
-}  // namespace operations
-}  // namespace ttnn
+}  // namespace ttnn::operations::ternary 
