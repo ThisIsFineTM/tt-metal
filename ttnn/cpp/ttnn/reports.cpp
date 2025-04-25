@@ -1,56 +1,30 @@
-// SPDX-FileCopyrightText: © 2023 Tenstorrent Inc.
+// SPDX-FileCopyrightText: © 2025 Tenstorrent Inc.
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#pragma once
+#include "reports.hpp"
 
+#include <algorithm> // max_element
 #include <cstddef>
 #include <cstdint>
+#include <map>
 #include <vector>
 
-#include <tt-metalium/buffer_constants.hpp> // BufferType
-
-// fwd decl
-namespace tt::tt_metal {
-class IDevice;
-}
-
+#include <tt-metalium/allocator.hpp>
 #include <tt-metalium/buffer.hpp>
 #include <tt-metalium/core_descriptor.hpp>
+#include <tt-metalium/device.hpp>
 #include <tt-metalium/device_pool.hpp>
 
-namespace ttnn {
+namespace ttnn::reports {
 
-namespace reports {
-
-struct DeviceInfo {
-    size_t num_y_cores;
-    size_t num_x_cores;
-    size_t num_y_compute_cores;
-    size_t num_x_compute_cores;
-    size_t worker_l1_size;
-    size_t l1_num_banks;
-    size_t l1_bank_size;
-    uint64_t address_at_first_l1_bank;
-    uint64_t address_at_first_l1_cb_buffer;
-    size_t num_banks_per_storage_core;
-    size_t num_compute_cores;
-    size_t num_storage_cores;
-    size_t total_l1_memory;
-    size_t total_l1_for_tensors;
-    size_t total_l1_for_interleaved_buffers;
-    size_t total_l1_for_sharded_buffers;
-    size_t cb_limit;
-};
-
-DeviceInfo get_device_info(tt::tt_metal::distributed::MeshDevice* device) {
+DeviceInfo get_device_info(const tt::tt_metal::IDevice& device) {
     DeviceInfo info{};
     const auto& dispatch_core_config = tt::tt_metal::get_dispatch_core_config();
-    const auto descriptor =
-        tt::get_core_descriptor_config(device->get_device_ids().at(0), device->num_hw_cqs(), dispatch_core_config);
-    const auto& device_allocator = device->allocator();
-    info.num_y_cores = device->logical_grid_size().y;
-    info.num_x_cores = device->logical_grid_size().x;
+    const auto descriptor = tt::get_core_descriptor_config(device.id(), device.num_hw_cqs(), dispatch_core_config);
+    const auto& device_allocator = device.allocator();
+    info.num_y_cores = device.logical_grid_size().y;
+    info.num_x_cores = device.logical_grid_size().x;
     info.num_y_compute_cores = descriptor.compute_grid_size.y;
     info.num_x_compute_cores = descriptor.compute_grid_size.x;
     info.worker_l1_size = device_allocator->get_config().worker_l1_size;
@@ -72,16 +46,9 @@ DeviceInfo get_device_info(tt::tt_metal::distributed::MeshDevice* device) {
     return info;
 }
 
-struct BufferInfo {
-    uint32_t device_id;
-    uint32_t address;
-    uint32_t max_size_per_bank;
-    tt::tt_metal::BufferType buffer_type;
-};
-
-std::vector<BufferInfo> get_buffers(const std::vector<tt::tt_metal::distributed::MeshDevice*>& devices) {
+std::vector<BufferInfo> get_buffers() {
     std::vector<BufferInfo> buffer_infos;
-    for (auto device : devices) {
+    for (const auto& device : tt::DevicePool::instance().get_all_active_devices()) {
         for (const auto& buffer : device->allocator()->get_allocated_buffers()) {
             auto device_id = device->id();
             auto address = buffer->address();
@@ -131,21 +98,9 @@ std::vector<BufferInfo> get_buffers(const std::vector<tt::tt_metal::distributed:
     return buffer_infos;
 }
 
-struct BufferPageInfo {
-    uint32_t device_id;
-    uint32_t address;
-    uint32_t core_y;
-    uint32_t core_x;
-    uint32_t bank_id;
-    uint32_t page_index;
-    uint32_t page_address;
-    uint32_t page_size;
-    tt::tt_metal::BufferType buffer_type;
-};
-
-std::vector<BufferPageInfo> get_buffer_pages(const std::vector<tt::tt_metal::distributed::MeshDevice*>& devices) {
+std::vector<BufferPageInfo> get_buffer_pages() {
     std::vector<BufferPageInfo> buffer_page_infos;
-    for (auto device : devices) {
+    for (const auto& device : tt::DevicePool::instance().get_all_active_devices()) {
         for (const auto& buffer : device->allocator()->get_allocated_buffers()) {
             if (not buffer->is_l1()) {
                 continue;
@@ -176,7 +131,7 @@ std::vector<BufferPageInfo> get_buffer_pages(const std::vector<tt::tt_metal::dis
                     page_address = buffer->sharded_page_address(bank_id, dev_page_index);
                 }
 
-                BufferPageInfo buffer_page_info = {};
+                BufferPageInfo buffer_page_info{};
                 buffer_page_info.device_id = device_id;
                 buffer_page_info.address = address;
                 buffer_page_info.core_y = core.y;
@@ -194,6 +149,4 @@ std::vector<BufferPageInfo> get_buffer_pages(const std::vector<tt::tt_metal::dis
     return buffer_page_infos;
 }
 
-}  // namespace reports
-
-}  // namespace ttnn
+}  // namespace ttnn::reports
