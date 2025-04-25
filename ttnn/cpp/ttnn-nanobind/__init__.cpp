@@ -165,7 +165,7 @@ void py_module(nb::module_& mod) {
     kv_cache::bind_kv_cache(m_kv_cache);
 
     auto m_copy = mod.def_submodule("copy", "copy operations");
-    conb::py_module(m_copy);
+    copy::py_module(m_copy);
 
     auto m_experimental = mod.def_submodule("experimental", "experimental operations");
     experimental::py_module(m_experimental);
