@@ -1291,6 +1291,7 @@ if(USE_NANOBIND)
         TTNN_SRC_NANOBIND
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn-nanobind/__init__.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn-nanobind/activation.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn-nanobind/core.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn-nanobind/types.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn-nanobind/reports.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn-nanobind/operations/copy.cpp
