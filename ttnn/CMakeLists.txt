@@ -1159,6 +1159,7 @@ if(USE_NANOBIND)
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn/operations/normalization/groupnorm/groupnorm_nanobind.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn/operations/normalization/layernorm/layernorm_nanobind.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn/operations/normalization/layernorm_distributed/layernorm_distributed_nanobind.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn/operations/normalization/normalization_nanobind.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn/operations/normalization/rmsnorm/rmsnorm_nanobind.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn/operations/normalization/rmsnorm/rmsnorm_nanobind.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/cpp/ttnn/operations/normalization/rmsnorm_distributed/rmsnorm_distributed_nanobind.cpp
