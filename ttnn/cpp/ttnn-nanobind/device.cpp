@@ -62,7 +62,7 @@ void ttnn_device(nb::module_& mod) {
         nb::arg("trace_region_size") = DEFAULT_TRACE_REGION_SIZE,
         nb::arg("dispatch_core_config") = tt::tt_metal::DispatchCoreConfig{},
         nb::arg("worker_l1_size") = DEFAULT_WORKER_L1_SIZE,
-        nb::return_value_policy::reference,
+        nb::rv_policy::reference,
         R"doc(
             Open a device with the given device_id. If the device is already open, return the existing device.
 
@@ -153,14 +153,17 @@ void py_device_module_types(nb::module_& m_device) {
 
 void device_module(nb::module_& m_device) {
     auto pySubDevice = static_cast<nb::class_<SubDevice>>(m_device.attr("SubDevice"));
-    pySubDevice.def(
-        nb::init<>([](std::vector<CoreRangeSet> cores) { return SubDevice(cores); }), // TODO
-        nb::arg("cores"),
-        R"doc(
-            Creates a SubDevice object from a list of CoreRangeSet objects, where each CoreRangeSet object
-            represents the cores from a specific CoreType.
-            The order of cores is Tensix, then Ethernet.
-        )doc");
+    pySubDevice
+        .def("__init__",
+            [](SubDevice* t, const std::vector<CoreRangeSet>& cores) { 
+                new (t) SubDevice(cores);
+            },
+            nb::arg("cores"),
+            R"doc(
+                Creates a SubDevice object from a list of CoreRangeSet objects, where each CoreRangeSet object
+                represents the cores from a specific CoreType.
+                The order of cores is Tensix, then Ethernet.
+            )doc");
 
     auto pySubDeviceId = static_cast<nb::class_<SubDeviceId>>(m_device.attr("SubDeviceId"));
     pySubDeviceId
@@ -323,10 +326,10 @@ void device_module(nb::module_& m_device) {
                 R"doc(Returns Infinity value for current architecture.)doc");
 
     auto pyDevice = static_cast<nb::class_<tt::tt_metal::Device, IDevice>>(m_device.attr("Device"));
-    pyDevice.def(
-        nb::init<>([](int device_id, size_t l1_small_size, size_t trace_region_size, size_t worker_l1_size) { // TODO
-            return tt::tt_metal::Device(device_id, 1, l1_small_size, trace_region_size, {}, {}, worker_l1_size);
-        }),
+    pyDevice.def("__init__",
+        [](tt::tt_metal::Device* t, int device_id, size_t l1_small_size, size_t trace_region_size, size_t worker_l1_size) {
+            new (t) tt::tt_metal::Device(device_id, 1, l1_small_size, trace_region_size, {}, {}, worker_l1_size);
+        },
         "Create device.",
         nb::arg("device_id"),
         nb::arg("l1_small_size") = DEFAULT_L1_SMALL_SIZE,

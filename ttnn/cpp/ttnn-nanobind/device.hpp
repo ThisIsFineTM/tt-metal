@@ -4,15 +4,12 @@
 
 #pragma once
 
-#include "pybind11/pybind_fwd.hpp"
-#include "ttnn/device.hpp"
-#include "ttnn/operations/experimental/auto_format/auto_format.hpp"
-
-namespace py = pybind11;
+#include "ttnn-nanobind/nanobind_fwd.hpp"
 
 namespace ttnn::device {
 
-void py_device_module_types(py::module& module);
-void py_device_module(py::module& module);
+namespace nb = nanobind;
+void py_device_module_types(nb::module_& mod);
+void py_device_module(nb::module_& mod);
 
 }  // namespace ttnn::device
