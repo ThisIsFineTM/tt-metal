@@ -4,10 +4,11 @@
 
 #pragma once
 
-#include "pybind11/pybind_fwd.hpp"
+#include "ttnn-nanobind/nanobind_fwd.hpp"
 
 namespace ttnn::operations::experimental::ccl {
 
-void py_bind_all_gather_matmul(pybind11::module& module);
+namespace nb = nanobind;
+void bind_all_gather_matmul(nb::module_& mod);
 
 }  // namespace ttnn::operations::experimental::ccl
