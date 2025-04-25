@@ -24,7 +24,7 @@ namespace ttnn::operations::experimental::ccl {
 namespace {
 
 template <typename ccl_operation_t>
-void bind_operation_all_gather_async(nanobind::module& module, const ccl_operation_t& operation, const char* doc) {
+void bind_operation_all_gather_async(nb::module_& mod, const ccl_operation_t& operation, const char* doc) {
 
     bind_registered_operation(
         mod,
