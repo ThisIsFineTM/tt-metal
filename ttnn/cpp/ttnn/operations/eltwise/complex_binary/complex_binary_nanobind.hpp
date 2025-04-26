@@ -4,25 +4,26 @@
 
 #pragma once
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+// this file doesn't appear to be used anywhere?
+#include <string>
 
-#include "cpp/pybind11/decorators.hpp"
+#include <fmt/format.h>
+#include <nanobind/nanobind.h>
+
+#include "cpp/ttnn-nanobind/decorators.hpp"
 #include "ttnn/operations/eltwise/complex/complex.hpp"
 #include "ttnn/types.hpp"
 
-namespace py = pybind11;
-
-namespace ttnn {
-namespace operations {
-namespace complex_binary {
+namespace ttnn::operations::complex_binary {
 
 namespace detail {
+
+namespace nb = nanobind;
 
 // OpHandler_complex_binary_type1 = get_function_complex_binary
 template <typename complex_unary_operation_t>
 void bind_complex_binary_type1(
-    py::module& module, const complex_unary_operation_t& operation, const std::string& description) {
+    nb::module_& mod, const complex_unary_operation_t& operation, const std::string& description) {
     auto doc = fmt::format(
         R"doc({0}(input_tensor_a: ComplexTensor, input_tensor_b: ComplexTensor, *, memory_config: ttnn.MemoryConfig) -> ComplexTensor
 
@@ -46,24 +47,22 @@ Example:
         description);
 
     bind_registered_operation(
-        module,
+        mod,
         operation,
         doc,
-        ttnn::pybind_overload_t{
+        ttnn::nanobind_overload_t{
             [](const complex_unary_operation_t& self,
                const ComplexTensor& input_tensor_a,
                const ComplexTensor& input_tensor_b,
                const ttnn::MemoryConfig& memory_config) -> ComplexTensor {
                 return self(input_tensor_a, input_tensor_b, memory_config);
             },
-            py::arg("input_tensor_a"),
-            py::arg("input_tensor_b"),
-            py::kw_only(),
-            py::arg("memory_config")});
+            nb::arg("input_tensor_a"),
+            nb::arg("input_tensor_b"),
+            nb::kw_only(),
+            nb::arg("memory_config")});
 }
 
 }  // namespace detail
 
-}  // namespace complex_binary
-}  // namespace operations
-}  // namespace ttnn
+}  // namespace ttnn::operations::complex_binary 
