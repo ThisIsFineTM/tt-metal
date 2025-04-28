@@ -220,7 +220,9 @@ void py_module(nb::module_& mod) {
 
     mod.def(
         "allocate_tensor_on_device",
-        nb::overload_cast<const ttnn::TensorSpec&, MeshDevice*>(&ttnn::operations::core::allocate_tensor_on_device),
+        [](const ttnn::TensorSpec& spec, MeshDevice* device) {
+            return tt::tt_metal::allocate_tensor_on_mesh(spec, device);
+        },
         nb::arg("tensor_spec"),
         nb::arg("mesh_device"));
 
@@ -240,12 +242,18 @@ void py_module(nb::module_& mod) {
 
     mod.def(
         "allocate_tensor_on_device",
-        nb::overload_cast<
-            const ttnn::Shape&,
-            ttnn::DataType,
-            ttnn::Layout,
-            MeshDevice*,
-            const std::optional<ttnn::MemoryConfig>&>(&ttnn::operations::core::allocate_tensor_on_device),
+        [](const ttnn::Shape& shape,
+           ttnn::DataType dtype,
+           ttnn::Layout layout,
+           MeshDevice* device,
+           const std::optional<ttnn::MemoryConfig>& mem_config) {
+            return tt::tt_metal::allocate_tensor_on_mesh(
+                TensorSpec(
+                    shape,
+                    tt::tt_metal::TensorLayout(
+                        dtype, tt::tt_metal::PageConfig(layout), mem_config.value_or(MemoryConfig{}))),
+                device);
+        },
         nb::arg("shape"),
         nb::arg("dtype"),
         nb::arg("layout"),
@@ -254,7 +262,11 @@ void py_module(nb::module_& mod) {
 
     mod.def(
         "copy_host_to_device_tensor",
-        &ttnn::operations::core::copy_host_to_device_tensor,
+        [](const ttnn::Tensor& host_tensor, ttnn::Tensor device_tensor, QueueId cq_id = ttnn::DefaultQueueId) {
+            // Copies `device_tensor`, to be able to asynchronously populate metadata in tensor attributes, stored as a
+            // shared pointer.
+            tt::tt_metal::write_tensor(host_tensor, std::move(device_tensor), cq_id);
+        },
         nb::arg("host_tensor"),
         nb::arg("device_tensor"),
         nb::arg("cq_id") = ttnn::DefaultQueueId);
