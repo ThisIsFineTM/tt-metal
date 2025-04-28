@@ -27,6 +27,8 @@
 namespace ttnn {
 namespace decorators {
 
+namespace nb = nanobind;
+
 template <typename T, typename return_t, typename... args_t>
 constexpr auto resolve_call_method(return_t (*function)(args_t...)) {
     return [](const T& self, args_t... args) { return self(std::forward<args_t>(args)...); };
@@ -122,14 +124,10 @@ void def_primitive_operation_method(
         overload.args.value);
 }
 
-template <
-    reflect::fixed_string cpp_fully_qualified_name,
-    typename operation_t,
-    bool auto_launch_op,
-    typename... overload_t>
+template <reflect::fixed_string cpp_fully_qualified_name, typename operation_t, typename... overload_t>
 auto bind_registered_operation(
     nb::module_& mod,
-    const registered_operation_t<cpp_fully_qualified_name, operation_t, auto_launch_op>& operation,
+    const registered_operation_t<cpp_fully_qualified_name, operation_t>& operation,
     const std::string& doc,
     overload_t&&... overloads) {
     using registered_operation_t = std::decay_t<decltype(operation)>;
