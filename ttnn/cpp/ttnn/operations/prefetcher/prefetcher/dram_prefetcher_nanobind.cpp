@@ -30,6 +30,8 @@ void bind_dram_prefetcher_operation(nb::module_& mod) {
                     for which tensors need to be pre-fetched.
                 global_cb (GlobalCircularBuffer): A global cb object, used internally to manage data movement
                     across dram reader cores, and downstream consumer cores.
+                enable_performance_mode (bool, optional): If set to true, the operation will be optimized for performance.
+                    May lead to ND behavior on wormhole 4U systems!
 
             Returns:
                 ttnn.Tensor: empty tensor (TODO: Should return None)
@@ -39,6 +41,8 @@ void bind_dram_prefetcher_operation(nb::module_& mod) {
             nb::arg("tensors"),
             nb::arg("num_layers"),
             nb::arg("global_cb"),
+            nb::kw_only(),
+            nb::arg("enable_performance_mode") = false,
         });
 }
 
