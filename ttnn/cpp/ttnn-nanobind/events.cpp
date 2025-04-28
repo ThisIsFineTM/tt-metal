@@ -73,37 +73,6 @@ void py_module(nb::module_& mod) {
     // Multi Device APIs
     mod.def(
         "record_event",
-        nb::overload_cast<MeshDevice*, QueueId, const std::vector<SubDeviceId>&>(&record_event),
-        nb::arg("cq_id"),
-        nb::arg("multi_device_event"),
-        nb::arg("sub_device_ids") = std::vector<SubDeviceId>(),
-        R"doc(
-            Records the completion of commands on this CQ, preceeding this call.
-
-            Args:
-                device (ttnn.MeshDevice*): The device on which the event is being recorded.
-                cq_id (int): The Command Queue on which event completion will be recorded.
-                sub_device_ids (List[ttnn.SubDeviceId], optional): The sub-device IDs to record completion for. Defaults to sub-devices set by set_sub_device_stall_group.
-
-            Returns:
-                multi_device_event: The event used to record completion of preceeding commands.
-        )doc");
-
-    mod.def(
-        "wait_for_event",
-        nb::overload_cast<QueueId, const MultiDeviceEvent&>(&wait_for_event),
-        nb::arg("cq_id"),
-        nb::arg("multi_device_event"),
-        R"doc(
-            Inserts a barrier - makes a CQ wait until an event is recorded.
-
-            Args:
-                cq_id (int): The Command Queue on which the barrier is being issued.
-                multi_device_event (multi_device_event): The Command Queue will stall until this event is completed.
-            )doc");
-
-    mod.def(
-        "record_mesh_event",
         nb::overload_cast<
             MeshDevice*,
             QueueId,
@@ -127,7 +96,7 @@ void py_module(nb::module_& mod) {
         )doc");
 
     mod.def(
-        "wait_for_mesh_event",
+        "wait_for_event",
         nb::overload_cast<QueueId, const MeshEvent&>(&wait_for_mesh_event),
         nb::arg("cq_id"),
         nb::arg("mesh_event"),
