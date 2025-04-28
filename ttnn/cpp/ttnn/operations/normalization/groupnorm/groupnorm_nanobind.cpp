@@ -16,7 +16,8 @@ namespace nb = nanobind;
 
 namespace ttnn::operations::normalization::detail {
 
-void bind_normalization_group_norm(nb::module_& mod) {
+namespace {
+void bind_normalization_group_norm_operation(nb::module_& mod) {
 
     ttnn::bind_registered_operation(
         mod,
@@ -59,7 +60,11 @@ void bind_normalization_group_norm(nb::module_& mod) {
             nb::arg("dtype") = std::nullopt,
             nb::arg("core_grid") = std::nullopt,
             nb::arg("inplace") = true,
-            nb::arg("output_layout") = std::nullopt});
+            nb::arg("output_layout") = std::nullopt,
+            nb::arg("num_out_blocks") = std::nullopt});
 }
+} // namespace
+
+void bind_normalization_group_norm(nb::module_& mod) { bind_normalization_group_norm_operation(mod); }
 
 }  // namespace ttnn::operations::normalization::detail
