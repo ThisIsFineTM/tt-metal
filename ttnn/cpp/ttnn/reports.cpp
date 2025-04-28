@@ -12,19 +12,22 @@
 
 #include <tt-metalium/allocator.hpp>
 #include <tt-metalium/buffer.hpp>
+#include <tt-metalium/mesh_device.hpp>
 #include <tt-metalium/core_descriptor.hpp>
-#include <tt-metalium/device.hpp>
 #include <tt-metalium/device_pool.hpp>
+
+template class std::vector<tt::tt_metal::distributed::MeshDevice*>;
 
 namespace ttnn::reports {
 
-DeviceInfo get_device_info(const tt::tt_metal::IDevice& device) {
+DeviceInfo get_device_info(tt::tt_metal::distributed::MeshDevice* device) {
     DeviceInfo info{};
     const auto& dispatch_core_config = tt::tt_metal::get_dispatch_core_config();
-    const auto descriptor = tt::get_core_descriptor_config(device.id(), device.num_hw_cqs(), dispatch_core_config);
-    const auto& device_allocator = device.allocator();
-    info.num_y_cores = device.logical_grid_size().y;
-    info.num_x_cores = device.logical_grid_size().x;
+    const auto descriptor =
+        tt::get_core_descriptor_config(device->get_device_ids().at(0), device->num_hw_cqs(), dispatch_core_config);
+    const auto& device_allocator = device->allocator();
+    info.num_y_cores = device->logical_grid_size().y;
+    info.num_x_cores = device->logical_grid_size().x;
     info.num_y_compute_cores = descriptor.compute_grid_size.y;
     info.num_x_compute_cores = descriptor.compute_grid_size.x;
     info.worker_l1_size = device_allocator->get_config().worker_l1_size;
@@ -46,9 +49,9 @@ DeviceInfo get_device_info(const tt::tt_metal::IDevice& device) {
     return info;
 }
 
-std::vector<BufferInfo> get_buffers() {
+std::vector<BufferInfo> get_buffers(const std::vector<tt::tt_metal::distributed::MeshDevice*>& devices) {
     std::vector<BufferInfo> buffer_infos;
-    for (const auto& device : tt::DevicePool::instance().get_all_active_devices()) {
+    for (auto device : devices) {
         for (const auto& buffer : device->allocator()->get_allocated_buffers()) {
             auto device_id = device->id();
             auto address = buffer->address();
@@ -98,9 +101,9 @@ std::vector<BufferInfo> get_buffers() {
     return buffer_infos;
 }
 
-std::vector<BufferPageInfo> get_buffer_pages() {
+std::vector<BufferPageInfo> get_buffer_pages(const std::vector<tt::tt_metal::distributed::MeshDevice*>& devices) {
     std::vector<BufferPageInfo> buffer_page_infos;
-    for (const auto& device : tt::DevicePool::instance().get_all_active_devices()) {
+    for (auto device : devices) {
         for (const auto& buffer : device->allocator()->get_allocated_buffers()) {
             if (not buffer->is_l1()) {
                 continue;
@@ -131,7 +134,7 @@ std::vector<BufferPageInfo> get_buffer_pages() {
                     page_address = buffer->sharded_page_address(bank_id, dev_page_index);
                 }
 
-                BufferPageInfo buffer_page_info{};
+                BufferPageInfo buffer_page_info = {};
                 buffer_page_info.device_id = device_id;
                 buffer_page_info.address = address;
                 buffer_page_info.core_y = core.y;
