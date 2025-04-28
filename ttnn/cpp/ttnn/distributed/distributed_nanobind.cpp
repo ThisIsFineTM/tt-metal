@@ -1,21 +1,12 @@
-// SPDX-FileCopyrightText: © 2023 Tenstorrent Inc.
+// SPDX-FileConbrightText: © 2023 Tenstorrent Inc.
 //
 // SPDX-License-Identifier: Apache-2.0
 
+#include "ttnn/distributed/distributed_nanobind.hpp"
+
 #include <cstddef>
 #include <memory>
-
-#include "tt-metalium/mesh_coord.hpp"
-#include "distributed_tensor.hpp"
-#include "ttnn/distributed/api.hpp"
-#include "ttnn/distributed/types.hpp"
-#include <tt-metalium/command_queue.hpp>
-
-// This is required for automatic conversions, as in the creation of mesh devices
-// https://github.com/tenstorrent/tt-metal/issues/18082
-#include "ttnn/tensor/types.hpp"
-
-#include "ttnn/distributed/distributed_nanobind.hpp"
+#include <ostream>
 
 #include <nanobind/nanobind.h>
 #include <nanobind/make_iterator.h>
@@ -23,6 +14,18 @@
 #include <nanobind/stl/shared_ptr.h>
 #include <nanobind/stl/vector.h>
 
+#include <tt-metalium/command_queue.hpp>
+#include <tt-metalium/hal.hpp>
+#include <tt-metalium/mesh_coord.hpp>
+#include "distributed_tensor.hpp"
+#include "ttnn/distributed/api.hpp"
+#include "ttnn/distributed/types.hpp"
+
+// This is required for automatic conversions, as in the creation of mesh devices
+// https://github.com/tenstorrent/tt-metal/issues/18082
+#include "ttnn/tensor/types.hpp"
+
+// note from nanobind docs:
 // We strongly recommend that you replace all use of std::unique_ptr<T> by
 // std::unique_ptr<T, nb::deleter<T>> in your code. Without the latter type
 // declaration, which references a custom nanobind-provided deleter nb::deleter<T>,
@@ -30,17 +33,13 @@
 // to C++ and will refuse to do so with an error message. Further detail on this
 // special case can be found in the advanced section on object ownership.
 
-//#include <nanobind/pytypes.h>
-//#include <nanobind/cast.h>
-//#include <nanobind/stl.h>
-
 using namespace tt::tt_metal;
 
 namespace ttnn::distributed {
 
 namespace nb = nanobind;
 
-void py_module_types(nb::module_& mod) {
+void nb_module_types(nb::module_& mod) {
     nb::class_<MeshToTensor>(mod, "CppMeshToTensor");
     nb::class_<TensorToMesh>(mod, "CppTensorToMesh");
 
@@ -56,7 +55,7 @@ void py_module_types(nb::module_& mod) {
         mod, "MeshCoordinateRangeSet", "Set of coordinate ranges within a mesh device.");
 }
 
-void py_module(nb::module_& mod) {
+void nb_module(nb::module_& mod) {
     // TODO: #17477 - Remove overloads that accept 'row' and 'col'. Instead, use generic ND terms.
 
     static_cast<nb::class_<MeshShape>>(mod.attr("MeshShape"))
@@ -169,8 +168,8 @@ void py_module(nb::module_& mod) {
             return str.str();
         });
 
-    auto py_mesh_device = static_cast<nb::class_<MeshDevice>>(mod.attr("MeshDevice"));
-    py_mesh_device
+    auto nb_mesh_device = static_cast<nb::class_<MeshDevice>>(mod.attr("MeshDevice"));
+    nb_mesh_device
         .def(
             nb::new_([](const MeshShape& mesh_shape,
                         size_t l1_small_size,
@@ -262,17 +261,6 @@ void py_module(nb::module_& mod) {
                Arch: The arch of the first device in the device mesh.
        )doc")
         .def(
-            "enable_async",
-            &MeshDevice::enable_async,
-            nb::arg("enable"),
-            R"doc(
-               Enable or disable async mode across all devices in the mesh.
-
-
-               Args:
-                   enable (bool): True to enable async mode, False to disable it.
-           )doc")
-        .def(
             "enable_program_cache",
             &MeshDevice::enable_program_cache,
             R"doc(
@@ -283,6 +271,12 @@ void py_module(nb::module_& mod) {
             &MeshDevice::disable_and_clear_program_cache,
             R"doc(
                Disable program cache across all devices in the mesh.
+           )doc")
+        .def(
+            "set_program_cache_misses_allowed",
+            &MeshDevice::set_program_cache_misses_allowed,
+            R"doc(
+               Set whether program cache misses are allowed across all devices in the mesh.
            )doc")
         .def_prop_ro(
             "shape",
@@ -327,7 +321,7 @@ void py_module(nb::module_& mod) {
         .def(
             "create_sub_device_manager",
             [](MeshDevice& self, const std::vector<SubDevice>& sub_devices, DeviceAddr local_l1_size) {
-                return self.mesh_create_sub_device_manager(sub_devices, local_l1_size);
+                return self.create_sub_device_manager(sub_devices, local_l1_size);
             },
             nb::arg("sub_devices"),
             nb::arg("local_l1_size"),
@@ -342,12 +336,12 @@ void py_module(nb::module_& mod) {
 
 
                Returns:
-                   MeshSubDeviceManagerId: The ID of the created sub-device manager.
+                   SubDeviceManagerId: The ID of the created sub-device manager.
            )doc")
         .def(
             "create_sub_device_manager_with_fabric",
             [](MeshDevice& self, const std::vector<SubDevice>& sub_devices, DeviceAddr local_l1_size) {
-                return self.mesh_create_sub_device_manager_with_fabric(sub_devices, local_l1_size);
+                return self.create_sub_device_manager_with_fabric(sub_devices, local_l1_size);
             },
             nb::arg("sub_devices"),
             nb::arg("local_l1_size"),
@@ -363,41 +357,41 @@ void py_module(nb::module_& mod) {
 
 
                Returns:
-                   MeshSubDeviceManagerId: The ID of the created sub-device manager.
+                   SubDeviceManagerId: The ID of the created sub-device manager.
                    SubDeviceId: The ID of the sub-device that will be used for fabric.
            )doc")
         .def(
             "load_sub_device_manager",
-            &MeshDevice::mesh_load_sub_device_manager,
-            nb::arg("mesh_sub_device_manager_id"),
+            &MeshDevice::load_sub_device_manager,
+            nb::arg("sub_device_manager_id"),
             R"doc(
                Loads the sub-device manager with the given ID.
 
 
                Args:
-                   mesh_sub_device_manager_id (MeshSubDeviceManagerId): The ID of the sub-device manager to load.
+                   sub_device_manager_id (SubDeviceManagerId): The ID of the sub-device manager to load.
            )doc")
         .def(
             "clear_loaded_sub_device_manager",
-            &MeshDevice::mesh_clear_loaded_sub_device_manager,
+            &MeshDevice::clear_loaded_sub_device_manager,
             R"doc(
                Clears the loaded sub-device manager for the given mesh device.
            )doc")
         .def(
             "remove_sub_device_manager",
-            &MeshDevice::mesh_remove_sub_device_manager,
-            nb::arg("mesh_sub_device_manager_id"),
+            &MeshDevice::remove_sub_device_manager,
+            nb::arg("sub_device_manager_id"),
             R"doc(
                Removes the sub-device manager with the given ID.
 
 
                Args:
-                   mesh_sub_device_manager_id (MeshSubDeviceManagerId): The ID of the sub-device manager to remove.
+                   sub_device_manager_id (SubDeviceManagerId): The ID of the sub-device manager to remove.
            )doc")
         .def(
             "set_sub_device_stall_group",
             [](MeshDevice& self, const std::vector<SubDeviceId>& sub_device_ids) {
-                self.mesh_set_sub_device_stall_group(sub_device_ids);
+                self.set_sub_device_stall_group(sub_device_ids);
             },
             nb::arg("sub_device_ids"),
             R"doc(
@@ -411,11 +405,27 @@ void py_module(nb::module_& mod) {
            )doc")
         .def(
             "reset_sub_device_stall_group",
-            &MeshDevice::mesh_reset_sub_device_stall_group,
+            &MeshDevice::reset_sub_device_stall_group,
             R"doc(
                Resets the sub_device_ids that will be stalled on by default for Fast Dispatch commands such as reading, writing, synchronizing
                back to all SubDevice IDs.
-           )doc");
+           )doc")
+        .def(
+            "num_program_cache_entries",
+            &MeshDevice::num_program_cache_entries,
+            "Number of entries in the program cache for this device")
+        .def(
+            "sfpu_eps",
+            [](MeshDevice* device) { return tt::tt_metal::hal::get_eps(); },
+            R"doc(Returns machine epsilon value for current architecture.)doc")
+        .def(
+            "sfpu_nan",
+            [](MeshDevice* device) { return tt::tt_metal::hal::get_nan(); },
+            R"doc(Returns NaN value for current architecture.)doc")
+        .def(
+            "sfpu_inf",
+            [](MeshDevice* device) { return tt::tt_metal::hal::get_inf(); },
+            R"doc(Returns Infinity value for current architecture.)doc");
 
     auto py_tensor_to_mesh =
         static_cast<nb::class_<TensorToMesh>>(mod.attr("CppTensorToMesh"));
@@ -435,23 +445,11 @@ void py_module(nb::module_& mod) {
         nb::arg("physical_device_ids"),
         nb::arg("dispatch_core_config"),
         nb::arg("worker_l1_size") = DEFAULT_WORKER_L1_SIZE);
-    mod.def("close_mesh_device", &close_mesh_device, nb::kw_only(), nb::arg("mesh_device"));
     mod.def(
-        "get_device_tensor",
-        nb::overload_cast<const Tensor&, int>(&ttnn::distributed::get_device_tensor),
+        "close_mesh_device",
+        &close_mesh_device,
         nb::kw_only(),
-        nb::arg("tensor"),
-        nb::arg("device_id"),
-        R"doc(
-       Get the tensor shard corresponding to the device_id.
-
-       Args:
-           tensor (Tensor): The tensor to get the shard from.
-           device_id (int): The device id to get the shard for.
-
-        Returns:
-            Tensor: The shard of the tensor corresponding to the device_id.
-    )doc");
+        nb::arg("mesh_device"));
 
     auto py_shard2d_config = static_cast<nb::class_<Shard2dConfig>>(mod.attr("Shard2dConfig"));
     py_shard2d_config.def(nb::init<int, int>(), nb::arg("row_dim"), nb::arg("col_dim"))
@@ -462,23 +460,7 @@ void py_module(nb::module_& mod) {
         .def_rw("row_dim", &Concat2dConfig::row_dim)
         .def_rw("col_dim", &Concat2dConfig::col_dim);
 
-    mod.def(
-        "get_device_tensor",
-        nb::overload_cast<const Tensor&, const IDevice*>(&ttnn::distributed::get_device_tensor),
-        nb::kw_only(),
-        nb::arg("tensor"),
-        nb::arg("device"),
-        R"doc(
-       Get the tensor shard corresponding to the device.
 
-       Args:
-           tensor (Tensor): The tensor to get the shard from.
-           device (Device): The device to get the shard for.
-
-
-       Returns:
-           Tensor: The shard of the tensor corresponding to the device.
-   )doc");
     mod.def(
         "get_device_tensors",
         &get_device_tensors,
