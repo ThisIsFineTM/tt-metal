@@ -59,6 +59,7 @@ docs/doxygen_build
 **.swp
 **.swo
 **.swn
+*~
 
 *profile_log*.csv
 **/profiler/output/*

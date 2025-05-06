@@ -5,8 +5,10 @@
 #pragma once
 
 #include <algorithm>
-#include <functional>
-#include <unordered_map>
+#include <iterator>
+#include <utility>
+#include <variant>
+#include <vector>
 
 #include <tt-metalium/distributed.hpp>
 #include <tt-metalium/program_cache.hpp>

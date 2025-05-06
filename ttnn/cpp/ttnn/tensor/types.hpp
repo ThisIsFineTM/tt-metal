@@ -4,12 +4,11 @@
 
 #pragma once
 
+#include <array>
 #include <cstdint>
-#include <memory>
+#include <iosfwd>
 #include <optional>
-#include <variant>
-#include <vector>
-#include <algorithm>
+#include <type_traits>
 
 #include <tt-metalium/bfloat16.hpp>
 #include <tt-metalium/core_coord.hpp>
@@ -24,9 +23,7 @@
 
 #include "ttnn/tensor/shape/shape.hpp"
 
-namespace tt {
-
-namespace tt_metal {
+namespace tt::tt_metal {
 
 static constexpr std::uint8_t VERSION_ID = 5;
 
@@ -82,7 +79,7 @@ static constexpr std::size_t MAX_NUM_DIMENSIONS = 8;
 using Array1D = std::array<uint32_t, 1>;
 using Array2D = std::array<uint32_t, 2>;
 using Array3D = std::array<uint32_t, 3>;
-using Array4D = std::array<uint32_t, 4>;
+using Array4D = std::array<uint32_t, 4>; // looks like this is the only one that's actually used
 using Array5D = std::array<uint32_t, 5>;
 using Array6D = std::array<uint32_t, 6>;
 using Array7D = std::array<uint32_t, 7>;
@@ -128,8 +125,7 @@ std::ostream& operator<<(std::ostream& os, const MemoryConfig& config);
 bool operator==(const MemoryConfig &config_a, const MemoryConfig &config_b);
 bool operator!=(const MemoryConfig &config_a, const MemoryConfig &config_b);
 
-} // namespace tt_metal
-} // namespace tt
+} // namespace tt::tt_metal
 
 template <>
 struct tt::stl::json::to_json_t<tt::tt_metal::MemoryConfig> {

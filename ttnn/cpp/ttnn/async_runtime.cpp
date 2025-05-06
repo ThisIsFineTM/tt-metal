@@ -10,6 +10,11 @@
 
 using namespace tt::tt_metal;
 
+template class std::shared_ptr<void>;
+template class std::vector<std::shared_ptr<void>>;
+template class std::optional<tt::tt_metal::BufferRegion>;
+template class std::shared_ptr<tt::tt_metal::Event>;
+
 namespace ttnn {
 
 void write_buffer(

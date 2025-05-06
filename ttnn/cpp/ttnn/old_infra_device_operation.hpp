@@ -4,6 +4,13 @@
 
 #pragma once
 
+#include <optional>
+#include <string>
+#include <tuple>
+#include <unordered_map>
+#include <variant>
+#include <vector>
+
 #include "ttnn/operation.hpp"
 #include "ttnn/device_operation.hpp"
 #include "ttnn/decorators.hpp"

@@ -4,8 +4,21 @@
 
 #pragma once
 
-#include <memory>
+#include <cstddef>
+#include <cstdint>
+#include <vector>
+#include <tuple>
+
 #include "ttnn/types.hpp"
+
+// forward declarations
+namespace tt::tt_metal {
+class IDevice;
+}
+
+extern template class std::vector<tt::tt_metal::GlobalSemaphore>;
+extern template class std::vector<tt::tt_metal::IDevice*>;
+extern template class std::vector<tt::tt_metal::DeviceAddr>;
 
 namespace ttnn::global_semaphore {
 
@@ -34,6 +47,7 @@ MultiDeviceGlobalSemaphore create_global_semaphore(
     const CoreRangeSet& cores,
     uint32_t initial_value,
     BufferType buffer_type = BufferType::L1);
+
 MultiDeviceGlobalSemaphore create_global_semaphore_with_same_address(
     const std::vector<IDevice*>& devices,
     const CoreRangeSet& cores,

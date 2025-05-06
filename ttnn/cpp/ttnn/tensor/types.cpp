@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include <cstdint>
+#include <ostream>
+
 #include "ttnn/tensor/types.hpp"
-#include "ttnn/tensor/tensor_impl.hpp"
 
 namespace tt::tt_metal {
 

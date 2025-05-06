@@ -9,7 +9,6 @@
 #include <reflect>
 #include <string>
 #include <string_view>
-#include <tuple>
 
 #include <tt-metalium/logger.hpp>
 #include <tt_stl/reflection.hpp>

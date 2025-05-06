@@ -7,7 +7,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
-#include <memory>
 #include <tuple>
 
 #include <tt-metalium/buffer_types.hpp>
@@ -15,16 +14,17 @@
 #include <tt-metalium/hal_types.hpp>
 #include <tt-metalium/mesh_buffer.hpp>
 
-namespace tt {
-namespace tt_metal {
+namespace tt::tt_metal {
 class IDevice;
-}  // namespace tt_metal
-}  // namespace tt
+}  // namespace tt::tt_metal
 
 namespace tt::tt_metal {
 
 class GlobalSemaphore {
 public:
+
+    GlobalSemaphore() = default;
+
     GlobalSemaphore(
         IDevice* device, const CoreRangeSet& cores, uint32_t initial_value, BufferType buffer_type = BufferType::L1);
 

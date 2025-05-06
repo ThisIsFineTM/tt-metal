@@ -4,6 +4,14 @@
 
 #pragma once
 
+#include <concepts>
+#include <string>
+#include <string_view>
+#include <tuple>
+#include <type_traits>
+#include <utility>
+
+#include <fmt/format.h>
 #include <reflect>
 
 #include <tt-metalium/graph_tracking.hpp>

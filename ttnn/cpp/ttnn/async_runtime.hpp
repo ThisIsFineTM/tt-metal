@@ -4,10 +4,19 @@
 
 #pragma once
 
+#include <memory>
 #include <optional>
+#include <vector>
+
 #include "ttnn/tensor/types.hpp"
 #include "ttnn/run_operation.hpp"
 #include "types.hpp"
+
+// forward declarations
+extern template class std::shared_ptr<void>;
+extern template class std::vector<std::shared_ptr<void>>;
+extern template class std::optional<tt::tt_metal::BufferRegion>;
+extern template class std::shared_ptr<tt::tt_metal::Event>;
 
 namespace ttnn {
 
