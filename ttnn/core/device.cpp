@@ -3,7 +3,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "ttnn/device.hpp"
+
+#include <tt-metalium/device.hpp>
 #include <tt-metalium/device_pool.hpp>
+#include <tt-metalium/dispatch_core_common.hpp>
+
+template class std::shared_ptr<tt::tt_metal::distributed::MeshDevice>;
 
 namespace ttnn {
 

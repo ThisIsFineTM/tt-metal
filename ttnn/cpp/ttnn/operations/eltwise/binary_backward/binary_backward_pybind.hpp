@@ -4,22 +4,17 @@
 
 #pragma once
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include "ttnn-pybind/pybind_fwd.hpp"
 
-#include "ttnn-pybind/decorators.hpp"
-#include "ttnn/operations/eltwise/binary_backward/binary_backward.hpp"
-#include "ttnn/operations/eltwise/ternary_backward/ternary_backward.hpp"
-#include "ttnn/types.hpp"
-#include "ttnn/common/constants.hpp"
+namespace ttnn::operations::binary_backward {
 
 namespace py = pybind11;
+void py_module(py::module& module);
 
-namespace ttnn {
-namespace operations {
-namespace binary_backward {
+}  // namespace ttnn::operations::binary_backward
 
-namespace detail {
+/*
+amespace detail {
 
 template <typename binary_backward_operation_t>
 void bind_binary_backward_ops(
@@ -1329,7 +1324,4 @@ void py_module(py::module& module) {
         R"doc(BFLOAT16)doc",
         R"doc(For more details about BFLOAT8_B, refer to the `BFLOAT8_B limitations <../tensor.html#limitation-of-bfloat8-b>`_.)doc");
 }
-
-}  // namespace binary_backward
-}  // namespace operations
-}  // namespace ttnn
+*/

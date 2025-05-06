@@ -4,10 +4,16 @@
 
 #pragma once
 
+#include <memory>
 #include <optional>
+#include <vector>
+
 #include "ttnn/tensor/types.hpp"
 #include "ttnn/run_operation.hpp"
 #include "types.hpp"
+
+// forward declarations
+extern template class std::optional<tt::tt_metal::BufferRegion>;
 
 namespace ttnn {
 

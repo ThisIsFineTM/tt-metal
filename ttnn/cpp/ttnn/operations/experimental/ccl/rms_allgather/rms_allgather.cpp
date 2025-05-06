@@ -4,6 +4,9 @@
 
 #include "rms_allgather.hpp"
 
+#include "ttnn/operations/experimental/ccl/rms_allgather/device/rms_allgather_op.hpp"
+#include "cpp/ttnn/global_semaphore.hpp"
+
 namespace ttnn {
 namespace operations::fused::normalization {
 

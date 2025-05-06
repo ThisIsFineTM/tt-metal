@@ -4,6 +4,16 @@
 
 #pragma once
 
+#include "ttnn-pybind/pybind_fwd.hpp"
+
+namespace py = pybind11;
+
+namespace ttnn::operations::data_movement {
+
+void py_module(py::module& module);
+}  // ttnn::operations::data_movement 
+
+/*
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
@@ -92,3 +102,4 @@ void py_module(py::module& module) {
 }  // namespace data_movement
 }  // namespace operations
 }  // namespace ttnn
+*/

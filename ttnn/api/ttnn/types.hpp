@@ -11,8 +11,6 @@
 #include <tt-metalium/sub_device.hpp>
 #include <tt-metalium/buffer_types.hpp>
 
-#include "ttnn/distributed/types.hpp"
-#include "ttnn/tensor/tensor.hpp"
 #include "ttnn/tensor/types.hpp"
 
 namespace ttnn {
@@ -30,11 +28,11 @@ using tt::tt_metal::ShardMode;
 using tt::tt_metal::ShardOrientation;
 using tt::tt_metal::TensorMemoryLayout;
 
-static const auto DRAM_MEMORY_CONFIG = MemoryConfig{TensorMemoryLayout::INTERLEAVED, BufferType::DRAM};
-static const auto L1_MEMORY_CONFIG = MemoryConfig{TensorMemoryLayout::INTERLEAVED, BufferType::L1};
-static const auto L1_BLOCK_SHARDED_MEMORY_CONFIG = MemoryConfig{TensorMemoryLayout::BLOCK_SHARDED, BufferType::L1};
-static const auto L1_HEIGHT_SHARDED_MEMORY_CONFIG = MemoryConfig{TensorMemoryLayout::HEIGHT_SHARDED, BufferType::L1};
-static const auto L1_WIDTH_SHARDED_MEMORY_CONFIG = MemoryConfig{TensorMemoryLayout::WIDTH_SHARDED, BufferType::L1};
+static constexpr auto DRAM_MEMORY_CONFIG = MemoryConfig{TensorMemoryLayout::INTERLEAVED, BufferType::DRAM};
+static constexpr auto L1_MEMORY_CONFIG = MemoryConfig{TensorMemoryLayout::INTERLEAVED, BufferType::L1};
+static constexpr auto L1_BLOCK_SHARDED_MEMORY_CONFIG = MemoryConfig{TensorMemoryLayout::BLOCK_SHARDED, BufferType::L1};
+static constexpr auto L1_HEIGHT_SHARDED_MEMORY_CONFIG = MemoryConfig{TensorMemoryLayout::HEIGHT_SHARDED, BufferType::L1};
+static constexpr auto L1_WIDTH_SHARDED_MEMORY_CONFIG = MemoryConfig{TensorMemoryLayout::WIDTH_SHARDED, BufferType::L1};
 
 using tt::tt_metal::Layout;
 static constexpr auto ROW_MAJOR_LAYOUT = Layout::ROW_MAJOR;
@@ -57,7 +55,7 @@ struct CoreGrid {
 
 using Buffer = tt::tt_metal::Buffer;
 
-static std::ostream& operator<<(std::ostream& os, const CoreGrid& core_grid) {
+inline std::ostream& operator<<(std::ostream& os, const CoreGrid& core_grid) {
     os << "ttnn.CoreGrid(x=" << core_grid.x << ", y=" << core_grid.y << ")";
     return os;
 }

@@ -4,20 +4,15 @@
 
 #pragma once
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include "ttnn-pybind/pybind_fwd.hpp"
 
-#include "ttnn-pybind/decorators.hpp"
-#include "ttnn/operations/eltwise/complex_unary/complex_unary.hpp"
-#include "ttnn/operations/eltwise/complex/complex.hpp"
-#include "ttnn/types.hpp"
+namespace ttnn::operations::complex_unary {
 
 namespace py = pybind11;
+void py_module(py::module& module);
+}  // namespace complex_unary
 
-namespace ttnn {
-namespace operations {
-namespace complex_unary {
-
+/*
 namespace detail {
 
 template <typename complex_unary_operation_t>
@@ -136,6 +131,4 @@ void py_module(py::module& module) {
         R"doc(Perform an polar to Cartesian transformation on :attr:`input_tensor`, input_tensor.real(r), input_tensor.imag(theta) into x + i*y generating a complex tensor.)doc");
 }
 
-}  // namespace complex_unary
-}  // namespace operations
-}  // namespace ttnn
+*/

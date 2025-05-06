@@ -4,7 +4,11 @@
 
 #include "ttnn/distributed/api.hpp"
 
+#include <algorithm>
+#include <cstdint>
 #include <memory>
+#include <utility>
+#include <variant>
 
 #include <tt_stl/overloaded.hpp>
 #include "tt-metalium/assert.hpp"

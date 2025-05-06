@@ -6,11 +6,11 @@
 
 #include <tt-metalium/program_cache.hpp>
 
-#include <memory>
-#include <optional>
-#include <functional>
-#include <concepts>
-#include <variant>
+#include <string>
+#include <type_traits>
+#include <unordered_map>
+#include <utility>
+
 #include "ttnn/distributed/types.hpp"
 #include "ttnn/mesh_device_operation_utils.hpp"
 #include "ttnn/operation_concepts.hpp"

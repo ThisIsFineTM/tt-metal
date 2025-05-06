@@ -4,17 +4,16 @@
 
 #pragma once
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-
-#include "ttnn-pybind/decorators.hpp"
-
-#include "ttnn/operations/experimental/transformer/concatenate_heads/concatenate_heads.hpp"
+#include "ttnn-pybind/pybind_fwd.hpp"
 
 namespace ttnn::operations::experimental::transformer::detail {
 
 namespace py = pybind11;
+void bind_concatenate_heads(py::module& module);
 
+}  // namespace ttnn::operations::experimental::transformer::detail
+
+/*
 void bind_concatenate_heads(py::module& module) {
     auto concatenate_heads_doc =
         R"doc(concatenate_heads(input_tensor: ttnn.Tensor, compute_with_storage_grid_size: ttnn.CoreCoord: *, memory_config: Optional[MemoryConfig] = None) -> ttnn.Tensor
@@ -51,5 +50,4 @@ void bind_concatenate_heads(py::module& module) {
             py::arg("output_tensor") = std::nullopt,
             py::arg("queue_id") = DefaultQueueId});
 }
-
-}  // namespace ttnn::operations::experimental::transformer::detail
+*/

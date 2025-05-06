@@ -4,20 +4,14 @@
 
 #pragma once
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include "ttnn-pybind/pybind_fwd.hpp"
 
-#include "ttnn-pybind/decorators.hpp"
-#include "ttnn/operations/eltwise/binary_backward/binary_backward.hpp"
-#include "ttnn/operations/eltwise/unary_backward/unary_backward.hpp"
-#include "ttnn/types.hpp"
+namespace ttnn::operations::unary_backward {
 
 namespace py = pybind11;
-
-namespace ttnn {
-namespace operations {
-namespace unary_backward {
-
+void py_module(py::module& module);
+}  // namespace ttnn::operations::unary_backward
+/*
 namespace detail {
 
 template <typename unary_backward_operation_t>
@@ -1742,7 +1736,4 @@ void py_module(py::module& module) {
         "n",
         "Order of polygamma function");
 }
-
-}  // namespace unary_backward
-}  // namespace operations
-}  // namespace ttnn
+*/

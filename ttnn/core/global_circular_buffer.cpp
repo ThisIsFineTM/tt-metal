@@ -4,8 +4,11 @@
 
 #include "ttnn/global_circular_buffer.hpp"
 
-#include <memory>
+#include <tt-metalium/global_circular_buffer_impl.hpp>
 #include <tt-metalium/global_circular_buffer.hpp>
+
+template class std::pair<CoreCoord, CoreRangeSet>;
+template class std::vector<std::pair<CoreCoord, CoreRangeSet>>;
 
 namespace ttnn::global_circular_buffer {
 

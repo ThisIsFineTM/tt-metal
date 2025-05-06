@@ -5,6 +5,9 @@
 #pragma once
 
 #include <optional>
+#include <utility>
+#include <vector>
+
 #include <ttnn/tensor/tensor.hpp>
 
 #include "ttnn/operations/experimental/auto_format/auto_format.hpp"

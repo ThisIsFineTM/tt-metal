@@ -10,7 +10,14 @@
 #include "ttnn/common/queue_id.hpp"
 #include "ttnn/distributed/types.hpp"
 
+#include <tt-metalium/device.hpp>
+#include <tt-metalium/event.hpp>
 #include <tt-metalium/host_api.hpp>
+
+template class std::shared_ptr<tt::tt_metal::Event>;
+template class std::vector<tt::tt_metal::SubDeviceId>;
+template class std::vector<std::shared_ptr<tt::tt_metal::Event>>;
+template class std::optional<ttnn::MeshCoordinateRange>;
 
 namespace ttnn::events {
 

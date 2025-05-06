@@ -4,23 +4,14 @@
 
 #pragma once
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include "ttnn-pybind/pybind_fwd.hpp"
 
-#include "ttnn-pybind/decorators.hpp"
-#include "ttnn/operations/eltwise/unary/unary.hpp"
-#include "ttnn/operations/eltwise/unary/unary_composite.hpp"
-#include "ttnn/operations/eltwise/complex_unary/complex_unary.hpp"
-#include "ttnn/types.hpp"
-#include "ttnn/operations/eltwise/complex/complex.hpp"
-#include "unary.hpp"
+namespace ttnn::operations::unary {
 
 namespace py = pybind11;
-
-namespace ttnn {
-namespace operations {
-namespace unary {
-
+void py_module(py::module& module);
+}  // namespace ttnn::operations::unary
+/*
 namespace detail {
 
 template <typename unary_operation_t>
@@ -2015,7 +2006,4 @@ void py_module(py::module& module) {
 
         R"doc(BFLOAT16)doc", R"doc(System memory is not supported.)doc");
 }
-
-}  // namespace unary
-}  // namespace operations
-}  // namespace ttnn
+*/

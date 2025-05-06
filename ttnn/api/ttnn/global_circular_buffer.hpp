@@ -4,9 +4,16 @@
 
 #pragma once
 
-#include <memory>
+#include <cstdint>
+#include <utility>
+#include <vector>
+
 #include <tt-metalium/global_circular_buffer.hpp>
 #include "ttnn/types.hpp"
+
+// forward declarations
+extern template class std::pair<CoreCoord, CoreRangeSet>;
+extern template class std::vector<std::pair<CoreCoord, CoreRangeSet>>;
 
 namespace ttnn::global_circular_buffer {
 

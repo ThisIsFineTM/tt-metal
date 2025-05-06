@@ -4,11 +4,16 @@
 
 #pragma once
 
-#include <nlohmann/json_fwd.hpp>
-#include "ttnn/tensor/types.hpp"
-#include "ttnn/tensor/tensor.hpp"
-
+#include <cstddef>
+#include <cstdint>
+#include <string>
+#include <unordered_set>
 #include <vector>
+
+#include <nlohmann/json_fwd.hpp>
+
+#include "ttnn/tensor/shape/shape.hpp"
+#include <tt-metalium/buffer_types.hpp>
 
 namespace ttnn::graph {
 

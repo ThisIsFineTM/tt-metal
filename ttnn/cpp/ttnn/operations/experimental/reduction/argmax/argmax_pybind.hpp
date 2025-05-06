@@ -4,15 +4,16 @@
 
 #pragma once
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-
-#include "ttnn-pybind/decorators.hpp"
-
-#include "ttnn/operations/experimental/reduction/argmax/argmax.hpp"
+#include "ttnn-pybind/pybind_fwd.hpp"
 
 namespace ttnn::operations::experimental::reduction::detail {
 namespace py = pybind11;
+void bind_argmax_operation(py::module& module);
+void bind_argmin_operation(py::module& module);
+
+}  // namespace ttnn::operations::experimental::reduction::detail
+
+/*
 void bind_argmax_operation(py::module& module) {
     auto doc =
         R"doc(argmax(input_tensor: ttnn.Tensor, *, dim: Optional[int] = None, memory_config: MemoryConfig = std::nullopt) -> ttnn.Tensor
@@ -97,5 +98,4 @@ void bind_argmin_operation(py::module& module) {
             py::arg("all") = false,
             py::arg("memory_config") = std::nullopt});
 }
-
-}  // namespace ttnn::operations::experimental::reduction::detail
+*/

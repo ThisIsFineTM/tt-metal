@@ -4,19 +4,16 @@
 
 #pragma once
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include "ttnn-pybind/pybind_fwd.hpp"
 
-#include "ttnn-pybind/decorators.hpp"
-#include "ttnn/operations/eltwise/ternary/ternary_composite.hpp"
-#include "ttnn/operations/eltwise/ternary/where.hpp"
-#include "ttnn/types.hpp"
+namespace ttnn::operations::ternary {
 
 namespace py = pybind11;
+void py_module(py::module& module);
 
-namespace ttnn {
-namespace operations {
-namespace ternary {
+}  // namespace ttnn
+
+/*
 
 namespace detail {
 
@@ -390,6 +387,4 @@ void py_module(py::module& module) {
         R"doc(Computes Mac on :attr:`input_tensor_a`, :attr:`input_tensor_b` and :attr:`input_tensor_c` and returns the tensor with the same layout as :attr:`input_tensor_a`)doc");
 }
 
-}  // namespace ternary
-}  // namespace operations
-}  // namespace ttnn
+*/

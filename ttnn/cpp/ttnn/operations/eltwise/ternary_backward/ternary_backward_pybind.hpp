@@ -4,19 +4,15 @@
 
 #pragma once
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include "ttnn-pybind/pybind_fwd.hpp"
 
-#include "ttnn-pybind/decorators.hpp"
-#include "ttnn/operations/eltwise/ternary_backward/ternary_backward.hpp"
-#include "ttnn/types.hpp"
+namespace ttnn::operations::ternary_backward {
 
 namespace py = pybind11;
+void py_module(py::module& module);
+}  // namespace ttnn::operations::ternary_backward
 
-namespace ttnn {
-namespace operations {
-namespace ternary_backward {
-
+/*
 namespace detail {
 
 template <typename ternary_backward_operation_t>
@@ -322,7 +318,4 @@ void py_module(py::module& module) {
         R"doc(Performs backward operations for lerp of :attr:`input_tensor_a`, :attr:`input_tensor_b` and :attr:`input_tensor_c` or :attr:`scalar` with given :attr:`grad_tensor`.)doc",
         R"doc(BFLOAT16, BFLOAT8_B)doc");
 }
-
-}  // namespace ternary_backward
-}  // namespace operations
-}  // namespace ttnn
+*/

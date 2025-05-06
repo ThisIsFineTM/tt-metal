@@ -4,6 +4,11 @@
 
 #pragma once
 
+#include <functional>
+#include <memory>
+#include <optional>
+#include <vector>
+
 #include "ttnn/tensor/tensor.hpp"
 #include "ttnn/distributed/types.hpp"
 

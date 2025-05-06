@@ -10,6 +10,8 @@
 
 using namespace tt::tt_metal;
 
+template class std::optional<tt::tt_metal::BufferRegion>;
+
 namespace ttnn {
 
 void write_buffer(

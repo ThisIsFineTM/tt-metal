@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "ttnn/graph/graph_processor.hpp"
+
 #include "ttnn/graph/graph_argument_serializer.hpp"
 #include "ttnn/graph/graph_consts.hpp"
 #include "ttnn/types.hpp"
@@ -10,11 +11,18 @@
 #include <cxxabi.h>
 #include <memory>
 #include <string>
-#include <tt-metalium/circular_buffer.hpp>
-#include <tt-metalium/program.hpp>
-#include <tt_stl/reflection.hpp>
+#include <type_traits>
+#include <typeinfo>
 #include <typeindex>
 #include <unordered_map>
+#include <variant>
+
+#include <tt-metalium/buffer.hpp>
+#include <tt-metalium/buffer_types.hpp>
+#include <tt-metalium/circular_buffer.hpp>
+#include <tt-metalium/device.hpp>
+#include <tt-metalium/program.hpp>
+#include <tt_stl/reflection.hpp>
 
 using namespace tt::tt_metal;
 

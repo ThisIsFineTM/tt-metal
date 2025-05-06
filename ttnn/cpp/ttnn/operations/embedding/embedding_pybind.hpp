@@ -4,15 +4,16 @@
 
 #pragma once
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-
-#include "ttnn-pybind/decorators.hpp"
-#include "ttnn/operations/embedding/embedding.hpp"
+#include "ttnn-pybind/pybind_fwd.hpp"
 
 namespace ttnn::operations::embedding {
 namespace py = pybind11;
 
+void py_module(py::module& module);
+
+}  // namespace ttnn::operations::embedding
+
+/*
 void py_module(py::module& module) {
     py::enum_<ttnn::operations::embedding::EmbeddingsType>(module, "EmbeddingsType")
         .value("GENERIC", ttnn::operations::embedding::EmbeddingsType::GENERIC)
@@ -98,4 +99,4 @@ void py_module(py::module& module) {
             py::arg("queue_id") = DefaultQueueId});
 }
 
-}  // namespace ttnn::operations::embedding
+*/

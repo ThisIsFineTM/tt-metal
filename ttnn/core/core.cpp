@@ -4,7 +4,17 @@
 
 #include "ttnn/core.hpp"
 
+#include <csignal>
+#include <iostream>
+
 #include <magic_enum/magic_enum.hpp>
+
+template class std::optional<ttnn::MemoryConfig>;
+template class std::optional<ttnn::Tensor>;
+//template class std::optional<const ttnn::Tensor>;
+template class std::vector<std::optional<ttnn::Tensor>>;
+//template class std::vector<std::optional<const ttnn::Tensor>>;
+template class std::vector<ttnn::Tensor>;
 
 namespace ttnn::core {
 

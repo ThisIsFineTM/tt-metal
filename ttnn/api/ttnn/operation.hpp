@@ -4,6 +4,20 @@
 
 #pragma once
 
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <concepts>
+#include <cstddef>
+#include <functional>
+#include <optional>
+#include <stdexcept>
+#include <string>
+#include <type_traits>
+#include <unordered_map>
+#include <variant>
+#include <vector>
+
 #include <experimental/type_traits>
 #include <ttnn/tensor/tensor.hpp>
 

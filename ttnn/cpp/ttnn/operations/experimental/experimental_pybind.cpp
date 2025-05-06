@@ -48,6 +48,8 @@
 #include "ttnn/operations/experimental/reduction/sort/sort_pybind.hpp"
 #include "ttnn/operations/experimental/gather/gather_pybind.hpp"
 
+namespace py = pybind11;
+
 namespace ttnn::operations::experimental {
 
 void py_module(py::module& module) {

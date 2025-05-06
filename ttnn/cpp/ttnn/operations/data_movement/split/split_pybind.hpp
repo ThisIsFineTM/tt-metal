@@ -4,16 +4,16 @@
 
 #pragma once
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-
-#include "ttnn-pybind/decorators.hpp"
-
-#include "split.hpp"
+#include "ttnn-pybind/pybind_fwd.hpp"
 
 namespace ttnn::operations::data_movement::detail {
 namespace py = pybind11;
 
+void bind_split(py::module& module);
+
+}  // namespace ttnn::operations::data_movement::detail
+
+/*
 void bind_split(py::module& module) {
     auto doc =
         R"doc(
@@ -71,4 +71,4 @@ void bind_split(py::module& module) {
             py::arg("queue_id") = DefaultQueueId,
         });
 }
-}  // namespace ttnn::operations::data_movement::detail
+*/

@@ -2,12 +2,18 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "ttnn/operations/reduction/topk/topk.hpp"
-#include "ttnn-pybind/decorators.hpp"
+#pragma once
+
+#include "ttnn-pybind/pybind_fwd.hpp"
 
 namespace ttnn::operations::reduction::detail {
 namespace py = pybind11;
 
+void bind_reduction_topk_operation(py::module& module);
+
+}  // namespace ttnn::operations::reduction::detail
+
+/*
 void bind_reduction_topk_operation(py::module& module) {
     auto doc =
         R"doc(topk(input_tensor: ttnn.Tensor, k: int, dim: int, largest: bool, sorted: bool, out : Optional[ttnn.Tensor] = std::nullopt, memory_config: MemoryConfig = std::nullopt, queue_id : [int] = 0) -> Tuple[ttnn.Tensor, ttnn.Tensor]
@@ -87,4 +93,4 @@ void bind_reduction_topk_operation(py::module& module) {
             py::arg("queue_id") = DefaultQueueId});
 }
 
-}  // namespace ttnn::operations::reduction::detail
+*/

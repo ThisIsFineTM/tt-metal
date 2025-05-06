@@ -4,6 +4,11 @@
 
 #pragma once
 
+#include <cstdint>
+#include <functional>
+#include <memory>
+#include <optional>
+#include <string>
 #include <array>
 #include <random>
 #include <tuple>
@@ -320,3 +325,6 @@ using Tensor = tt::tt_metal::Tensor;
 using TensorSpec = tt::tt_metal::TensorSpec;
 
 }  // namespace ttnn
+
+// vector<Tensor> is used all over the place so might as well
+extern template class std::vector<tt::tt_metal::Tensor>;

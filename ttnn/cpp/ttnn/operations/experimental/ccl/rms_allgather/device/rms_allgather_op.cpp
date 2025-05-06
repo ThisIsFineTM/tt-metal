@@ -3,10 +3,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "rms_allgather_op.hpp"
-#include "ttnn/run_operation.hpp"
-#include "ttnn/operations/math.hpp"
+
+#include "ttnn/tensor/tensor.hpp"
+#include "ttnn/operations/core/core.hpp"
 
 #include <tt-metalium/constants.hpp>
+#include <tt-metalium/device.hpp>
 
 #include <optional>
 
@@ -16,28 +18,6 @@ using namespace tt::tt_metal;
 
 namespace ttnn::operations::fused::normalization {
 
-tt::tt_metal::operation::Hash RMSAllGather::compute_program_hash(
-    const std::vector<Tensor>& input_tensors,
-    const std::vector<std::optional<const Tensor>>& optional_input_tensors) const {
-    log_trace(tt::LogOp, "compute_program_hash is called");
-    auto input_shape = input_tensors[0].get_padded_shape();
-    auto input_memory_layout = input_tensors[0].get_layout();
-    auto input_dtype = input_tensors[0].get_dtype();
-    auto input_memory_config = input_tensors[0].memory_config();
-    return tt::tt_metal::operation::hash_operation<RMSAllGather>(
-        this->eps,
-        this->dtype,
-        this->is_pre,
-        this->num_links,
-        this->ring_size,
-        this->output_mem_config,
-        this->topology,
-        this->cluster_axis,
-        input_shape,
-        input_memory_layout,
-        input_dtype,
-        input_memory_config);
-}
 
 void RMSAllGather::validate(
     const std::vector<Tensor>& input_tensors,
@@ -390,6 +370,72 @@ tt::tt_metal::operation::ProgramWithCallbacks RMSAllGather::create_program_at(
             }
         },
         this->program_config);
+}
+
+RMSAllGather::RMSAllGather(
+    float eps,
+    MemoryConfig output_mem_config,
+    ttnn::operations::normalization::LayerNormProgramConfig program_config,
+    const DeviceComputeKernelConfig compute_kernel_config,
+    std::optional<DataType> dtype,
+    ::ttnn::ccl::Topology topology,
+    const bool is_pre,
+    const uint32_t num_links,
+    const uint32_t ring_size,
+    GlobalSemaphore semaphore,
+    std::optional<tt::tt_metal::SubDeviceId>& sub_device_id,
+    uint32_t cluster_axis) :
+    eps(eps),
+    output_mem_config(output_mem_config),
+    program_config(program_config),
+    compute_kernel_config(compute_kernel_config),
+    dtype(dtype),
+    topology(topology),
+    is_pre(is_pre),
+    num_links(num_links),
+    ring_size(ring_size),
+    semaphore(semaphore),
+    sub_device_id(sub_device_id),
+    cluster_axis(cluster_axis) {}
+
+auto RMSAllGather::attributes() const -> std::vector<std::tuple<std::string, tt::stl::reflection::Attribute>> {
+    using tt::stl::reflection::Attribute;
+    std::vector<std::tuple<std::string, Attribute>> attrs;
+    attrs.emplace_back("eps", eps);
+    attrs.emplace_back("program_config", program_config);
+    attrs.emplace_back("compute_kernel_config", compute_kernel_config);
+    attrs.emplace_back("dtype", dtype);
+    attrs.emplace_back("is_pre", is_pre);
+    attrs.emplace_back("num_links", num_links);
+    attrs.emplace_back("output_mem_config", output_mem_config);
+    attrs.emplace_back("topology", topology);
+    attrs.emplace_back("semaphore", semaphore);
+    attrs.emplace_back("cluster_axis", cluster_axis);
+
+    return attrs;
+}
+
+tt::tt_metal::operation::Hash RMSAllGather::compute_program_hash(
+    const std::vector<Tensor>& input_tensors,
+    const std::vector<std::optional<const Tensor>>& optional_input_tensors) const {
+    log_trace(tt::LogOp, "compute_program_hash is called");
+    auto input_shape = input_tensors[0].get_padded_shape();
+    auto input_memory_layout = input_tensors[0].get_layout();
+    auto input_dtype = input_tensors[0].get_dtype();
+    auto input_memory_config = input_tensors[0].memory_config();
+    return tt::tt_metal::operation::hash_operation<RMSAllGather>(
+        this->eps,
+        this->dtype,
+        this->is_pre,
+        this->num_links,
+        this->ring_size,
+        this->output_mem_config,
+        this->topology,
+        this->cluster_axis,
+        input_shape,
+        input_memory_layout,
+        input_dtype,
+        input_memory_config);
 }
 
 }  // namespace ttnn::operations::fused::normalization

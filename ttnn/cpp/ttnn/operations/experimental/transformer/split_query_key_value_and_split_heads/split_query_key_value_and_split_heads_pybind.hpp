@@ -4,17 +4,16 @@
 
 #pragma once
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-
-#include "ttnn-pybind/decorators.hpp"
-
-#include "ttnn/operations/experimental/transformer/split_query_key_value_and_split_heads/split_query_key_value_and_split_heads.hpp"
+#include "ttnn-pybind/pybind_fwd.hpp"
 
 namespace ttnn::operations::experimental::transformer::detail {
 
 namespace py = pybind11;
 
+void bind_split_qkv(py::module& module);
+}  // namespace ttnn::operations::experimental::transformer::detail
+
+/*
 void bind_split_qkv(py::module& module) {
     using SplitOperationType = decltype(ttnn::experimental::split_query_key_value_and_split_heads);
     ttnn::bind_registered_operation(
@@ -59,4 +58,4 @@ void bind_split_qkv(py::module& module) {
             py::arg("queue_id") = DefaultQueueId});
 }
 
-}  // namespace ttnn::operations::experimental::transformer::detail
+*/

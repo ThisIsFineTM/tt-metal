@@ -10,6 +10,7 @@
 #include "ttnn-pybind/decorators.hpp"
 #include "ttnn/operations/experimental/reduction/cumprod/cumprod.hpp"
 #include "ttnn/types.hpp"
+#include "ttnn/common/queue_id.hpp"
 
 namespace ttnn::operations::experimental::reduction::cumprod::detail {
 void bind_cumprod_operation(py::module& module) {

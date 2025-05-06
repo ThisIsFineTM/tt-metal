@@ -3,7 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#include <csignal>
+
+#include <atomic>
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -14,6 +15,14 @@
 #include "ttnn/tensor/types.hpp"
 #include "ttnn/config.hpp"
 #include "ttnn/types.hpp"
+
+// forward declarations
+extern template class std::optional<ttnn::MemoryConfig>;
+extern template class std::optional<ttnn::Tensor>;
+//extern template class std::optional<const ttnn::Tensor>; // doesn't actually instantiate?
+extern template class std::vector<std::optional<ttnn::Tensor>>;
+//extern template class std::vector<std::optional<const ttnn::Tensor>>; // doesn't actually instantiate?
+extern template class std::vector<ttnn::Tensor>;
 
 namespace ttnn {
 

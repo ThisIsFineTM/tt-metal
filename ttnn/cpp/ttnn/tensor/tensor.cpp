@@ -24,6 +24,7 @@
 #include "ttnn/tensor/tensor_utils.hpp"
 #include "ttnn/tensor/types.hpp"
 #include <tt-metalium/constants.hpp>
+#include <tt-metalium/graph_tracking.hpp>
 #include <tt-metalium/math.hpp>
 #include <tt-metalium/tt_metal.hpp>
 #include <tt-metalium/mesh_device.hpp>
@@ -34,6 +35,8 @@
 #include "ttnn/core.hpp"
 #include "ttnn/tensor/layout/tensor_layout.hpp"
 #include "ttnn/distributed/api.hpp"
+
+template class std::vector<tt::tt_metal::Tensor>;
 
 namespace tt::tt_metal {
 namespace {

@@ -7,11 +7,11 @@
 #include <cstdint>
 #include <optional>
 #include <string>
+#include <tuple>
+#include <variant>
 
 #include <nlohmann/json.hpp>
 #include <tt-metalium/logger.hpp>
-#include <tuple>
-#include <variant>
 #include "ttnn/graph/graph_processor.hpp"
 #include "ttnn/graph/graph_trace_utils.hpp"
 #include "ttnn/tensor/tensor.hpp"

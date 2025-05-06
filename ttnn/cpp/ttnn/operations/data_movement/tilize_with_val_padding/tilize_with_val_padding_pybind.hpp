@@ -4,15 +4,17 @@
 
 #pragma once
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-
-#include "tilize_with_val_padding.hpp"
-#include "ttnn-pybind/decorators.hpp"
+#include "ttnn-pybind/pybind_fwd.hpp"
 
 namespace ttnn::operations::data_movement::detail {
 namespace py = pybind11;
 
+void bind_tilize_with_val_padding(py::module& module);
+
+void bind_tilize_with_zero_padding(py::module& module);
+}  // namespace ttnn::operations::data_movement::detail
+
+/*
 void bind_tilize_with_val_padding(py::module& module) {
     auto doc =
         R"doc(
@@ -109,5 +111,4 @@ void bind_tilize_with_zero_padding(py::module& module) {
             py::arg("queue_id") = DefaultQueueId,
         });
 }
-
-}  // namespace ttnn::operations::data_movement::detail
+*/

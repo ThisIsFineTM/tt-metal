@@ -4,20 +4,17 @@
 
 #pragma once
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include "ttnn-pybind/pybind_fwd.hpp"
 
-#include "ttnn-pybind/decorators.hpp"
-#include "ttnn/operations/pool/global_avg_pool/global_avg_pool.hpp"
-#include "ttnn/types.hpp"
+namespace ttnn::operations::avgpool {
 
 namespace py = pybind11;
-namespace ttnn {
-namespace operations {
-namespace avgpool {
 
-namespace detail {
+void py_module(py::module& module);
 
+}  // namespace avgpool
+
+/*
 void bind_global_avg_pool2d(py::module& module) {
     auto doc = fmt::format(
         R"doc(
@@ -63,7 +60,4 @@ void bind_global_avg_pool2d(py::module& module) {
 }  // namespace detail
 
 void py_module(py::module& module) { detail::bind_global_avg_pool2d(module); }
-
-}  // namespace avgpool
-}  // namespace operations
-}  // namespace ttnn
+*/

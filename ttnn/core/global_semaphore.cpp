@@ -8,6 +8,10 @@
 #include <tt-metalium/global_semaphore.hpp>
 #include <tt_stl/span.hpp>
 
+template class std::vector<tt::tt_metal::GlobalSemaphore>;
+template class std::vector<tt::tt_metal::IDevice*>;
+template class std::vector<tt::tt_metal::DeviceAddr>;
+
 namespace ttnn::global_semaphore {
 
 MultiDeviceGlobalSemaphore::MultiDeviceGlobalSemaphore(size_t num_devices) {
