@@ -4,28 +4,34 @@
 
 #pragma once
 
-#include <array>
-#include <random>
+#include <cstdint>
+#include <functional>
+#include <memory>
+#include <optional>
+#include <string>
+#include <tuple>
 #include <tuple>
 #include <variant>
 #include <vector>
 
-#include <tt-metalium/bfloat16.hpp>
-#include <tt-metalium/bfloat4.hpp>
-#include <tt-metalium/bfloat8.hpp>
-#include <tt-metalium/tilize_utils.hpp>
-#include <tt-metalium/tt_backend_api_types.hpp>
 #include "ttnn/common/queue_id.hpp"
 #include "ttnn/distributed/distributed_tensor_config.hpp"
-#include "ttnn/tensor/types.hpp"
+#include "ttnn/tensor/layout/tensor_layout.hpp"
 #include "ttnn/tensor/storage.hpp"
 #include "ttnn/tensor/tensor_attributes.hpp"
 #include "ttnn/tensor/tensor_spec.hpp"
-#include "ttnn/tensor/layout/tensor_layout.hpp"
+#include "ttnn/tensor/types.hpp"
+
+#include <tt-metalium/bfloat16.hpp>
+#include <tt-metalium/bfloat4.hpp>
+#include <tt-metalium/bfloat8.hpp>
 #include <tt-metalium/buffer.hpp>
-#include <tt-metalium/tile.hpp>
 #include <tt-metalium/device.hpp>
+#include <tt-metalium/tile.hpp>
+#include <tt-metalium/tilize_utils.hpp>
+#include <tt-metalium/tt_backend_api_types.hpp>
 #include <tt_stl/reflection.hpp>
+
 #include "types.hpp"
 
 namespace tt {
@@ -350,3 +356,6 @@ using Tensor = tt::tt_metal::Tensor;
 using TensorSpec = tt::tt_metal::TensorSpec;
 
 }  // namespace ttnn
+
+// vector<Tensor> is used all over the place so might as well
+extern template class std::vector<tt::tt_metal::Tensor>;

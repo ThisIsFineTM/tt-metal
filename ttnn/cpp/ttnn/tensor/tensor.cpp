@@ -8,32 +8,36 @@
 #include <memory>
 #include <utility>
 
+#include <tracy/Tracy.hpp>
+
+#include "ttnn/core.hpp"
+#include "ttnn/distributed/api.hpp"
+#include "ttnn/distributed/distributed_tensor_config.hpp"
+#include "ttnn/tensor/layout/tensor_layout.hpp"
+#include "ttnn/tensor/storage.hpp"
+#include "ttnn/tensor/tensor_impl.hpp"
+#include "ttnn/tensor/tensor_impl_wrapper.hpp"
+#include "ttnn/tensor/tensor_ops.hpp"
+#include "ttnn/tensor/tensor_utils.hpp"
+#include "ttnn/tensor/types.hpp"
+
 #include <tt-metalium/assert.hpp>
 #include <tt-metalium/bfloat16.hpp>
 #include <tt-metalium/buffer.hpp>
 #include <tt-metalium/buffer_types.hpp>
-#include <tt_stl/overloaded.hpp>
-#include "storage.hpp"
-
-#include "tt-metalium/mesh_device_view.hpp"
-#include "ttnn/distributed/distributed_tensor_config.hpp"
-#include "ttnn/tensor/storage.hpp"
-#include "ttnn/tensor/tensor_ops.hpp"
-#include "ttnn/tensor/tensor_impl.hpp"
-#include "ttnn/tensor/tensor_impl_wrapper.hpp"
-#include "ttnn/tensor/tensor_utils.hpp"
-#include "ttnn/tensor/types.hpp"
 #include <tt-metalium/constants.hpp>
+#include <tt-metalium/graph_tracking.hpp>
 #include <tt-metalium/math.hpp>
-#include <tt-metalium/tt_metal.hpp>
-#include <tt-metalium/mesh_device.hpp>
 #include <tt-metalium/mesh_buffer.hpp>
 #include <tt-metalium/mesh_command_queue.hpp>
-#include <tracy/Tracy.hpp>
-#include <tt-metalium/graph_tracking.hpp>
-#include "ttnn/core.hpp"
-#include "ttnn/tensor/layout/tensor_layout.hpp"
-#include "ttnn/distributed/api.hpp"
+#include <tt-metalium/mesh_device.hpp>
+#include <tt-metalium/mesh_device_view.hpp>
+#include <tt-metalium/tt_metal.hpp>
+#include <tt_stl/overloaded.hpp>
+
+#include "storage.hpp"
+
+template class std::vector<tt::tt_metal::Tensor>;
 
 namespace tt::tt_metal {
 namespace {

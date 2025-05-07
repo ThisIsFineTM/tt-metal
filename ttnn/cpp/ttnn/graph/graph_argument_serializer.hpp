@@ -4,9 +4,12 @@
 #pragma once
 
 #include <any>
+#include <cstddef>
 #include <functional>
 #include <span>
 #include <string>
+#include <string_view>
+#include <vector>
 #include <typeindex>
 #include <unordered_map>
 

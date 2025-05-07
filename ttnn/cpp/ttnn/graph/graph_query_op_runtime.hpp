@@ -7,9 +7,14 @@
 #include <chrono>
 #include <cstdint>
 #include <optional>
+#include <stdexcept>
 #include <string>
+#include <tuple>
+#include <type_traits>
+#include <utility>
 
 #include "ttnn/graph/graph_trace_utils.hpp"
+#include "ttnn/distributed/types.hpp"
 #include "ttnn/operations/trace.hpp"
 
 namespace ttnn::graph {

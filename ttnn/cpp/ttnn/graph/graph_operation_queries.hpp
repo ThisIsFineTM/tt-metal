@@ -4,11 +4,10 @@
 
 #pragma once
 
-#include <nlohmann/json.hpp>
 #include "graph_processor.hpp"
 #include "graph_trace_utils.hpp"
 
-#include <vector>
+#include <tt-metalium/graph_tracking.hpp>
 
 namespace ttnn::graph {
 

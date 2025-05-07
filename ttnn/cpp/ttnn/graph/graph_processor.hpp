@@ -4,16 +4,31 @@
 
 #pragma once
 
-#include <tt-metalium/graph_tracking.hpp>
-#include <nlohmann/json.hpp>
-#include "ttnn/tensor/tensor.hpp"
-
+#include <any>
+#include <cstdint>
+#include <functional>
 #include <mutex>
+#include <memory>
 #include <stack>
+#include <string>
+#include <string_view>
+#include <vector>
 #include <typeindex>
 #include <unordered_map>
-#include <functional>
-#include <any>
+
+#include <nlohmann/json.hpp>
+
+#include <tt-metalium/core_coord.hpp>
+#include <tt-metalium/graph_tracking.hpp>
+
+// forward declarations
+namespace tt::tt_metal {
+class Buffer;
+class Program;
+class IDevice;
+class Tensor;
+}
+
 namespace ttnn::graph {
 
 class ProcessorHooks : public tt::tt_metal::IGraphHooks {
@@ -28,7 +43,7 @@ public:
 
     bool hook_program(tt::tt_metal::Program* program) override;
 
-    virtual ~ProcessorHooks() = default;
+    ~ProcessorHooks() override = default;
 
     void set_block(bool block);
 

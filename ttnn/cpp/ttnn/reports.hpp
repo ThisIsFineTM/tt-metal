@@ -14,8 +14,6 @@ namespace tt::tt_metal::distributed {
 class MeshDevice;
 }
 
-extern template class std::vector<tt::tt_metal::distributed::MeshDevice*>;
-
 namespace ttnn::reports {
 
 struct DeviceInfo {
@@ -65,6 +63,7 @@ std::vector<BufferPageInfo> get_buffer_pages(const std::vector<tt::tt_metal::dis
 
 }  // namespace ttnn::reports
 
+extern template class std::vector<tt::tt_metal::distributed::MeshDevice*>;
 extern template class std::vector<ttnn::reports::BufferInfo>;
 extern template class std::vector<ttnn::reports::BufferPageInfo>;
 

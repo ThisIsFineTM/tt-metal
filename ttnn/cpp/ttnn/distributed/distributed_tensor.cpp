@@ -2,6 +2,10 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+#include <algorithm>
+#include <cstddef>
+#include <iterator>
+
 #include "ttnn/distributed/api.hpp"
 #include "ttnn/distributed/distributed_tensor.hpp"
 #include <tt-metalium/assert.hpp>
@@ -61,7 +65,7 @@ public:
         // Shard along rows
         if (!row_dim.has_value()) {
             row_tensors.reserve(mesh_rows_);
-            for (int i = 0; i < mesh_rows_; ++i) {
+            for (size_t i = 0; i < mesh_rows_; ++i) {
                 row_tensors.push_back(tensor);
             }
         } else {
@@ -73,7 +77,7 @@ public:
         // Shard along columns
         if (!col_dim.has_value()) {
             for (const auto& t : row_tensors) {
-                for (int i = 0; i < mesh_cols_; ++i) {
+                for (size_t i = 0; i < mesh_cols_; ++i) {
                     tensor_shards.push_back(t);
                 }
             }

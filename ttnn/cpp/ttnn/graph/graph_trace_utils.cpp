@@ -4,14 +4,17 @@
 
 #include "graph_trace_utils.hpp"
 
+#include <cmath>
 #include <cstdlib>  // std::strtoul
 #include <string>
+#include <string_view>
+#include <utility>
 
 #include <nlohmann/json.hpp>
 
 #include "graph_consts.hpp"
-#include "graph_processor.hpp"
 #include <tt-metalium/assert.hpp>
+#include <tt-metalium/small_vector.hpp>
 
 namespace ttnn::graph {
 
