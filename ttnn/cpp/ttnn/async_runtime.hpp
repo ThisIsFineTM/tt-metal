@@ -13,10 +13,7 @@
 #include "types.hpp"
 
 // forward declarations
-extern template class std::shared_ptr<void>;
-extern template class std::vector<std::shared_ptr<void>>;
 extern template class std::optional<tt::tt_metal::BufferRegion>;
-extern template class std::shared_ptr<tt::tt_metal::Event>;
 
 namespace ttnn {
 
