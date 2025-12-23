@@ -56,7 +56,7 @@ multiprocess==0.70.15
 networkx==3.4.2
 numba>=0.63.1
 numpy==2.2.6
-open_clip_torch=3.2.0
+open_clip_torch==3.2.0
 opencv-python-headless==4.12.0.88
 pyarrow==22.0.0
 pydantic==2.12.5
