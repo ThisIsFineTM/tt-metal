@@ -33,26 +33,26 @@ protobuf==6.33.2
 
 # For TT-Transformers Qwen3 support
 transformers==4.57.3
-huggingface-hub>=0.36.0
+huggingface-hub>=1.2.3
 
 # testing
 accelerate==1.12.0
 bert-score==0.3.13
 blobfile==3.1.0
-datasets==2.14.4
+datasets==4.4.2
 diffusers==0.36.0
 docopt==0.6.2
 einops==0.8.1
 enlighten==1.14.1
 evaluate==0.4.6
 fiftyone==1.11.0
-fsspec==2025.12.0
+fsspec==2025.10.0
 ftfy==6.3.1
 gitpython==3.1.45
 jiwer==4.0.0
 jsbeautifier==1.15.4
 librosa==0.11.0
-multiprocess==0.70.15
+multiprocess==0.70.18
 networkx==3.4.2
 numba>=0.63.1
 numpy==2.2.6
@@ -94,7 +94,7 @@ mmcv==2.2.0
 mmcv-full==1.7.2
 pandas==2.3.3
 plotly==6.5.0
-pyyaml>=6.0.1
+pyyaml==6.0.3
 seaborn==0.13.2
 
 # CPU-only torch for x86_64 to avoid installing CUDA dependencies on dev machines
